@@ -1,0 +1,19 @@
+body{font-family:Arial;background:#f4f6f8;margin:0}
+header{background:#fff;padding:10px;display:flex;gap:12px}
+.logo{height:48px}
+nav{background:#111;padding:10px}
+nav button{background:#ff7a00;color:#fff;border:none;padding:10px;margin-right:5px}
+.tab{display:none;padding:16px}
+.tab.active{display:block}
+table{width:100%;border-collapse:collapse}
+td{border:1px solid #ccc;padding:8px}
+
+.pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#fafafa;font-size:12px;font-weight:800;color:#6b7280}
+
+.table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+.table th,.table td{border-bottom:1px solid #e5e7eb;padding:10px;font-size:12px;text-align:left}
+.table th{background:#fafafa;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;font-size:11px}
+
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn.secondary{background:#111827;color:#fff}
