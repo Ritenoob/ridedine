@@ -1,218 +1,254 @@
-let orders=[], logs=[];
+// RideNDine v1.1 simulation logic (no external libs)
+// Pilot constraints:
+// - batch radius: 5km (orders grouped near each other / cook)
+// - max order distance from cook: 20km
 
-function show(id){
- document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
- document.getElementById(id).classList.add('active');
-}
+window.RD = window.RD || {};
 
-function createOrder(){
- let v=Number(orderValue.value);
- orders.push(v);
- orderList.innerHTML+=`<li>$${v}</li>`;
-}
+RD.CONFIG = {
+  city: "Hamilton",
+  batchRadiusKm: 5,
+  maxOrderKmFromCook: 20,
+  avgSpeedKmh: 28,      // urban average
+  pickupMinutes: 4,     // time at cook
+  dropoffMinutes: 3,    // time at customer
+  baseDriverPay: 4.0,   // per stop base payout (demo)
+  payPerKm: 0.65,       // demo driver rate
+  orderValueAvg: 30.0,
+  commissionSplit: { chef: 0.30, platform: 0.40, delivery: 0.30 },
+  cooks: [
+    { id: "C1", name: "Cook #1", x: 20, y: 55 },
+    { id: "C2", name: "Cook #2", x: 55, y: 30 },
+    { id: "C3", name: "Cook #3", x: 75, y: 70 }
+  ]
+};
 
-function runSim(){
- logs=[];
- let count=Number(scenario.value);
- let drivers=Math.ceil(count/10);
- let revenue=0,cost=0,time=0;
-
- for(let i=0;i<count;i++){
-  let val=50+Math.random()*50;
-  let platform=val*0.4;
-  let dcost=6+Math.random()*4;
-  let t=15+Math.random()*25;
-
-  revenue+=platform;
-  cost+=dcost;
-  time+=t;
-  logs.push(`Order ${i+1}: ${t.toFixed(1)}min | $${platform.toFixed(2)}`);
- }
-
- log.innerText=logs.slice(0,20).join('\n')+'\n...';
-
- stats.innerHTML='';
- stats.innerHTML+=`<tr><td>Orders</td><td>${count}</td></tr>`;
- stats.innerHTML+=`<tr><td>Drivers</td><td>${drivers}</td></tr>`;
- stats.innerHTML+=`<tr><td>Avg Time</td><td>${(time/count).toFixed(1)} min</td></tr>`;
- stats.innerHTML+=`<tr><td>Platform Revenue</td><td>$${revenue.toFixed(2)}</td></tr>`;
- stats.innerHTML+=`<tr><td>Delivery Cost</td><td>$${cost.toFixed(2)}</td></tr>`;
- stats.innerHTML+=`<tr><td>Net Margin</td><td>$${(revenue-cost).toFixed(2)}</td></tr>`;
-}
-
-
-/* ===== v0.6.0 additions: driver pool controls + routes + clusters + compare ===== */
-function getDriverPoolCount(orderCount){
-  const modeEl = document.getElementById('driverMode');
-  const countEl = document.getElementById('driverCount');
-  const mode = modeEl ? modeEl.value : 'auto';
-  if(mode === 'manual'){
-    const n = Math.max(1, Number(countEl?.value || 1));
-    return n;
-  }
-  return Math.max(10, Math.ceil(orderCount/10));
-}
-
-// Simple color hash for batch IDs
-const BATCH_COLORS = ['#ff7a00','#00a9a5','#111827','#7c3aed','#ef4444','#0ea5e9','#22c55e','#f97316','#14b8a6','#a855f7'];
-function batchColor(id){
-  if(!id) return '#64748b';
-  let n=0; for(let i=0;i<id.length;i++) n=(n+id.charCodeAt(i))%BATCH_COLORS.length;
-  return BATCH_COLORS[n];
-}
-
-// Attempt to hook into existing driver generation by monkey-patching if demo exposes generateDrivers/orderCount variables.
-// If your existing code uses a different function name, this still won't break anything; it just won't override.
-(function(){
-  try{
-    if(typeof window.generateDrivers === 'function'){
-      const _gen = window.generateDrivers;
-      window.generateDrivers = function(orderCount){
-        const n = getDriverPoolCount(orderCount || window.orders?.length || 50);
-        return _gen(n);
-      }
-    }
-  }catch(e){}
-})();
-
-// Route + cluster drawing: if canvas draw function exists, extend it without breaking existing map rendering.
-(function(){
-  const c = document.getElementById('map') || document.getElementById('mapCanvas') || document.querySelector('canvas');
-  if(!c) return;
-  const ctx = c.getContext('2d');
-
-  function project(lat,lng,b){
-    const W=c.width, H=c.height;
-    const pad=40;
-    const x=pad + ((lng-b.minLng)/(b.maxLng-b.minLng||1))*(W-pad*2);
-    const y=pad + ((b.maxLat-lat)/(b.maxLat-b.minLat||1))*(H-pad*2);
-    return {x,y};
-  }
-
-  function boundsFromPoints(points){
-    const lats=points.map(p=>p.lat), lngs=points.map(p=>p.lng);
-    return {minLat:Math.min(...lats),maxLat:Math.max(...lats),minLng:Math.min(...lngs),maxLng:Math.max(...lngs)};
-  }
-
-  // expose helper for existing draw routines if needed
-  window.__rd_project = project;
-  window.__rd_bounds = boundsFromPoints;
-
-  window.__rd_drawRoutesAndClusters = function(state, tMin){
-    if(!state || !state.batches) return;
-    const pts=[];
-    (state.cooks||[]).forEach(x=>pts.push({lat:x.lat||x.loc?.lat, lng:x.lng||x.loc?.lng}));
-    (state.orders||[]).forEach(o=>pts.push({lat:o.dropLat||o.dropLoc?.lat, lng:o.dropLng||o.dropLoc?.lng}));
-    if(pts.length<2) return;
-    const b=boundsFromPoints(pts);
-
-    // clusters
-    ctx.save();
-    ctx.globalAlpha=0.12;
-    ctx.lineWidth=2;
-    (state.batches||[]).forEach(bat=>{
-      const orders = bat.orders || [];
-      if(!orders.length) return;
-      const first = orders[0];
-      const orderAt = first.orderAtMin ?? first.orderAt ?? 0;
-      if(orderAt > tMin) return;
-      let lat=0,lng=0;
-      orders.forEach(o=>{
-        const dl = o.dropLoc || {lat:o.dropLat, lng:o.dropLng};
-        lat+=dl.lat; lng+=dl.lng;
-      });
-      lat/=orders.length; lng/=orders.length;
-      const p=project(lat,lng,b);
-      ctx.strokeStyle=batchColor(bat.id||bat.batchId);
-      ctx.beginPath(); ctx.arc(p.x,p.y,30,0,Math.PI*2); ctx.stroke(); // visual cluster circle
-    });
-    ctx.restore();
-
-    // routes (if batchResults exist)
-    if(!state.batchResults) return;
-    ctx.save();
-    ctx.globalAlpha=0.65;
-    ctx.lineWidth=3;
-    state.batchResults.forEach(br=>{
-      const depart = br.departAtMin ?? br.departAt ?? 0;
-      if(depart > tMin) return;
-      const bat = (state.batches||[]).find(x=>(x.id||x.batchId)===(br.batchId||br.id));
-      if(!bat) return;
-      const cook = bat.cookLoc || bat.cook || {lat:bat.cookLat, lng:bat.cookLng};
-      const orders = (bat.orders||[]).slice().sort((a,b)=>(a.deliveredAtMin||1e9)-(b.deliveredAtMin||1e9));
-      const ptsRoute=[cook].concat(orders.map(o=>o.dropLoc || {lat:o.dropLat, lng:o.dropLng}));
-      ctx.strokeStyle=batchColor(br.batchId||bat.id);
-      ctx.beginPath();
-      ptsRoute.forEach((pt,i)=>{
-        const pp=project(pt.lat, pt.lng, b);
-        if(i===0) ctx.moveTo(pp.x,pp.y); else ctx.lineTo(pp.x,pp.y);
-      });
-      ctx.stroke();
-    });
-    ctx.restore();
+// Simple deterministic RNG (seeded) so demo is repeatable
+RD.rng = function(seed = 12345) {
+  let s = seed >>> 0;
+  return function() {
+    s = (1664525 * s + 1013904223) >>> 0;
+    return s / 4294967296;
   };
-})();
+};
 
-// Scenario compare: runs three simulations by clicking existing buttons if present.
-(function(){
-  const btn = document.getElementById('btnCompare');
-  if(!btn) return;
-  btn.addEventListener('click', ()=>{
-    const status = document.getElementById('compareStatus');
-    const table = document.getElementById('compareTable');
-    if(status) status.textContent='Running…';
+// Demo coordinate system: 0..100 (grid). Convert grid distance to km.
+RD.gridDistToKm = function(d) {
+  // 100 grid units ~ 30km across city (demo scale)
+  return (d / 100) * 30;
+};
 
-    const orderCountEl = document.getElementById('orderCount');
-    const hoursEl = document.getElementById('hours');
-    const genBtn = document.getElementById('btnGenerate') || document.querySelector('[data-generate]');
-    const runBtn = document.getElementById('btnRun') || document.querySelector('[data-run]');
-    const kMargin = document.getElementById('kMargin');
-    const kBatches = document.getElementById('kBatches');
-    const kBatched = document.getElementById('kBatched');
-    const kDrivers = document.getElementById('kDrivers');
-    const kAvg = document.getElementById('kAvg');
+RD.dist = function(a, b) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx*dx + dy*dy);
+};
 
-    const scenarios=[50,100,200];
-    const results=[];
+// Generate orders around cooks with constraint max 20km from cook
+RD.generateOrders = function({ count = 50, hours = 6, seed = 42 }) {
+  const rand = RD.rng(seed);
+  const cooks = RD.CONFIG.cooks;
 
-    function readTotals(){
-      // try read from any totals table if exists
-      const totals = Array.from(document.querySelectorAll('#totalsTable td:last-child')).map(x=>x.textContent.trim());
-      return {platformRev: totals[0]||'—', driverCost: totals[2]||'—'};
+  const orders = [];
+  const startTs = Date.now();
+
+  for (let i = 0; i < count; i++) {
+    const cook = cooks[Math.floor(rand() * cooks.length)];
+
+    // Generate a customer point near cook, but enforce <= 20km
+    let customer, kmFromCook;
+    for (let tries = 0; tries < 200; tries++) {
+      const angle = rand() * Math.PI * 2;
+      const r = rand() * 40; // in grid units
+      const x = Math.max(0, Math.min(100, cook.x + Math.cos(angle) * r));
+      const y = Math.max(0, Math.min(100, cook.y + Math.sin(angle) * r));
+      customer = { x, y };
+      kmFromCook = RD.gridDistToKm(RD.dist(cook, customer));
+      if (kmFromCook <= RD.CONFIG.maxOrderKmFromCook) break;
     }
 
-    function runOne(i){
-      if(i>=scenarios.length){
-        // render
-        const headers=['Orders','Batches','Batched %','Drivers','Avg Delivery (min)','Platform Rev','Driver Cost','Net Margin'];
-        const h = `<tr>${headers.map(x=>`<th>${x}</th>`).join('')}</tr>`;
-        const b = results.map(r=>`<tr>${headers.map(k=>`<td>${r[k]}</td>`).join('')}</tr>`).join('');
-        table.innerHTML = h + b;
-        if(status) status.textContent='Completed';
-        return;
+    const minutesIntoWindow = Math.floor(rand() * (hours * 60));
+    const createdAt = new Date(startTs + minutesIntoWindow * 60_000);
+
+    // Order value ~ $30 avg
+    const value = (RD.CONFIG.orderValueAvg * (0.75 + rand() * 0.7)).toFixed(2);
+
+    orders.push({
+      id: `O${String(i + 1).padStart(4, "0")}`,
+      cookId: cook.id,
+      cookName: cook.name,
+      cookX: cook.x, cookY: cook.y,
+      custX: customer.x, custY: customer.y,
+      createdAt,
+      value: Number(value),
+      kmFromCook
+    });
+  }
+
+  // Sort by time
+  orders.sort((a, b) => a.createdAt - b.createdAt);
+  return orders;
+};
+
+// Batch orders by cook + within 5km customer proximity
+RD.batchOrders = function(orders) {
+  const radiusKm = RD.CONFIG.batchRadiusKm;
+  const radiusGrid = (radiusKm / 30) * 100; // inverse of gridDistToKm
+
+  const batches = [];
+  const remaining = [...orders];
+
+  while (remaining.length) {
+    const seed = remaining.shift();
+
+    const batch = {
+      id: `B${String(batches.length + 1).padStart(3, "0")}`,
+      cookId: seed.cookId,
+      cookName: seed.cookName,
+      cookX: seed.cookX,
+      cookY: seed.cookY,
+      orders: [seed]
+    };
+
+    // Add other orders for same cook within radius of the seed customer
+    for (let i = remaining.length - 1; i >= 0; i--) {
+      const o = remaining[i];
+      if (o.cookId !== seed.cookId) continue;
+
+      const dGrid = RD.dist({ x: seed.custX, y: seed.custY }, { x: o.custX, y: o.custY });
+      if (dGrid <= radiusGrid) {
+        batch.orders.push(o);
+        remaining.splice(i, 1);
       }
-      const sc=scenarios[i];
-      if(orderCountEl) orderCountEl.value=String(sc);
-      if(genBtn) genBtn.click();
-      if(runBtn) runBtn.click();
-
-      setTimeout(()=>{
-        const totals=readTotals();
-        results.push({
-          'Orders': String(sc),
-          'Batches': kBatches?.textContent || '—',
-          'Batched %': kBatched?.textContent || '—',
-          'Drivers': kDrivers?.textContent || '—',
-          'Avg Delivery (min)': (kAvg?.textContent||'—').replace(' min',''),
-          'Platform Rev': totals.platformRev,
-          'Driver Cost': totals.driverCost,
-          'Net Margin': kMargin?.textContent || '—'
-        });
-        runOne(i+1);
-      }, 150);
     }
 
-    runOne(0);
+    batches.push(batch);
+  }
+
+  return batches;
+};
+
+// Assign drivers and simulate routes (simple heuristic):
+// - One driver per batch
+// - Driver goes: start -> cook -> dropoffs (nearest-neighbor)
+RD.runSimulation = function({ orders }) {
+  const batches = RD.batchOrders(orders);
+
+  const drivers = [];
+  const deliveries = [];
+
+  const speed = RD.CONFIG.avgSpeedKmh;
+  const pickupMin = RD.CONFIG.pickupMinutes;
+  const dropMin = RD.CONFIG.dropoffMinutes;
+
+  const mkDriver = (idx) => ({
+    id: `D${String(idx).padStart(3, "0")}`,
+    trips: 0,
+    stops: 0,
+    km: 0,
+    minutes: 0,
+    earnings: 0
   });
-})();
+
+  for (let b = 0; b < batches.length; b++) {
+    const batch = batches[b];
+    const driver = mkDriver(drivers.length + 1);
+
+    // Route planning: nearest-neighbor among dropoffs
+    const cook = { x: batch.cookX, y: batch.cookY };
+
+    let remainingStops = batch.orders.map(o => ({ x: o.custX, y: o.custY, orderId: o.id }));
+    let current = cook;
+
+    // Start at cook (assume driver "appears" at cook for demo)
+    let totalKm = 0;
+    let totalMin = pickupMin;
+
+    const stopSequence = [];
+
+    while (remainingStops.length) {
+      // Find nearest next stop
+      let bestIdx = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < remainingStops.length; i++) {
+        const d = RD.gridDistToKm(RD.dist(current, remainingStops[i]));
+        if (d < bestD) { bestD = d; bestIdx = i; }
+      }
+
+      const next = remainingStops.splice(bestIdx, 1)[0];
+      totalKm += bestD;
+      totalMin += (bestD / speed) * 60; // travel time
+      totalMin += dropMin;
+
+      stopSequence.push({ orderId: next.orderId, kmFromPrev: bestD });
+      current = next;
+    }
+
+    // Driver pay (demo): base per stop + per km
+    const driverPay = (RD.CONFIG.baseDriverPay * batch.orders.length) + (RD.CONFIG.payPerKm * totalKm);
+
+    // Revenue split per order (Chef 30, Platform 40, Delivery 30)
+    const totalOrderValue = batch.orders.reduce((s, o) => s + o.value, 0);
+    const chefShare = totalOrderValue * RD.CONFIG.commissionSplit.chef;
+    const platformShare = totalOrderValue * RD.CONFIG.commissionSplit.platform;
+    const deliveryShare = totalOrderValue * RD.CONFIG.commissionSplit.delivery;
+
+    // Delivery margin is delivery share - driver pay (for demo)
+    const deliveryMargin = deliveryShare - driverPay;
+
+    driver.trips += 1;
+    driver.stops += batch.orders.length;
+    driver.km += totalKm;
+    driver.minutes += totalMin;
+    driver.earnings += driverPay;
+
+    drivers.push(driver);
+
+    deliveries.push({
+      batchId: batch.id,
+      cookName: batch.cookName,
+      orders: batch.orders.length,
+      km: Number(totalKm.toFixed(2)),
+      minutes: Number(totalMin.toFixed(1)),
+      orderValue: Number(totalOrderValue.toFixed(2)),
+      chefShare: Number(chefShare.toFixed(2)),
+      platformShare: Number(platformShare.toFixed(2)),
+      deliveryShare: Number(deliveryShare.toFixed(2)),
+      driverPay: Number(driverPay.toFixed(2)),
+      deliveryMargin: Number(deliveryMargin.toFixed(2))
+    });
+  }
+
+  // Totals
+  const totals = deliveries.reduce((t, d) => {
+    t.orders += d.orders;
+    t.batches += 1;
+    t.km += d.km;
+    t.minutes += d.minutes;
+    t.orderValue += d.orderValue;
+    t.chefShare += d.chefShare;
+    t.platformShare += d.platformShare;
+    t.deliveryShare += d.deliveryShare;
+    t.driverPay += d.driverPay;
+    t.deliveryMargin += d.deliveryMargin;
+    return t;
+  }, {
+    orders: 0, batches: 0, km: 0, minutes: 0,
+    orderValue: 0, chefShare: 0, platformShare: 0, deliveryShare: 0,
+    driverPay: 0, deliveryMargin: 0
+  });
+
+  // Averages
+  const avgDeliveryMin = totals.batches ? (totals.minutes / totals.batches) : 0;
+
+  return {
+    batches,
+    drivers,
+    deliveries,
+    totals: {
+      ...Object.fromEntries(Object.entries(totals).map(([k,v]) => [k, Number(v.toFixed(2))])),
+      avgDeliveryMin: Number(avgDeliveryMin.toFixed(1))
+    }
+  };
+};
 
