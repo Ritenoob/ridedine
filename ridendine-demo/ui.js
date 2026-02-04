@@ -4,18 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const orderCount = el("orderCount");
   const hours = el("hours");
 
-  const btnPlace = el("placeOrderBtn");
+  const placeOrderBtn = el("placeOrderBtn");
   const btnGenerate = el("btnGenerate");
   const btnRun = el("btnRun");
-
   const btnCompare = el("btnCompare");
+
   const compareStatus = el("compareStatus");
   const compareTable = el("compareTable");
 
   const totalsTable = el("totalsTable");
   const driverTable = el("driverTable");
   const deliveryTable = el("deliveryTable");
-  const mapCanvas = el("mapCanvas");
   const eventLog = el("eventLog");
 
   const log = (msg) => {
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
     eventLog.scrollTop = eventLog.scrollHeight;
   };
 
-  // Render helpers
   const renderTable = (tableEl, headers, rows) => {
     tableEl.innerHTML = `
       <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
@@ -32,78 +30,111 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   };
 
-  // Simple “map” (no APIs): draw cooks + customers on an HTML canvas created inside mapCanvas div
-  const drawMap = (orders = [], cooks = []) => {
-    mapCanvas.innerHTML = `<canvas id="rdCanvas" width="900" height="280"></canvas>`;
-    const canvas = document.getElementById("rdCanvas");
-    const ctx = canvas.getContext("2d");
+  // Leaflet map (Hamilton)
+  const map = L.map("mapCanvas").setView([RD.HAMILTON.center.lat, RD.HAMILTON.center.lng], 12);
 
-    // background
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
 
-    const toPx = (x, y) => ({
-      px: (x / 100) * (canvas.width - 20) + 10,
-      py: (y / 100) * (canvas.height - 20) + 10
-    });
+  const markersLayer = L.layerGroup().addTo(map);
+  const circlesLayer = L.layerGroup().addTo(map);
 
-    // Draw customers
-    ctx.fillStyle = "#2b7fff";
-    orders.forEach(o => {
-      const p = toPx(o.custX, o.custY);
-      ctx.beginPath();
-      ctx.arc(p.px, p.py, 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
+  const clearMap = () => { markersLayer.clearLayers(); circlesLayer.clearLayers(); };
 
-    // Draw cooks (bigger, orange)
-    ctx.fillStyle = "#ff7a00";
-    cooks.forEach(c => {
-      const p = toPx(c.x, c.y);
-      ctx.beginPath();
-      ctx.arc(p.px, p.py, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillText(c.id, p.px + 10, p.py + 4);
+  const drawCooks = () => {
+    RD.CONFIG.cooks.forEach(c => {
+      L.circleMarker([c.lat, c.lng], {
+        radius: 8,
+        weight: 2,
+        color: "#ff7a00",
+        fillColor: "#ff7a00",
+        fillOpacity: 1
+      })
+        .bindPopup(`${c.id} – ${c.name}`)
+        .addTo(markersLayer);
     });
   };
 
-  // App state
+  const drawOrders = (orders) => {
+    orders.forEach(o => {
+      L.circleMarker([o.custLat, o.custLng], {
+        radius: 3,
+        weight: 1,
+        color: "#2b7fff",
+        fillColor: "#2b7fff",
+        fillOpacity: 0.9
+      })
+        .bindPopup(`${o.id}<br>${o.cookName}<br>$${o.value}`)
+        .addTo(markersLayer);
+    });
+  };
+
+  const drawBatchCircles = (batches) => {
+    // 5km radius around each cook for visualization
+    batches.forEach(b => {
+      L.circle([b.cookLat, b.cookLng], {
+        radius: RD.CONFIG.batchRadiusKm * 1000,
+        color: "#ff7a00",
+        weight: 1,
+        fillOpacity: 0.05
+      }).addTo(circlesLayer);
+    });
+  };
+
+  // State
   let currentOrders = [];
   let lastRun = null;
 
-  // Place Order = adds a single “manual” order (small feature)
-  btnPlace.onclick = () => {
-    const n = Number(orderCount.value || 50);
-    log(`Order placed: ${n} (manual placeholder)`);
+  // Init view
+  clearMap();
+  drawCooks();
+  log(`Ready ✅ ${RD.CONFIG.city} | batchRadius=${RD.CONFIG.batchRadiusKm}km | maxCookDistance=${RD.CONFIG.maxOrderKmFromCook}km`);
+
+  // Place single order (adds one order into current session)
+  placeOrderBtn.onclick = () => {
+    const h = Math.max(1, Number(hours.value || 6));
+    const next = RD.generateOrders({ count: 1, hours: h, seed: Date.now() })[0];
+    currentOrders.push(next);
+    clearMap(); drawCooks(); drawOrders(currentOrders);
+    log(`Order placed: ${next.id} ($${next.value})`);
   };
 
-  // Generate batch data = generate orders for the selected count/hours
+  // Generate batch data
   btnGenerate.onclick = () => {
     const n = Math.max(1, Number(orderCount.value || 50));
     const h = Math.max(1, Number(hours.value || 6));
+
     currentOrders = RD.generateOrders({ count: n, hours: h, seed: 42 });
 
-    drawMap(currentOrders, RD.CONFIG.cooks);
-
-    // Fill totals/driver/delivery with empty placeholders until run
     totalsTable.innerHTML = "";
     driverTable.innerHTML = "";
     deliveryTable.innerHTML = "";
 
-    log(`Batch data generated: ${n} orders over ${h} hours`);
+    clearMap();
+    drawCooks();
+    drawOrders(currentOrders);
+
+    log(`Generated ${n} orders over ${h} hours ✅`);
   };
 
-  // Run simulation = compute routing + costs + fill tables
+  // Run simulation
   btnRun.onclick = () => {
     if (!currentOrders.length) {
-      log("No data yet — click Generate Batch Data first.");
+      log("No orders yet — click Generate Batch Data first.");
       return;
     }
 
     lastRun = RD.runSimulation({ orders: currentOrders });
 
-    // Totals table
+    clearMap();
+    drawCooks();
+    drawOrders(currentOrders);
+    drawBatchCircles(lastRun.batches);
+
     const t = lastRun.totals;
+
     renderTable(
       totalsTable,
       ["Metric", "Value"],
@@ -112,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ["Batches", t.batches],
         ["Avg Delivery (min / batch)", t.avgDeliveryMin],
         ["Total KM", t.km],
-        ["Total Minutes", t.minutes],
         ["Order Value", `$${t.orderValue}`],
         ["Chef (30%)", `$${t.chefShare}`],
         ["Platform (40%)", `$${t.platformShare}`],
@@ -122,68 +152,63 @@ document.addEventListener("DOMContentLoaded", () => {
       ]
     );
 
-    // Driver table
     renderTable(
       driverTable,
       ["Driver", "Trips", "Stops", "KM", "Minutes", "Earnings"],
       lastRun.drivers.map(d => [
-        d.id, d.trips, d.stops, d.km.toFixed(2), d.minutes.toFixed(1), `$${d.earnings.toFixed(2)}`
+        d.id,
+        d.trips,
+        d.stops,
+        d.km.toFixed(2),
+        d.minutes.toFixed(1),
+        `$${d.earnings.toFixed(2)}`
       ])
     );
 
-    // Delivery table
     renderTable(
       deliveryTable,
-      ["Batch", "Cook", "Orders", "KM", "Min", "Value", "Driver Pay", "Delivery Margin"],
+      ["Batch", "Cook", "Orders", "KM", "Min", "Value", "Driver Pay", "Margin"],
       lastRun.deliveries.map(x => [
-        x.batchId, x.cookName, x.orders, x.km, x.minutes, `$${x.orderValue}`, `$${x.driverPay}`, `$${x.deliveryMargin}`
+        x.batchId,
+        x.cookName,
+        x.orders,
+        x.km,
+        x.minutes,
+        `$${x.orderValue}`,
+        `$${x.driverPay}`,
+        `$${x.deliveryMargin}`
       ])
     );
 
-    log(`Simulation completed ✅ ${t.batches} batches | ${lastRun.drivers.length} drivers used`);
+    log(`Simulation complete ✅ batches=${t.batches} drivers=${lastRun.drivers.length}`);
   };
 
-  // Scenario compare still works (uses the new engine)
+  // Scenario compare 50/100/200
   btnCompare.onclick = () => {
     const h = Math.max(1, Number(hours.value || 6));
-
     const scenarios = [50, 100, 200].map(n => {
       const orders = RD.generateOrders({ count: n, hours: h, seed: 42 });
       const run = RD.runSimulation({ orders });
-      return {
-        orders: n,
-        batches: run.totals.batches,
-        drivers: run.drivers.length,
-        avgDeliveryMin: run.totals.avgDeliveryMin,
-        platformRev: run.totals.platformShare,
-        driverCost: run.totals.driverPay,
-        netMargin: (run.totals.platformShare + run.totals.deliveryMargin).toFixed(2)
-      };
+      const t = run.totals;
+      const net = (t.platformShare + t.deliveryMargin);
+      return [
+        n,
+        t.batches,
+        run.drivers.length,
+        t.avgDeliveryMin,
+        `$${t.platformShare.toFixed(2)}`,
+        `$${t.driverPay.toFixed(2)}`,
+        `$${net.toFixed(2)}`
+      ];
     });
 
-    compareTable.innerHTML = `
-      <tr>
-        <th>Orders</th><th>Batches</th><th>Drivers</th>
-        <th>Avg Delivery (min)</th><th>Platform Rev</th><th>Driver Cost</th><th>Net Margin</th>
-      </tr>
-      ${scenarios.map(s => `
-        <tr>
-          <td>${s.orders}</td>
-          <td>${s.batches}</td>
-          <td>${s.drivers}</td>
-          <td>${s.avgDeliveryMin}</td>
-          <td>$${Number(s.platformRev).toFixed(2)}</td>
-          <td>$${Number(s.driverCost).toFixed(2)}</td>
-          <td>$${s.netMargin}</td>
-        </tr>
-      `).join("")}
-    `;
+    renderTable(
+      compareTable,
+      ["Orders", "Batches", "Drivers", "Avg Delivery (min)", "Platform Rev", "Driver Cost", "Net Margin"],
+      scenarios
+    );
 
     compareStatus.textContent = "Completed ✅";
     log("Scenario comparison completed ✅");
   };
-
-  // Initial paint
-  drawMap([], RD.CONFIG.cooks);
-  log(`Ready. Version: ${window.RIDENDINE_VERSION || "unknown"}`);
 });

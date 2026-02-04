@@ -1,92 +1,109 @@
+:root {
+  --orange: #ff7a00;
+  --dark: #121212;
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --border: #e5e7eb;
+}
+
+* { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: #111;
 }
 
 .header {
+  background: #fff;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  background: white;
-  border-bottom: 1px solid #ddd;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
 }
-
-.logo {
-  height: 40px;
-  margin-right: 15px;
-}
+.logo { width: 38px; height: 38px; }
 
 .nav {
-  background: #111;
-  padding: 10px;
+  background: var(--dark);
+  padding: 12px 18px;
 }
-
-.nav button {
-  background: #ff8800;
+.tab {
+  background: var(--orange);
   border: none;
-  padding: 10px 15px;
-  color: white;
+  padding: 10px 16px;
+  color: #fff;
   cursor: pointer;
+  font-weight: 700;
 }
+.tab.active { opacity: 1; }
 
 .container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 20px;
+  max-width: 1100px;
+  margin: 18px auto;
+  padding: 0 14px 60px;
 }
 
 .card {
-  background: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
 }
 
-label {
-  margin-right: 15px;
-}
-
-input {
-  margin-left: 5px;
-  width: 80px;
-}
-
-button {
-  margin-right: 10px;
-}
-
-#mapCanvas {
-  height: 300px;
-  background: #eaeaea;
+.row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 15px;
 }
+label { font-weight: 700; }
+input {
+  width: 100px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: #f2f2f2;
+}
+button:hover { filter: brightness(0.98); }
 
-table {
+.hint { color: #4b5563; margin-top: 10px; }
+
+.table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 15px;
+  margin-top: 8px;
 }
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  text-align: center;
-}
-
-#eventLog {
-  background: #000;
-  color: #0f0;
-  font-family: monospace;
-  height: 150px;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.hint {
-  color: #666;
+.table th, .table td {
+  border: 1px solid var(--border);
+  padding: 8px;
+  text-align: left;
   font-size: 14px;
+}
+.table th { background: #fafafa; }
+
+#mapCanvas {
+  height: 420px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin: 12px 0 18px;
+}
+
+.log {
+  background: #000;
+  color: #00ff63;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  padding: 10px;
+  height: 170px;
+  overflow: auto;
+  border-radius: 10px;
 }

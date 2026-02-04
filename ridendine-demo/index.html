@@ -5,79 +5,83 @@
   <title>RideNDine – Simulation Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Leaflet (FREE / no account) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
+
 <body>
+  <header class="header">
+    <img class="logo" src="./assets/logo.png" alt="RideNDine Logo" />
+    <h1>RideNDine – Simulation Demo</h1>
+  </header>
 
-<header class="header">
-  <img src="./assets/logo.png" class="logo" />
-  <h1>RideNDine – Simulation Demo</h1>
-</header>
+  <nav class="nav">
+    <button class="tab active">Orders</button>
+  </nav>
 
-<nav class="nav">
-  <button class="active">Orders</button>
-</nav>
+  <main class="container">
 
-<main class="container">
+    <section class="card">
+      <h2>Order Form</h2>
 
-  <!-- ORDER FORM -->
-  <section class="card">
-    <h2>Order Form</h2>
+      <div class="row">
+        <label>Orders</label>
+        <input id="orderCount" type="number" value="50" min="1" step="1" />
 
-    <label>
-      Orders
-      <input id="orderCount" type="number" value="50" />
-    </label>
+        <label>Hours</label>
+        <input id="hours" type="number" value="6" min="1" step="1" />
 
-    <label>
-      Hours
-      <input id="hours" type="number" value="6" />
-    </label>
+        <button id="placeOrderBtn">Place Order</button>
+        <button id="btnGenerate">Generate Batch Data</button>
+        <button id="btnRun">Run Simulation</button>
+      </div>
 
-    <button id="placeOrderBtn">Place Order</button>
-    <button id="btnGenerate">Generate Batch Data</button>
-    <button id="btnRun">Run Simulation</button>
+      <p class="hint">
+        Pilot rules: batching radius <b>5km</b> • orders ≤ <b>20km</b> from cook • Hamilton, Ontario
+      </p>
+    </section>
 
-    <p class="hint">
-      Pilot rules enforced in logic: batching radius 5km, max 20km delivery.
-    </p>
-  </section>
+    <section class="card">
+      <h2>Scenario Compare</h2>
+      <div class="row">
+        <button id="btnCompare">Run 50 / 100 / 200 Compare</button>
+        <span id="compareStatus">Not run</span>
+      </div>
+      <table id="compareTable" class="table"></table>
+    </section>
 
-  <!-- SCENARIO COMPARE -->
-  <section class="card">
-    <h2>Scenario Compare</h2>
+    <section class="card">
+      <h2>Live Operations Dashboard</h2>
 
-    <button id="btnCompare">Run 50 / 100 / 200 Compare</button>
-    <span id="compareStatus">Not run</span>
+      <!-- REQUIRED ID -->
+      <div id="mapCanvas"></div>
 
-    <table id="compareTable"></table>
-  </section>
+      <h3>Totals</h3>
+      <table id="totalsTable" class="table"></table>
 
-  <!-- DASHBOARD -->
-  <section class="card">
-    <h2>Live Operations Dashboard</h2>
+      <h3>Drivers</h3>
+      <table id="driverTable" class="table"></table>
 
-    <div id="mapCanvas">🗺 Map will render here</div>
+      <h3>Deliveries</h3>
+      <table id="deliveryTable" class="table"></table>
 
-    <h3>Totals</h3>
-    <table id="totalsTable"></table>
+      <h3>Event Log</h3>
+      <div id="eventLog" class="log"></div>
+    </section>
 
-    <h3>Drivers</h3>
-    <table id="driverTable"></table>
+  </main>
 
-    <h3>Deliveries</h3>
-    <table id="deliveryTable"></table>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <h3>Event Log</h3>
-    <div id="eventLog"></div>
-  </section>
-
-</main>
-
-<!-- SCRIPTS (ORDER MATTERS) -->
-<script src="./core/version.js"></script>
-<script src="./logic.js"></script>
-<script src="./ui.js"></script>
-
+  <!-- Your app -->
+  <script src="./core/version.js"></script>
+  <script src="./logic.js"></script>
+  <script src="./ui.js"></script>
 </body>
 </html>
