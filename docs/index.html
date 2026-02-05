@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RideNDine – Simulation Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet (FREE / no account) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="header">
+    <img class="logo" src="./assets/logo.png" alt="RideNDine Logo" />
+    <div>
+      <h1>RideNDine – Simulation Demo</h1>
+      <div class="subhead">Centennial Batch Center • 75 Centennial Parkway N • Hamilton, ON</div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="tab active">Orders</button>
+  </nav>
+
+  <main class="container">
+
+    <section class="card">
+      <h2>Order Form</h2>
+
+      <div class="row">
+        <label>Orders</label>
+        <input id="orderCount" type="number" value="50" min="1" step="1" />
+
+        <label>Hours</label>
+        <input id="hours" type="number" value="6" min="1" step="1" />
+
+        <button id="placeOrderBtn">Place Order</button>
+        <button id="btnGenerate">Generate Batch Data</button>
+        <button id="btnRun">Run Simulation</button>
+      </div>
+
+      <p class="hint">
+        Rules: hub radius <b>20km</b> • 4 chefs within <b>2km</b> of hub • batching radius <b>5km</b> • orders ≤ <b>20km</b> from chef
+        <br/>
+        Tip: click any <b>Deliveries</b> row to draw that car’s route on the map.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Scenario Compare</h2>
+      <div class="row">
+        <button id="btnCompare">Run 50 / 100 / 200 Compare</button>
+        <span id="
