@@ -1,8 +1,0 @@
-{
-  "name": "ridendine-demo",
-  "version": "0.7.0",
-  "private": true,
-  "scripts": {
-    "serve": "python -m http.server 8080"
-  }
-}
