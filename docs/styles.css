@@ -1,15 +1,1 @@
-﻿.subhead {
-  margin-top: 4px;
-  font-size: 13px;
-  color: #555;
-}
-
-.table tr:hover td {
-  background: #f8fafc;
-}
-
-
-/* GitHub Pages fix: ensure Leaflet map renders */
-#map { height: 520px; width: 100%; border-radius: 12px; }
-
-
+﻿#map { height: 520px; width: 100%; }
