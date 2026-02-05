@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RideNDine â€“ Simulation Demo</title>
+  <title>RideNDine – Simulation Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Leaflet (FREE / no account) -->
@@ -12,15 +12,14 @@
   />
 
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
   <header class="header">
     <img class="logo" src="./assets/logo.png" alt="RideNDine Logo" />
     <div>
-      <h1>RideNDine â€“ Simulation Demo</h1>
-      <div class="subhead">Centennial Batch Center â€¢ 75 Centennial Parkway N â€¢ Hamilton, ON</div>
+      <h1>RideNDine – Simulation Demo</h1>
+      <div class="subhead">Centennial Batch Center • 75 Centennial Parkway N • Hamilton, ON</div>
     </div>
   </header>
 
@@ -29,7 +28,6 @@
   </nav>
 
   <main class="container">
-    <section class="card"><h2>Map</h2><div id="map"></div></section>
 
     <section class="card">
       <h2>Order Form</h2>
@@ -47,9 +45,9 @@
       </div>
 
       <p class="hint">
-        Rules: hub radius <b>20km</b> â€¢ 4 chefs within <b>2km</b> of hub â€¢ batching radius <b>5km</b> â€¢ orders â‰¤ <b>20km</b> from chef
+        Rules: hub radius <b>20km</b> • 4 chefs within <b>2km</b> of hub • batching radius <b>5km</b> • orders ≤ <b>20km</b> from chef
         <br/>
-        Tip: click any <b>Deliveries</b> row to draw that carâ€™s route on the map.
+        Tip: click any <b>Deliveries</b> row to draw that car’s route on the map.
       </p>
     </section>
 
@@ -58,4 +56,3 @@
       <div class="row">
         <button id="btnCompare">Run 50 / 100 / 200 Compare</button>
         <span id="
-
