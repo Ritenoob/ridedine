@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RideNDine • Home Chef Delivery</title>
+    <link rel="icon" type="image/svg+xml" href="assets/app-icon.svg" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav">
+        <div class="brand">
+          <img src="assets/logo.svg" alt="RideNDine logo" />
+        </div>
+        <div class="nav-links">
+          <a href="#operations">Operations</a>
+          <a href="#routing">Routing</a>
+          <a href="#branches">Branches</a>
+        </div>
+        <button class="primary">Launch Orders</button>
+      </nav>
+      <div class="hero-content">
+        <div class="hero-text">
+          <span class="pill">Live in Hamilton, ON</span>
+          <h1>Delivering home-chef meals with smart routing.</h1>
+          <p>
+            RideNDine connects local chefs with hungry neighbors. Dispatch drivers from our
+            Centennial Parkway base, track routes in real time, and keep every delivery on time.
+          </p>
+          <div class="hero-actions">
+            <button class="primary">Start a delivery</button>
+            <button class="ghost">View chef menu</button>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <h3>12</h3>
+              <span>Active drivers</span>
+            </div>
+            <div>
+              <h3>4.9★</h3>
+              <span>Chef rating</span>
+            </div>
+            <div>
+              <h3>18 min</h3>
+              <span>Avg. delivery</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h2>Dispatch Control</h2>
+          <p>Base address:</p>
+          <strong>75 Centennial Parkway, Hamilton, Ontario</strong>
+          <div class="status">
+            <div>
+              <span class="dot"></span>
+              <span>Routing engine online</span>
+            </div>
+            <div>
+              <span class="dot"></span>
+              <span>Drivers simulated</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="operations" class="section">
+        <div class="section-heading">
+          <h2>Operations overview</h2>
+          <p>See drivers, chefs, and drop-offs update in real time.</p>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <h3>Chef network</h3>
+            <p>12 active kitchens across Hamilton with nightly pickup windows.</p>
+          </div>
+          <div class="card">
+            <h3>Driver simulation</h3>
+            <p>Animated scooter fleet that loops around priority zones.</p>
+          </div>
+          <div class="card">
+            <h3>Order routing</h3>
+            <p>Auto-calculated routes from base to each delivery stop.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="routing" class="section">
+        <div class="section-heading">
+          <h2>Routing &amp; mapping</h2>
+          <p>Center of operations pinned at 75 Centennial Parkway, Hamilton.</p>
+        </div>
+        <div class="map-panel">
+          <div id="map"></div>
+          <div class="map-legend">
+            <h3>Live dispatch</h3>
+            <ul>
+              <li><span class="legend base"></span>Base hub</li>
+              <li><span class="legend chef"></span>Chef pickup</li>
+              <li><span class="legend customer"></span>Customer drop-off</li>
+              <li><span class="legend driver"></span>Driver simulators</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="branches" class="section">
+        <div class="section-heading">
+          <h2>Branch readiness</h2>
+          <p>All release tracks are aligned for Pages deployments.</p>
+        </div>
+        <div class="grid">
+          <div class="card branch">
+            <h3>Main</h3>
+            <p>Production-ready UI and live GitHub Pages builds.</p>
+            <span class="badge">running</span>
+          </div>
+          <div class="card branch">
+            <h3>Stable</h3>
+            <p>QA-approved feature set for client walkthroughs.</p>
+            <span class="badge">running</span>
+          </div>
+          <div class="card branch">
+            <h3>Dev</h3>
+            <p>Rapid iteration track for routing and driver simulation.</p>
+            <span class="badge">running</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>RideNDine © 2026 — Built for home chefs.</span>
+      <span class="footer-links">GitHub Pages ready • Hamilton, ON</span>
+    </footer>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-o9N1j7kGStb9kG1R5t1T1JDw2CqS+e0pShG6GZQ1h3U="
+      crossorigin=""
+    ></script>
+    <script src="app.js"></script>
+  </body>
+</html>
