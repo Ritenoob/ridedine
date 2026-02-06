@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>RideNDine | Home Chef Delivery</title>
     <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#ff7a18" />
     <link rel="preconnect" href="https://unpkg.com" />
     <link
       rel="stylesheet"
@@ -21,16 +23,17 @@
         <img src="./assets/logo.svg" alt="RideNDine" />
       </div>
       <nav class="header__nav">
+        <a href="#customer">Customers</a>
+        <a href="#admin">Admin Dashboard</a>
         <a href="#map-panel">Live Map</a>
         <a href="#drivers">Drivers</a>
-        <a href="#branches">Branches</a>
         <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
           Repo
         </a>
       </nav>
     </header>
 
-    <section class="hero">
+    <section id="customer" class="hero">
       <div class="hero__card">
         <h1 class="hero__title">Delivering home chef meals across Hamilton.</h1>
         <p class="hero__subtitle">
@@ -40,6 +43,16 @@
         <div class="hero__actions">
           <button class="button button--primary">Launch Driver Simulator</button>
           <button class="button button--ghost">View Chef Orders</button>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <strong>4 chefs</strong>
+            <span>Daily rotating menus</span>
+          </div>
+          <div class="metric-card">
+            <strong>100 deliveries</strong>
+            <span>Target in 6 hours</span>
+          </div>
         </div>
       </div>
       <div class="hero__card">
@@ -67,6 +80,69 @@
       <div class="info-card">
         <h3>Neighborhood First</h3>
         <p>Local-first delivery means faster drop-offs and trusted couriers.</p>
+      </div>
+    </section>
+
+    <section class="chef-grid">
+      <div class="info-card">
+        <h3>Chef Amina</h3>
+        <p>Moroccan bowls • 24 orders queued</p>
+      </div>
+      <div class="info-card">
+        <h3>Chef Luca</h3>
+        <p>Italian classics • 30 orders queued</p>
+      </div>
+      <div class="info-card">
+        <h3>Chef Priya</h3>
+        <p>South Indian plates • 22 orders queued</p>
+      </div>
+      <div class="info-card">
+        <h3>Chef Mateo</h3>
+        <p>Latin comfort food • 24 orders queued</p>
+      </div>
+    </section>
+
+    <section id="admin" class="admin">
+      <div class="admin__login">
+        <h2>Admin Dashboard Login</h2>
+        <p class="hero__subtitle">Demo access is available now. Use the bypass to preview the dashboard.</p>
+        <form class="login-form">
+          <label>
+            Email
+            <input type="email" placeholder="admin@ridendine.com" />
+          </label>
+          <label>
+            Password
+            <input type="password" placeholder="••••••••" />
+          </label>
+          <div class="hero__actions">
+            <button type="button" class="button button--primary" data-bypass>Bypass Login</button>
+            <button type="button" class="button button--ghost">Request Access</button>
+          </div>
+        </form>
+      </div>
+      <div class="admin__panel" data-panel hidden>
+        <h2>Admin Dashboard</h2>
+        <p class="hero__subtitle">Operational overview for the next 6-hour delivery window.</p>
+        <div class="admin-grid">
+          <div class="info-card">
+            <h3>Delivery Goal</h3>
+            <p>100 deliveries in 6 hours with buffer for late orders.</p>
+          </div>
+          <div class="info-card">
+            <h3>Chef Lineup</h3>
+            <ul class="chef-list">
+              <li><strong>Chef Amina</strong> — Moroccan bowls</li>
+              <li><strong>Chef Luca</strong> — Italian classics</li>
+              <li><strong>Chef Priya</strong> — South Indian plates</li>
+              <li><strong>Chef Mateo</strong> — Latin comfort food</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <h3>Driver Coverage</h3>
+            <p>3 live drivers plus 2 on-call. Coverage radius: 8 km.</p>
+          </div>
+        </div>
       </div>
     </section>
 

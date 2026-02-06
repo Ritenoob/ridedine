@@ -74,3 +74,22 @@ if (routeStats.length) {
     node.textContent = index === 0 ? "6.4 mi loop" : "ETA 22-28 min";
   });
 }
+
+const bypassButton = document.querySelector("[data-bypass]");
+const adminPanel = document.querySelector("[data-panel]");
+const adminLogin = document.querySelector(".admin__login");
+
+if (bypassButton && adminPanel && adminLogin) {
+  bypassButton.addEventListener("click", () => {
+    adminPanel.hidden = false;
+    adminLogin.classList.add("is-hidden");
+    adminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+const invalidateMap = () => map.invalidateSize();
+window.addEventListener("resize", () => {
+  window.clearTimeout(window.__mapResizeTimer);
+  window.__mapResizeTimer = window.setTimeout(invalidateMap, 150);
+});
+setTimeout(invalidateMap, 400);

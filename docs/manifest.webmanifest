@@ -10,7 +10,7 @@
       "src": "./assets/app-icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
