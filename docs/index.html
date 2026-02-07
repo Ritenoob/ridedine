@@ -134,46 +134,94 @@
       <div class="admin__panel" data-panel hidden>
         <h2>Admin Dashboard</h2>
         <p class="hero__subtitle">Operational overview for the next 6-hour delivery window.</p>
-        <div class="admin-grid">
-          <div class="info-card">
-            <h3>Delivery Goal</h3>
-            <p>100 deliveries in 6 hours with buffer for late orders.</p>
-            <div class="progress">
-              <div class="progress__fill" data-progress></div>
+        <div class="tabs">
+          <button class="tab-button is-active" type="button" data-tab-target="overview">Overview</button>
+          <button class="tab-button" type="button" data-tab-target="orders">Orders</button>
+          <button class="tab-button" type="button" data-tab-target="payments">Payments</button>
+          <button class="tab-button" type="button" data-tab-target="simulation">Simulation</button>
+        </div>
+        <div class="tab-panel is-active" data-tab-panel="overview">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Delivery Goal</h3>
+              <p>100 deliveries in 6 hours with buffer for late orders.</p>
+              <div class="progress">
+                <div class="progress__fill" data-progress></div>
+              </div>
+              <p class="progress__label" data-progress-label>0 / 100 delivered</p>
             </div>
-            <p class="progress__label" data-progress-label>0 / 100 delivered</p>
-          </div>
-          <div class="info-card">
-            <h3>Chef Lineup</h3>
-            <ul class="chef-list">
-              <li><strong>Chef Amina</strong> — Moroccan bowls</li>
-              <li><strong>Chef Luca</strong> — Italian classics</li>
-              <li><strong>Chef Priya</strong> — South Indian plates</li>
-              <li><strong>Hoang Gia Pho</strong> — Vietnamese pho</li>
-            </ul>
-          </div>
-          <div class="info-card">
-            <h3>Driver Coverage</h3>
-            <p>3 live drivers plus 2 on-call. Coverage radius: 20 km.</p>
-            <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+            <div class="info-card">
+              <h3>Chef Lineup</h3>
+              <ul class="chef-list">
+                <li><strong>Chef Amina</strong> — Moroccan bowls</li>
+                <li><strong>Chef Luca</strong> — Italian classics</li>
+                <li><strong>Chef Priya</strong> — South Indian plates</li>
+                <li><strong>Hoang Gia Pho</strong> — Vietnamese pho</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <h3>Driver Coverage</h3>
+              <p>3 live drivers plus 2 on-call. Coverage radius: 20 km.</p>
+              <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+            </div>
           </div>
         </div>
-        <div class="admin-grid">
-          <div class="info-card">
-            <h3>Chef Orders</h3>
-            <p class="hero__subtitle">Live queues coming from the chef site and payment window.</p>
-            <ul class="order-list" data-order-list></ul>
-          </div>
-          <div class="info-card">
-            <h3>Payments</h3>
-            <p class="hero__subtitle">Completed transactions for the current shift.</p>
-            <div class="metric-card">
-              <strong data-payment-total>$0.00</strong>
-              <span>Collected today</span>
+        <div class="tab-panel" data-tab-panel="orders">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Chef Orders</h3>
+              <p class="hero__subtitle">Live queues coming from the chef site and payment window.</p>
+              <ul class="order-list" data-order-list></ul>
             </div>
-            <button class="button button--primary" type="button" data-open-payment>
-              Create Payment
-            </button>
+            <div class="info-card">
+              <h3>Chef Menu Link</h3>
+              <p class="hero__subtitle">Hoang Gia Pho is the active chef for this pilot.</p>
+              <a
+                class="button button--ghost"
+                href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open Hoang Gia Pho
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tab-panel="payments">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Payments</h3>
+              <p class="hero__subtitle">Completed transactions for the current shift.</p>
+              <div class="metric-card">
+                <strong data-payment-total>$0.00</strong>
+                <span>Collected today</span>
+              </div>
+              <button class="button button--primary" type="button" data-open-payment>
+                Create Payment
+              </button>
+            </div>
+            <div class="info-card">
+              <h3>Latest Orders</h3>
+              <p class="hero__subtitle">Payments sync into the order list automatically.</p>
+              <ul class="order-list" data-order-list></ul>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tab-panel="simulation">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Simulation Status</h3>
+              <p class="hero__subtitle">The dashboard simulation updates every 6 seconds.</p>
+              <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+            </div>
+            <div class="info-card">
+              <h3>Delivery Progress</h3>
+              <p class="hero__subtitle">Goal: 100 deliveries in 6 hours.</p>
+              <div class="progress">
+                <div class="progress__fill" data-progress></div>
+              </div>
+              <p class="progress__label" data-progress-label>0 / 100 delivered</p>
+            </div>
           </div>
         </div>
       </div>

@@ -105,10 +105,10 @@ const paymentButtons = document.querySelectorAll("[data-open-payment]");
 const closePaymentButton = document.querySelector("[data-close-payment]");
 const paymentForm = document.querySelector("[data-payment-form]");
 const paymentTotal = document.querySelector("[data-payment-total]");
-const orderList = document.querySelector("[data-order-list]");
-const progressFill = document.querySelector("[data-progress]");
-const progressLabel = document.querySelector("[data-progress-label]");
-const simStatus = document.querySelector("[data-sim-status]");
+const orderLists = document.querySelectorAll("[data-order-list]");
+const progressFills = document.querySelectorAll("[data-progress]");
+const progressLabels = document.querySelectorAll("[data-progress-label]");
+const simStatuses = document.querySelectorAll("[data-sim-status]");
 
 let paymentSum = 0;
 let deliveredCount = 0;
@@ -136,20 +136,25 @@ if (paymentModal) {
 }
 
 const updateProgress = () => {
-  if (!progressFill || !progressLabel) return;
   const percent = Math.min((deliveredCount / 100) * 100, 100);
-  progressFill.style.width = `${percent}%`;
-  progressLabel.textContent = `${deliveredCount} / 100 delivered`;
+  progressFills.forEach((progressFill) => {
+    progressFill.style.width = `${percent}%`;
+  });
+  progressLabels.forEach((progressLabel) => {
+    progressLabel.textContent = `${deliveredCount} / 100 delivered`;
+  });
 };
 
 const addOrder = (name, chef, amount) => {
-  if (!orderList) return;
-  const item = document.createElement("li");
-  item.innerHTML = `<span>${name} • ${chef}</span><span>$${amount.toFixed(2)}</span>`;
-  orderList.prepend(item);
-  if (orderList.children.length > 5) {
-    orderList.removeChild(orderList.lastChild);
-  }
+  if (!orderLists.length) return;
+  orderLists.forEach((orderList) => {
+    const item = document.createElement("li");
+    item.innerHTML = `<span>${name} • ${chef}</span><span>$${amount.toFixed(2)}</span>`;
+    orderList.prepend(item);
+    if (orderList.children.length > 5) {
+      orderList.removeChild(orderList.lastChild);
+    }
+  });
 };
 
 if (paymentForm) {
@@ -173,20 +178,38 @@ if (paymentForm) {
 }
 
 const simulateDashboard = () => {
-  if (!orderList) return;
+  if (!orderLists.length) return;
   const chefs = ["Hoang Gia Pho", "Chef Amina", "Chef Luca", "Chef Priya"];
   const names = ["Jade", "Marco", "Leila", "Andre", "Sienna", "Tariq"];
   const amount = 18 + Math.random() * 22;
   const name = names[Math.floor(Math.random() * names.length)];
   const chef = chefs[Math.floor(Math.random() * chefs.length)];
   addOrder(name, chef, amount);
-  if (simStatus) {
+  simStatuses.forEach((simStatus) => {
     simStatus.textContent = "Simulation: dispatching live orders.";
-  }
+  });
 };
 
 setInterval(simulateDashboard, 6000);
 updateProgress();
+
+const tabButtons = document.querySelectorAll("[data-tab-target]");
+const tabPanels = document.querySelectorAll("[data-tab-panel]");
+
+const setActiveTab = (target) => {
+  tabButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.tabTarget === target);
+  });
+  tabPanels.forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.tabPanel === target);
+  });
+};
+
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setActiveTab(button.dataset.tabTarget);
+  });
+});
 
 const invalidateMap = () => map.invalidateSize();
 window.addEventListener("resize", () => {
