@@ -146,6 +146,33 @@ a {
   padding: 0 6vw 40px;
 }
 
+.platform {
+  padding: 0 6vw 40px;
+}
+
+.platform-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 20px;
+}
+
+.platform-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.platform-links a {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #f7fbfa;
+  font-weight: 600;
+}
+
 .tracking {
   padding: 0 6vw 40px;
   display: grid;
