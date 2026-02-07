@@ -1,185 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RideNDine Demo</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<link rel="stylesheet" href="styles.css"/>
-</head>
-<body>
-<header>
-  <div class="brand">
-    <div class="logoWrap"><img src="assets/logo.png" class="logo" alt="RideNDine logo"/></div>
-    <div>
-      <h1>RideNDine Dashboard</h1>
-      <p class="sub">Mobile + Desktop Operations View · <span id="appVersion">v0.7.0</span></p>
-    </div>
-  </div>
-  <div class="row">
-    <span id="chefContext" class="pill">Chef: demo-default</span>
-    <button id="themeToggle" class="btn secondary" type="button">Toggle Theme</button>
-  </div>
-</header>
-
-<nav>
-  <button onclick="show('orders')">Orders</button>
-  <button onclick="show('simulate')">Simulation</button>
-  <button onclick="show('analytics')">Analytics</button>
-  <button onclick="show('payments')">Payments</button>
-</nav>
-
-<section class="card dashboard" id="dashboard">
-  <h2>Main Dashboard</h2>
-  <div class="kpis kpis-main">
-    <div class="kpi highlight"><span>Daily Orders</span><strong id="kDailyOrders">0</strong></div>
-    <div class="kpi highlight"><span>Daily Profit</span><strong id="kDailyProfit">$0.00</strong></div>
-    <div class="kpi"><span>Net Margin</span><strong id="kMargin">$0</strong></div>
-    <div class="kpi"><span>Avg Time</span><strong id="kAvgTime">0 min</strong></div>
-  </div>
-
-  <div class="tabs" id="dashTabs">
-    <button class="dash-tab active" data-tab="overview">Overview</button>
-    <button class="dash-tab" data-tab="operations">Operations</button>
-    <button class="dash-tab" data-tab="finance">Finance</button>
-  </div>
-
-  <div class="dash-panel active" data-panel="overview">
-    <div class="kpis" id="kpiGridOverview">
-      <div class="kpi"><span>Orders</span><strong id="kOrders">0</strong></div>
-      <div class="kpi"><span>Drivers</span><strong id="kDrivers">0</strong></div>
-      <div class="kpi"><span>Batches</span><strong id="kBatches">0</strong></div>
-      <div class="kpi"><span>Route Km</span><strong id="kRouteKm">0</strong></div>
-    </div>
-  </div>
-
-  <div class="dash-panel" data-panel="operations">
-    <div class="kpis">
-      <div class="kpi"><span>Chef Zones</span><strong>4</strong></div>
-      <div class="kpi"><span>Delivery Radius</span><strong>20km</strong></div>
-      <div class="kpi"><span>Batch Cluster</span><strong>4km</strong></div>
-      <div class="kpi"><span>Orders / Batch Max</span><strong>3</strong></div>
-    </div>
-  </div>
-
-  <div class="dash-panel" data-panel="finance">
-    <div class="kpis">
-      <div class="kpi"><span>Platform Revenue</span><strong id="kRevenue">$0.00</strong></div>
-      <div class="kpi"><span>Delivery Cost</span><strong id="kCost">$0.00</strong></div>
-      <div class="kpi"><span>Profit</span><strong id="kProfit">$0.00</strong></div>
-      <div class="kpi"><span>Chef Context</span><strong id="kChef">demo-default</strong></div>
-    </div>
-  </div>
-  <div class="chart card">
-    <h3>Daily Profit Trend (7d)</h3>
-    <div id="profitTrend" class="trend"></div>
-  </div>
-</section>
-
-<section class="workflow card">
-  <h2>Workflow Steps</h2>
-  <ol id="workflowSteps" class="steps">
-    <li id="step-config">1. Configure scenario and hours</li>
-    <li id="step-driver">2. Choose driver mode / count</li>
-    <li id="step-run">3. Run simulation</li>
-    <li id="step-review">4. Review metrics + leaflet routes/map</li>
-    <li id="step-publish">5. Export simulation snapshot</li>
-  </ol>
-  <button id="btnExport" class="btn secondary" disabled>Export JSON Snapshot</button>
-</section>
-
-<section id="orders" class="tab active">
-  <h2>Order Form</h2>
-  <input id="orderValue" type="number" value="50"/>
-  <button onclick="createOrder()">Place Order</button>
-  <ul id="orderList"></ul>
-</section>
-
-<section id="simulate" class="tab">
-  <h2>Simulation</h2>
-  <div class="row">
-    <label for="scenario">Orders</label>
-    <select id="scenario">
-      <option value="50">50 Orders</option>
-      <option value="100">100 Orders</option>
-      <option value="200">200 Orders</option>
-    </select>
-
-    <label for="hours">Hours</label>
-    <input id="hours" type="number" min="1" max="24" value="6"/>
-
-    <label for="roadSpeed">Road speed</label>
-    <select id="roadSpeed">
-      <option value="20">20 km/h</option>
-      <option value="30" selected>30 km/h</option>
-      <option value="40">40 km/h</option>
-      <option value="50">50 km/h</option>
-    </select>
-
-    <label for="playbackSpeed">Playback</label>
-    <select id="playbackSpeed">
-      <option value="60">1x</option>
-      <option value="120" selected>2x</option>
-      <option value="240">4x</option>
-      <option value="480">8x</option>
-    </select>
-  </div>
-
-  <div class="section">
-    <h3>Driver Pool</h3>
-    <label>Mode</label>
-    <select id="driverMode">
-      <option value="auto">Auto (scale with orders)</option>
-      <option value="manual">Manual (fixed driver count)</option>
-    </select>
-    <label style="margin-top:8px;">Manual driver count</label>
-    <input id="driverCount" type="number" min="1" max="500" value="20"/>
-  </div>
-
-  <button id="btnRun" onclick="runSim()">Run</button>
-
-  <div class="mapWrap">
-    <h3>Leaflet Routing Map</h3>
-    <p class="help">Routing uses nearest-chef assignment + constrained batching (max 3 orders, 4km cluster, max 18km route). Hover a moving scooter to see what that driver is delivering.</p>
-    <div id="leafletMap"></div>
-  </div>
-
-  <pre id="log"></pre>
-</section>
-
-<section id="analytics" class="tab">
-  <h2>Analytics</h2>
-  <table><tbody id="stats"></tbody></table>
-</section>
-
-<section id="payments" class="tab">
-  <h2>Payment Flow</h2>
-  <p class="help">MVP flow: chefs should deep-link into platform checkout via <code>?chef=&lt;id&gt;</code> so all payment capture stays on RideNDine.</p>
-  <button>Stripe Checkout (Demo)</button>
-</section>
-
-<div class="compareWrap">
-  <div class="card">
-    <h3>Scenario Compare</h3>
-    <div class="row">
-      <button id="btnCompare" class="btn secondary">Run 50 / 100 / 200 Compare</button>
-      <span id="compareStatus" class="pill">Not run</span>
-    </div>
-    <div style="overflow:auto;">
-      <table id="compareTable" class="table"></table>
-    </div>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="logic.js"></script>
-</body>
-=======
-=======
->>>>>>> main
-<<<<<<< dev
 <!doctype html>
 <html lang="en">
   <head>
@@ -190,20 +8,10 @@
     <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <meta name="theme-color" content="#ff7a18" />
-=======
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RideNDine • Home Chef Delivery</title>
-    <link rel="icon" type="image/svg+xml" href="assets/app-icon.svg" />
->>>>>>> main
     <link rel="preconnect" href="https://unpkg.com" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-<<<<<<< dev
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
@@ -233,8 +41,8 @@
           driver simulator, and the Centennial Parkway base powering our routing.
         </p>
         <div class="hero__actions">
-          <button class="button button--primary">Launch Driver Simulator</button>
-          <button class="button button--ghost">View Chef Orders</button>
+          <button class="button button--primary" data-bypass>Launch Driver Simulator</button>
+          <button class="button button--ghost" data-open-payment>Pay for an Order</button>
         </div>
         <div class="metric-grid">
           <div class="metric-card">
@@ -245,6 +53,10 @@
             <strong>100 deliveries</strong>
             <span>Target in 6 hours</span>
           </div>
+          <div class="metric-card">
+            <strong>20 km radius</strong>
+            <span>Hamilton delivery zone</span>
+          </div>
         </div>
       </div>
       <div class="hero__card">
@@ -254,9 +66,40 @@
         </p>
         <div class="route-summary">
           <div class="route-pill">Dispatch Window: 5:00 PM</div>
-          <div class="route-pill" data-route-stat>6.4 mi loop</div>
+          <div class="route-pill" data-route-stat>20 km coverage</div>
           <div class="route-pill" data-route-stat>ETA 22-28 min</div>
         </div>
+      </div>
+    </section>
+
+    <section class="tracking">
+      <div class="tracking__card">
+        <h2>Customer Order Tracking</h2>
+        <p class="hero__subtitle">
+          Enter your order ID to track the driver in real time and see updates from the dashboard.
+        </p>
+        <form class="tracking-form" data-tracking-form>
+          <label>
+            Order ID
+            <input name="orderId" type="text" placeholder="RD-2049" required />
+          </label>
+          <button class="button button--primary" type="submit">Track Order</button>
+        </form>
+        <div class="tracking-status" data-tracking-status>
+          Awaiting order lookup.
+        </div>
+      </div>
+      <div class="tracking__card">
+        <h3>Featured Chef</h3>
+        <p class="hero__subtitle">Order from our live chef menu and pay inside RideNDine.</p>
+        <a
+          class="button button--ghost"
+          href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Visit Hoang Gia Pho
+        </a>
       </div>
     </section>
 
@@ -275,7 +118,7 @@
       </div>
     </section>
 
-    <section class="chef-grid">
+    <section id="chefs" class="chef-grid">
       <div class="info-card">
         <h3>Chef Amina</h3>
         <p>Moroccan bowls • 24 orders queued</p>
@@ -288,9 +131,64 @@
         <h3>Chef Priya</h3>
         <p>South Indian plates • 22 orders queued</p>
       </div>
-      <div class="info-card">
-        <h3>Chef Mateo</h3>
-        <p>Latin comfort food • 24 orders queued</p>
+      <a
+        class="info-card info-card--link"
+        href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <h3>Hoang Gia Pho (featured)</h3>
+        <p>Vietnamese pho • 24 orders queued</p>
+        <span class="link-pill">Open chef menu</span>
+      </a>
+    </section>
+
+    <section class="platform">
+      <h2>RideNDine Platform Structure</h2>
+      <p class="hero__subtitle">
+        MVP pages below map to the target scalable file tree for customers, chefs, drivers, payments,
+        and admin operations.
+      </p>
+      <div class="platform-grid">
+        <div class="info-card">
+          <h3>Customer Web</h3>
+          <ul class="platform-links">
+            <li><a href="/apps/customer-web/pages/index.html">Customer Home</a></li>
+            <li><a href="/apps/customer-web/pages/chef.html">Chef Page</a></li>
+            <li><a href="/apps/customer-web/pages/cart.html">Cart</a></li>
+            <li><a href="/apps/customer-web/pages/checkout.html">Checkout</a></li>
+            <li><a href="/apps/customer-web/pages/order-status.html">Order Status</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>Chef Portal</h3>
+          <ul class="platform-links">
+            <li><a href="/apps/chef-portal/pages/login.html">Login</a></li>
+            <li><a href="/apps/chef-portal/pages/dashboard.html">Dashboard</a></li>
+            <li><a href="/apps/chef-portal/pages/orders.html">Orders</a></li>
+            <li><a href="/apps/chef-portal/pages/menu-editor.html">Menu Editor</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>Driver App</h3>
+          <ul class="platform-links">
+            <li><a href="/apps/driver-app/pages/login.html">Login</a></li>
+            <li><a href="/apps/driver-app/pages/jobs.html">Jobs</a></li>
+            <li><a href="/apps/driver-app/pages/navigation.html">Navigation</a></li>
+            <li><a href="/apps/driver-app/pages/proof-of-delivery.html">Proof of Delivery</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3>Admin & Legal</h3>
+          <ul class="platform-links">
+            <li><a href="/admin/pages/operations.html">Operations</a></li>
+            <li><a href="/admin/pages/chef-onboarding.html">Chef Onboarding</a></li>
+            <li><a href="/admin/pages/disputes-refunds.html">Disputes & Refunds</a></li>
+            <li><a href="/admin/pages/payouts-ledger.html">Payouts Ledger</a></li>
+            <li><a href="/legal/terms.html">Terms</a></li>
+            <li><a href="/legal/privacy.html">Privacy</a></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -309,30 +207,106 @@
           </label>
           <div class="hero__actions">
             <button type="button" class="button button--primary" data-bypass>Bypass Login</button>
-            <button type="button" class="button button--ghost">Request Access</button>
+            <button type="button" class="button button--ghost" data-open-payment>Open Payment Window</button>
           </div>
         </form>
       </div>
       <div class="admin__panel" data-panel hidden>
         <h2>Admin Dashboard</h2>
         <p class="hero__subtitle">Operational overview for the next 6-hour delivery window.</p>
-        <div class="admin-grid">
-          <div class="info-card">
-            <h3>Delivery Goal</h3>
-            <p>100 deliveries in 6 hours with buffer for late orders.</p>
+        <div class="tabs">
+          <button class="tab-button is-active" type="button" data-tab-target="overview">Overview</button>
+          <button class="tab-button" type="button" data-tab-target="orders">Orders</button>
+          <button class="tab-button" type="button" data-tab-target="payments">Payments</button>
+          <button class="tab-button" type="button" data-tab-target="simulation">Simulation</button>
+        </div>
+        <div class="tab-panel is-active" data-tab-panel="overview">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Delivery Goal</h3>
+              <p>100 deliveries in 6 hours with buffer for late orders.</p>
+              <div class="progress">
+                <div class="progress__fill" data-progress></div>
+              </div>
+              <p class="progress__label" data-progress-label>0 / 100 delivered</p>
+            </div>
+            <div class="info-card">
+              <h3>Chef Lineup</h3>
+              <ul class="chef-list">
+                <li><strong>Chef Amina</strong> — Moroccan bowls</li>
+                <li><strong>Chef Luca</strong> — Italian classics</li>
+                <li><strong>Chef Priya</strong> — South Indian plates</li>
+                <li><strong>Hoang Gia Pho</strong> — Vietnamese pho</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <h3>Driver Coverage</h3>
+              <p>3 live drivers plus 2 on-call. Coverage radius: 20 km.</p>
+              <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+            </div>
           </div>
-          <div class="info-card">
-            <h3>Chef Lineup</h3>
-            <ul class="chef-list">
-              <li><strong>Chef Amina</strong> — Moroccan bowls</li>
-              <li><strong>Chef Luca</strong> — Italian classics</li>
-              <li><strong>Chef Priya</strong> — South Indian plates</li>
-              <li><strong>Chef Mateo</strong> — Latin comfort food</li>
-            </ul>
+        </div>
+        <div class="tab-panel" data-tab-panel="orders">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Chef Orders</h3>
+              <p class="hero__subtitle">Live queues coming from the chef site and payment window.</p>
+              <ul class="order-list" data-order-list></ul>
+            </div>
+            <div class="info-card">
+              <h3>Chef Menu Link</h3>
+              <p class="hero__subtitle">Hoang Gia Pho is the active chef for this pilot.</p>
+              <a
+                class="button button--ghost"
+                href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open Hoang Gia Pho
+              </a>
+            </div>
           </div>
-          <div class="info-card">
-            <h3>Driver Coverage</h3>
-            <p>3 live drivers plus 2 on-call. Coverage radius: 8 km.</p>
+        </div>
+        <div class="tab-panel" data-tab-panel="payments">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Payments</h3>
+              <p class="hero__subtitle">Completed transactions for the current shift.</p>
+              <div class="metric-card">
+                <strong data-payment-total>$0.00</strong>
+                <span>Collected today</span>
+              </div>
+              <button class="button button--primary" type="button" data-open-payment>
+                Create Payment
+              </button>
+            </div>
+            <div class="info-card">
+              <h3>Latest Orders</h3>
+              <p class="hero__subtitle">Payments sync into the order list automatically.</p>
+              <ul class="order-list" data-order-list></ul>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" data-tab-panel="simulation">
+          <div class="admin-grid">
+            <div class="info-card">
+              <h3>Simulation Status</h3>
+              <p class="hero__subtitle">The dashboard simulation updates every 6 seconds.</p>
+              <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+            </div>
+            <div class="info-card">
+              <h3>Delivery Progress</h3>
+              <p class="hero__subtitle">Goal: 100 deliveries in 6 hours.</p>
+              <div class="progress">
+                <div class="progress__fill" data-progress></div>
+              </div>
+              <p class="progress__label" data-progress-label>0 / 100 delivered</p>
+            </div>
+            <div class="info-card">
+              <h3>Dashboard Map (Leaflet)</h3>
+              <p class="hero__subtitle">Live 20 km coverage ring from Centennial Parkway.</p>
+              <div id="admin-map"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -348,7 +322,7 @@
         <div class="route-summary">
           <div class="route-pill">3 active drivers</div>
           <div class="route-pill">4 chef pickups</div>
-          <div class="route-pill">OpenStreetMap</div>
+          <div class="route-pill">Leaflet + OpenStreetMap</div>
         </div>
       </section>
 
@@ -384,336 +358,54 @@
         </a>
       </div>
       <p>Theme colors remain aligned with the RideNDine brand palette.</p>
-=======
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="hero">
-      <nav class="nav">
-        <div class="brand">
-          <img src="assets/logo.svg" alt="RideNDine logo" />
+    </footer>
+
+    <div class="modal" data-payment-modal aria-hidden="true">
+      <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="payment-title">
+        <div class="modal__header">
+          <h3 id="payment-title">Payment Window</h3>
+          <button class="button button--ghost" type="button" data-close-payment>Close</button>
         </div>
-        <div class="nav-links">
-          <a href="#operations">Operations</a>
-          <a href="#routing">Routing</a>
-          <a href="#branches">Branches</a>
-        </div>
-        <button class="primary">Launch Orders</button>
-      </nav>
-      <div class="hero-content">
-        <div class="hero-text">
-          <span class="pill">Live in Hamilton, ON</span>
-          <h1>Delivering home-chef meals with smart routing.</h1>
-          <p>
-            RideNDine connects local chefs with hungry neighbors. Dispatch drivers from our
-            Centennial Parkway base, track routes in real time, and keep every delivery on time.
+        <p class="hero__subtitle">Collect payments for chef orders and log them in the dashboard.</p>
+        <form class="payment-form" data-payment-form>
+          <label>
+            Customer name
+            <input name="name" type="text" placeholder="Jordan Lee" required />
+          </label>
+          <label>
+            Order total (CAD)
+            <input name="amount" type="number" min="10" max="250" step="0.01" value="28.50" required />
+          </label>
+          <label>
+            Chef
+            <select name="chef">
+              <option>Hoang Gia Pho</option>
+              <option>Chef Amina</option>
+              <option>Chef Luca</option>
+              <option>Chef Priya</option>
+            </select>
+          </label>
+          <button class="button button--primary" type="submit">Process Payment</button>
+        </form>
+        <div class="checkout" data-checkout hidden>
+          <h4>Checkout Complete</h4>
+          <p class="hero__subtitle">
+            Payment received. Share this order ID with the customer for tracking.
           </p>
-          <div class="hero-actions">
-            <button class="primary">Start a delivery</button>
-            <button class="ghost">View chef menu</button>
+          <div class="metric-card">
+            <strong data-order-id>RD-0000</strong>
+            <span>Order ID</span>
           </div>
-          <div class="hero-stats">
-            <div>
-              <h3>12</h3>
-              <span>Active drivers</span>
-            </div>
-            <div>
-              <h3>4.9★</h3>
-              <span>Chef rating</span>
-            </div>
-            <div>
-              <h3>18 min</h3>
-              <span>Avg. delivery</span>
-            </div>
-          </div>
-        </div>
-        <div class="hero-card">
-          <h2>Dispatch Control</h2>
-          <p>Base address:</p>
-          <strong>75 Centennial Parkway, Hamilton, Ontario</strong>
-          <div class="status">
-            <div>
-              <span class="dot"></span>
-              <span>Routing engine online</span>
-            </div>
-            <div>
-              <span class="dot"></span>
-              <span>Drivers simulated</span>
-            </div>
-          </div>
+          <button class="button button--ghost" type="button" data-close-payment>Close</button>
         </div>
       </div>
-    </header>
-
-    <main>
-      <section id="operations" class="section">
-        <div class="section-heading">
-          <h2>Operations overview</h2>
-          <p>See drivers, chefs, and drop-offs update in real time.</p>
-        </div>
-        <div class="grid">
-          <div class="card">
-            <h3>Chef network</h3>
-            <p>12 active kitchens across Hamilton with nightly pickup windows.</p>
-          </div>
-          <div class="card">
-            <h3>Driver simulation</h3>
-            <p>Animated scooter fleet that loops around priority zones.</p>
-          </div>
-          <div class="card">
-            <h3>Order routing</h3>
-            <p>Auto-calculated routes from base to each delivery stop.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="routing" class="section">
-        <div class="section-heading">
-          <h2>Routing &amp; mapping</h2>
-          <p>Center of operations pinned at 75 Centennial Parkway, Hamilton.</p>
-        </div>
-        <div class="map-panel">
-          <div id="map"></div>
-          <div class="map-legend">
-            <h3>Live dispatch</h3>
-            <ul>
-              <li><span class="legend base"></span>Base hub</li>
-              <li><span class="legend chef"></span>Chef pickup</li>
-              <li><span class="legend customer"></span>Customer drop-off</li>
-              <li><span class="legend driver"></span>Driver simulators</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="branches" class="section">
-        <div class="section-heading">
-          <h2>Branch readiness</h2>
-          <p>All release tracks are aligned for Pages deployments.</p>
-        </div>
-        <div class="grid">
-          <div class="card branch">
-            <h3>Main</h3>
-            <p>Production-ready UI and live GitHub Pages builds.</p>
-            <span class="badge">running</span>
-          </div>
-          <div class="card branch">
-            <h3>Stable</h3>
-            <p>QA-approved feature set for client walkthroughs.</p>
-            <span class="badge">running</span>
-          </div>
-          <div class="card branch">
-            <h3>Dev</h3>
-            <p>Rapid iteration track for routing and driver simulation.</p>
-            <span class="badge">running</span>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <span>RideNDine © 2026 — Built for home chefs.</span>
-      <span class="footer-links">GitHub Pages ready • Hamilton, ON</span>
->>>>>>> main
-    </footer>
+    </div>
 
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-<<<<<<< dev
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
     <script src="./app.js"></script>
-=======
-      integrity="sha256-o9N1j7kGStb9kG1R5t1T1JDw2CqS+e0pShG6GZQ1h3U="
-      crossorigin=""
-    ></script>
-    <script src="app.js"></script>
->>>>>>> main
   </body>
-<<<<<<< HEAD
->>>>>>> 45e313009f3b8dc1f1a11d0f5b4edabb9b1a64cf
-=======
-=======
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RideNDine Demo</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<link rel="stylesheet" href="styles.css"/>
-</head>
-<body>
-<header>
-  <div class="brand">
-    <div class="logoWrap"><img src="assets/logo.png" class="logo" alt="RideNDine logo"/></div>
-    <div>
-      <h1>RideNDine Dashboard</h1>
-      <p class="sub">Mobile + Desktop Operations View · <span id="appVersion">v0.7.0</span></p>
-    </div>
-  </div>
-  <div class="row">
-    <span id="chefContext" class="pill">Chef: demo-default</span>
-    <button id="themeToggle" class="btn secondary" type="button">Toggle Theme</button>
-  </div>
-</header>
-
-<nav>
-  <button onclick="show('orders')">Orders</button>
-  <button onclick="show('simulate')">Simulation</button>
-  <button onclick="show('analytics')">Analytics</button>
-  <button onclick="show('payments')">Payments</button>
-</nav>
-
-<section class="card dashboard" id="dashboard">
-  <h2>Main Dashboard</h2>
-  <div class="kpis kpis-main">
-    <div class="kpi highlight"><span>Daily Orders</span><strong id="kDailyOrders">0</strong></div>
-    <div class="kpi highlight"><span>Daily Profit</span><strong id="kDailyProfit">$0.00</strong></div>
-    <div class="kpi"><span>Net Margin</span><strong id="kMargin">$0</strong></div>
-    <div class="kpi"><span>Avg Time</span><strong id="kAvgTime">0 min</strong></div>
-  </div>
-
-  <div class="tabs" id="dashTabs">
-    <button class="dash-tab active" data-tab="overview">Overview</button>
-    <button class="dash-tab" data-tab="operations">Operations</button>
-    <button class="dash-tab" data-tab="finance">Finance</button>
-  </div>
-
-  <div class="dash-panel active" data-panel="overview">
-    <div class="kpis" id="kpiGridOverview">
-      <div class="kpi"><span>Orders</span><strong id="kOrders">0</strong></div>
-      <div class="kpi"><span>Drivers</span><strong id="kDrivers">0</strong></div>
-      <div class="kpi"><span>Batches</span><strong id="kBatches">0</strong></div>
-      <div class="kpi"><span>Route Km</span><strong id="kRouteKm">0</strong></div>
-    </div>
-  </div>
-
-  <div class="dash-panel" data-panel="operations">
-    <div class="kpis">
-      <div class="kpi"><span>Chef Zones</span><strong>4</strong></div>
-      <div class="kpi"><span>Delivery Radius</span><strong>20km</strong></div>
-      <div class="kpi"><span>Batch Cluster</span><strong>4km</strong></div>
-      <div class="kpi"><span>Orders / Batch Max</span><strong>3</strong></div>
-    </div>
-  </div>
-
-  <div class="dash-panel" data-panel="finance">
-    <div class="kpis">
-      <div class="kpi"><span>Platform Revenue</span><strong id="kRevenue">$0.00</strong></div>
-      <div class="kpi"><span>Delivery Cost</span><strong id="kCost">$0.00</strong></div>
-      <div class="kpi"><span>Profit</span><strong id="kProfit">$0.00</strong></div>
-      <div class="kpi"><span>Chef Context</span><strong id="kChef">demo-default</strong></div>
-    </div>
-  </div>
-  <div class="chart card">
-    <h3>Daily Profit Trend (7d)</h3>
-    <div id="profitTrend" class="trend"></div>
-  </div>
-</section>
-
-<section class="workflow card">
-  <h2>Workflow Steps</h2>
-  <ol id="workflowSteps" class="steps">
-    <li id="step-config">1. Configure scenario and hours</li>
-    <li id="step-driver">2. Choose driver mode / count</li>
-    <li id="step-run">3. Run simulation</li>
-    <li id="step-review">4. Review metrics + leaflet routes/map</li>
-    <li id="step-publish">5. Export simulation snapshot</li>
-  </ol>
-  <button id="btnExport" class="btn secondary" disabled>Export JSON Snapshot</button>
-</section>
-
-<section id="orders" class="tab active">
-  <h2>Order Form</h2>
-  <input id="orderValue" type="number" value="50"/>
-  <button onclick="createOrder()">Place Order</button>
-  <ul id="orderList"></ul>
-</section>
-
-<section id="simulate" class="tab">
-  <h2>Simulation</h2>
-  <div class="row">
-    <label for="scenario">Orders</label>
-    <select id="scenario">
-      <option value="50">50 Orders</option>
-      <option value="100">100 Orders</option>
-      <option value="200">200 Orders</option>
-    </select>
-
-    <label for="hours">Hours</label>
-    <input id="hours" type="number" min="1" max="24" value="6"/>
-
-    <label for="roadSpeed">Road speed</label>
-    <select id="roadSpeed">
-      <option value="20">20 km/h</option>
-      <option value="30" selected>30 km/h</option>
-      <option value="40">40 km/h</option>
-      <option value="50">50 km/h</option>
-    </select>
-
-    <label for="playbackSpeed">Playback</label>
-    <select id="playbackSpeed">
-      <option value="60">1x</option>
-      <option value="120" selected>2x</option>
-      <option value="240">4x</option>
-      <option value="480">8x</option>
-    </select>
-  </div>
-
-  <div class="section">
-    <h3>Driver Pool</h3>
-    <label>Mode</label>
-    <select id="driverMode">
-      <option value="auto">Auto (scale with orders)</option>
-      <option value="manual">Manual (fixed driver count)</option>
-    </select>
-    <label style="margin-top:8px;">Manual driver count</label>
-    <input id="driverCount" type="number" min="1" max="500" value="20"/>
-  </div>
-
-  <button id="btnRun" onclick="runSim()">Run</button>
-
-  <div class="mapWrap">
-    <h3>Leaflet Routing Map</h3>
-    <p class="help">Routing uses nearest-chef assignment + constrained batching (max 3 orders, 4km cluster, max 18km route). Hover a moving scooter to see what that driver is delivering.</p>
-    <div id="leafletMap"></div>
-  </div>
-
-  <pre id="log"></pre>
-</section>
-
-<section id="analytics" class="tab">
-  <h2>Analytics</h2>
-  <table><tbody id="stats"></tbody></table>
-</section>
-
-<section id="payments" class="tab">
-  <h2>Payment Flow</h2>
-  <p class="help">MVP flow: chefs should deep-link into platform checkout via <code>?chef=&lt;id&gt;</code> so all payment capture stays on RideNDine.</p>
-  <button>Stripe Checkout (Demo)</button>
-</section>
-
-<div class="compareWrap">
-  <div class="card">
-    <h3>Scenario Compare</h3>
-    <div class="row">
-      <button id="btnCompare" class="btn secondary">Run 50 / 100 / 200 Compare</button>
-      <span id="compareStatus" class="pill">Not run</span>
-    </div>
-    <div style="overflow:auto;">
-      <table id="compareTable" class="table"></table>
-    </div>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="logic.js"></script>
-</body>
->>>>>>> dev
->>>>>>> main
 </html>

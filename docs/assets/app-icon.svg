@@ -1,4 +1,3 @@
-<<<<<<< dev
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="RideNDine app icon">
   <defs>
     <linearGradient id="iconGradient" x1="0" y1="0" x2="1" y2="1">
@@ -20,23 +19,4 @@
     <path d="M24 48h86l18-18" stroke="#ff7a18" stroke-width="12" stroke-linecap="round" fill="none" />
     <path d="M36 36c8-16 34-20 48-8" stroke="#19b7b1" stroke-width="10" stroke-linecap="round" fill="none" />
   </g>
-=======
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ride N Dine app icon">
-  <defs>
-    <linearGradient id="iconGradient" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#f97316" />
-      <stop offset="100%" stop-color="#0f766e" />
-    </linearGradient>
-  </defs>
-  <path d="M52 128c0-42 34-76 76-76s76 34 76 76-34 76-76 76-76-34-76-76z" fill="url(#iconGradient)" opacity="0.15" />
-  <path d="M64 136c12-36 38-56 64-56s52 20 64 56H64z" fill="#f97316" />
-  <rect x="118" y="74" width="20" height="10" rx="5" fill="#f59e0b" />
-  <rect x="116" y="90" width="4" height="18" rx="2" fill="#fff" />
-  <rect x="124" y="90" width="4" height="18" rx="2" fill="#fff" />
-  <rect x="132" y="90" width="4" height="18" rx="2" fill="#fff" />
-  <path d="M72 142c26 14 50 14 76 0s50-14 76 0" fill="none" stroke="#14b8a6" stroke-width="10" stroke-linecap="round" />
-  <circle cx="182" cy="154" r="18" fill="#f97316" />
-  <rect x="172" y="146" width="28" height="7" rx="3.5" fill="#0f172a" />
-  <circle cx="170" cy="172" r="8" fill="#0f172a" />
->>>>>>> main
 </svg>
