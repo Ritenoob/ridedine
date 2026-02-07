@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RideNDine Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logoWrap"><img src="assets/logo.png" class="logo" alt="RideNDine logo"/></div>
+    <div>
+      <h1>RideNDine Dashboard</h1>
+      <p class="sub">Mobile + Desktop Operations View · <span id="appVersion">v0.7.0</span></p>
+    </div>
+  </div>
+  <div class="row">
+    <span id="chefContext" class="pill">Chef: demo-default</span>
+    <button id="themeToggle" class="btn secondary" type="button">Toggle Theme</button>
+  </div>
+</header>
+
+<nav>
+  <button onclick="show('orders')">Orders</button>
+  <button onclick="show('simulate')">Simulation</button>
+  <button onclick="show('analytics')">Analytics</button>
+  <button onclick="show('payments')">Payments</button>
+</nav>
+
+<section class="card dashboard" id="dashboard">
+  <h2>Main Dashboard</h2>
+  <div class="kpis kpis-main">
+    <div class="kpi highlight"><span>Daily Orders</span><strong id="kDailyOrders">0</strong></div>
+    <div class="kpi highlight"><span>Daily Profit</span><strong id="kDailyProfit">$0.00</strong></div>
+    <div class="kpi"><span>Net Margin</span><strong id="kMargin">$0</strong></div>
+    <div class="kpi"><span>Avg Time</span><strong id="kAvgTime">0 min</strong></div>
+  </div>
+
+  <div class="tabs" id="dashTabs">
+    <button class="dash-tab active" data-tab="overview">Overview</button>
+    <button class="dash-tab" data-tab="operations">Operations</button>
+    <button class="dash-tab" data-tab="finance">Finance</button>
+  </div>
+
+  <div class="dash-panel active" data-panel="overview">
+    <div class="kpis" id="kpiGridOverview">
+      <div class="kpi"><span>Orders</span><strong id="kOrders">0</strong></div>
+      <div class="kpi"><span>Drivers</span><strong id="kDrivers">0</strong></div>
+      <div class="kpi"><span>Batches</span><strong id="kBatches">0</strong></div>
+      <div class="kpi"><span>Route Km</span><strong id="kRouteKm">0</strong></div>
+    </div>
+  </div>
+
+  <div class="dash-panel" data-panel="operations">
+    <div class="kpis">
+      <div class="kpi"><span>Chef Zones</span><strong>4</strong></div>
+      <div class="kpi"><span>Delivery Radius</span><strong>20km</strong></div>
+      <div class="kpi"><span>Batch Cluster</span><strong>4km</strong></div>
+      <div class="kpi"><span>Orders / Batch Max</span><strong>3</strong></div>
+    </div>
+  </div>
+
+  <div class="dash-panel" data-panel="finance">
+    <div class="kpis">
+      <div class="kpi"><span>Platform Revenue</span><strong id="kRevenue">$0.00</strong></div>
+      <div class="kpi"><span>Delivery Cost</span><strong id="kCost">$0.00</strong></div>
+      <div class="kpi"><span>Profit</span><strong id="kProfit">$0.00</strong></div>
+      <div class="kpi"><span>Chef Context</span><strong id="kChef">demo-default</strong></div>
+    </div>
+  </div>
+  <div class="chart card">
+    <h3>Daily Profit Trend (7d)</h3>
+    <div id="profitTrend" class="trend"></div>
+  </div>
+</section>
+
+<section class="workflow card">
+  <h2>Workflow Steps</h2>
+  <ol id="workflowSteps" class="steps">
+    <li id="step-config">1. Configure scenario and hours</li>
+    <li id="step-driver">2. Choose driver mode / count</li>
+    <li id="step-run">3. Run simulation</li>
+    <li id="step-review">4. Review metrics + leaflet routes/map</li>
+    <li id="step-publish">5. Export simulation snapshot</li>
+  </ol>
+  <button id="btnExport" class="btn secondary" disabled>Export JSON Snapshot</button>
+</section>
+
+<section id="orders" class="tab active">
+  <h2>Order Form</h2>
+  <input id="orderValue" type="number" value="50"/>
+  <button onclick="createOrder()">Place Order</button>
+  <ul id="orderList"></ul>
+</section>
+
+<section id="simulate" class="tab">
+  <h2>Simulation</h2>
+  <div class="row">
+    <label for="scenario">Orders</label>
+    <select id="scenario">
+      <option value="50">50 Orders</option>
+      <option value="100">100 Orders</option>
+      <option value="200">200 Orders</option>
+    </select>
+
+    <label for="hours">Hours</label>
+    <input id="hours" type="number" min="1" max="24" value="6"/>
+
+    <label for="roadSpeed">Road speed</label>
+    <select id="roadSpeed">
+      <option value="20">20 km/h</option>
+      <option value="30" selected>30 km/h</option>
+      <option value="40">40 km/h</option>
+      <option value="50">50 km/h</option>
+    </select>
+
+    <label for="playbackSpeed">Playback</label>
+    <select id="playbackSpeed">
+      <option value="60">1x</option>
+      <option value="120" selected>2x</option>
+      <option value="240">4x</option>
+      <option value="480">8x</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <h3>Driver Pool</h3>
+    <label>Mode</label>
+    <select id="driverMode">
+      <option value="auto">Auto (scale with orders)</option>
+      <option value="manual">Manual (fixed driver count)</option>
+    </select>
+    <label style="margin-top:8px;">Manual driver count</label>
+    <input id="driverCount" type="number" min="1" max="500" value="20"/>
+  </div>
+
+  <button id="btnRun" onclick="runSim()">Run</button>
+
+  <div class="mapWrap">
+    <h3>Leaflet Routing Map</h3>
+    <p class="help">Routing uses nearest-chef assignment + constrained batching (max 3 orders, 4km cluster, max 18km route). Hover a moving scooter to see what that driver is delivering.</p>
+    <div id="leafletMap"></div>
+  </div>
+
+  <pre id="log"></pre>
+</section>
+
+<section id="analytics" class="tab">
+  <h2>Analytics</h2>
+  <table><tbody id="stats"></tbody></table>
+</section>
+
+<section id="payments" class="tab">
+  <h2>Payment Flow</h2>
+  <p class="help">MVP flow: chefs should deep-link into platform checkout via <code>?chef=&lt;id&gt;</code> so all payment capture stays on RideNDine.</p>
+  <button>Stripe Checkout (Demo)</button>
+</section>
+
+<div class="compareWrap">
+  <div class="card">
+    <h3>Scenario Compare</h3>
+    <div class="row">
+      <button id="btnCompare" class="btn secondary">Run 50 / 100 / 200 Compare</button>
+      <span id="compareStatus" class="pill">Not run</span>
+    </div>
+    <div style="overflow:auto;">
+      <table id="compareTable" class="table"></table>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="logic.js"></script>
+</body>
+</html>
