@@ -6,36 +6,46 @@ const dropPoints = [
   [43.2318, -79.7708],
 ];
 
-const map = L.map("map", {
+const buildMap = (elementId, options = {}) => {
+  const mapInstance = L.map(elementId, {
+    zoomControl: false,
+    scrollWheelZoom: false,
+    ...options,
+  }).setView(base, 13);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(mapInstance);
+
+  L.control.zoom({ position: "bottomright" }).addTo(mapInstance);
+
+  const baseMarker = L.marker(base, {
+    title: "RideNDine Base - 75 Centennial Pkwy",
+  }).addTo(mapInstance);
+  baseMarker.bindPopup("RideNDine Base<br>75 Centennial Pkwy, Hamilton, ON");
+
+  L.circle(base, {
+    radius: 20000,
+    color: "#19b7b1",
+    weight: 2,
+    fillColor: "#19b7b1",
+    fillOpacity: 0.08,
+  }).addTo(mapInstance);
+
+  const routeLine = L.polyline([base, ...dropPoints, base], {
+    color: "#ff7a18",
+    weight: 4,
+    opacity: 0.9,
+  }).addTo(mapInstance);
+
+  return { mapInstance, routeLine };
+};
+
+const { mapInstance: map, routeLine } = buildMap("map");
+const { mapInstance: adminMap } = buildMap("admin-map", {
   zoomControl: false,
-  scrollWheelZoom: false,
-}).setView(base, 13);
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: "&copy; OpenStreetMap contributors",
-}).addTo(map);
-
-L.control.zoom({ position: "bottomright" }).addTo(map);
-
-const baseMarker = L.marker(base, {
-  title: "RideNDine Base - 75 Centennial Pkwy",
-}).addTo(map);
-baseMarker.bindPopup("RideNDine Base<br>75 Centennial Pkwy, Hamilton, ON");
-
-L.circle(base, {
-  radius: 20000,
-  color: "#19b7b1",
-  weight: 2,
-  fillColor: "#19b7b1",
-  fillOpacity: 0.08,
-}).addTo(map);
-
-const routeLine = L.polyline([base, ...dropPoints, base], {
-  color: "#ff7a18",
-  weight: 4,
-  opacity: 0.9,
-}).addTo(map);
+});
 
 const driverPaths = [
   [base, dropPoints[0], dropPoints[1], base],
@@ -109,6 +119,10 @@ const orderLists = document.querySelectorAll("[data-order-list]");
 const progressFills = document.querySelectorAll("[data-progress]");
 const progressLabels = document.querySelectorAll("[data-progress-label]");
 const simStatuses = document.querySelectorAll("[data-sim-status]");
+const checkoutPanel = document.querySelector("[data-checkout]");
+const orderIdOutput = document.querySelector("[data-order-id]");
+const trackingForm = document.querySelector("[data-tracking-form]");
+const trackingStatus = document.querySelector("[data-tracking-status]");
 
 let paymentSum = 0;
 let deliveredCount = 0;
@@ -117,10 +131,21 @@ const toggleModal = (isOpen) => {
   if (!paymentModal) return;
   paymentModal.classList.toggle("is-visible", isOpen);
   paymentModal.setAttribute("aria-hidden", String(!isOpen));
+  if (paymentForm) {
+    paymentForm.hidden = !isOpen;
+  }
 };
 
 paymentButtons.forEach((button) => {
-  button.addEventListener("click", () => toggleModal(true));
+  button.addEventListener("click", () => {
+    if (checkoutPanel) {
+      checkoutPanel.hidden = true;
+    }
+    if (paymentForm) {
+      paymentForm.hidden = false;
+    }
+    toggleModal(true);
+  });
 });
 
 if (closePaymentButton) {
@@ -147,14 +172,16 @@ const updateProgress = () => {
 
 const addOrder = (name, chef, amount) => {
   if (!orderLists.length) return;
+  const orderId = `RD-${String(Math.floor(1000 + Math.random() * 9000))}`;
   orderLists.forEach((orderList) => {
     const item = document.createElement("li");
-    item.innerHTML = `<span>${name} • ${chef}</span><span>$${amount.toFixed(2)}</span>`;
+    item.innerHTML = `<span>${orderId} • ${name} • ${chef}</span><span>$${amount.toFixed(2)}</span>`;
     orderList.prepend(item);
     if (orderList.children.length > 5) {
       orderList.removeChild(orderList.lastChild);
     }
   });
+  return orderId;
 };
 
 if (paymentForm) {
@@ -170,9 +197,14 @@ if (paymentForm) {
     if (paymentTotal) {
       paymentTotal.textContent = `$${paymentSum.toFixed(2)}`;
     }
-    addOrder(name, chef, amount);
+    const orderId = addOrder(name, chef, amount);
+    if (orderIdOutput && orderId) {
+      orderIdOutput.textContent = orderId;
+    }
     updateProgress();
-    toggleModal(false);
+    if (checkoutPanel) {
+      checkoutPanel.hidden = false;
+    }
     paymentForm.reset();
   });
 }
@@ -211,7 +243,29 @@ tabButtons.forEach((button) => {
   });
 });
 
-const invalidateMap = () => map.invalidateSize();
+if (trackingForm && trackingStatus) {
+  trackingForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(trackingForm);
+    const orderId = String(data.get("orderId") || "RD-0000").toUpperCase();
+    trackingStatus.textContent = `${orderId} is out for delivery. Driver ETA 22-28 min.`;
+  });
+}
+
+const closeButtons = document.querySelectorAll("[data-close-payment]");
+closeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (checkoutPanel) {
+      checkoutPanel.hidden = true;
+    }
+    toggleModal(false);
+  });
+});
+
+const invalidateMap = () => {
+  map.invalidateSize();
+  adminMap.invalidateSize();
+};
 window.addEventListener("resize", () => {
   window.clearTimeout(window.__mapResizeTimer);
   window.__mapResizeTimer = window.setTimeout(invalidateMap, 150);

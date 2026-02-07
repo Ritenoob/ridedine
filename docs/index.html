@@ -72,6 +72,37 @@
       </div>
     </section>
 
+    <section class="tracking">
+      <div class="tracking__card">
+        <h2>Customer Order Tracking</h2>
+        <p class="hero__subtitle">
+          Enter your order ID to track the driver in real time and see updates from the dashboard.
+        </p>
+        <form class="tracking-form" data-tracking-form>
+          <label>
+            Order ID
+            <input name="orderId" type="text" placeholder="RD-2049" required />
+          </label>
+          <button class="button button--primary" type="submit">Track Order</button>
+        </form>
+        <div class="tracking-status" data-tracking-status>
+          Awaiting order lookup.
+        </div>
+      </div>
+      <div class="tracking__card">
+        <h3>Featured Chef</h3>
+        <p class="hero__subtitle">Order from our live chef menu and pay inside RideNDine.</p>
+        <a
+          class="button button--ghost"
+          href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Visit Hoang Gia Pho
+        </a>
+      </div>
+    </section>
+
     <section class="info-grid">
       <div class="info-card">
         <h3>Home Chef Marketplace</h3>
@@ -222,6 +253,11 @@
               </div>
               <p class="progress__label" data-progress-label>0 / 100 delivered</p>
             </div>
+            <div class="info-card">
+              <h3>Dashboard Map (Leaflet)</h3>
+              <p class="hero__subtitle">Live 20 km coverage ring from Centennial Parkway.</p>
+              <div id="admin-map"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -302,6 +338,17 @@
           </label>
           <button class="button button--primary" type="submit">Process Payment</button>
         </form>
+        <div class="checkout" data-checkout hidden>
+          <h4>Checkout Complete</h4>
+          <p class="hero__subtitle">
+            Payment received. Share this order ID with the customer for tracking.
+          </p>
+          <div class="metric-card">
+            <strong data-order-id>RD-0000</strong>
+            <span>Order ID</span>
+          </div>
+          <button class="button button--ghost" type="button" data-close-payment>Close</button>
+        </div>
       </div>
     </div>
 
