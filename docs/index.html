@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RideNDine | Home Chef Delivery</title>
+    <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#ff7a18" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__brand">
+        <img src="./assets/logo.svg" alt="RideNDine" />
+      </div>
+      <nav class="header__nav">
+        <a href="#customer">Customers</a>
+        <a href="#admin">Admin Dashboard</a>
+        <a href="#map-panel">Live Map</a>
+        <a href="#drivers">Drivers</a>
+        <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
+          Repo
+        </a>
+      </nav>
+    </header>
+
+    <section id="customer" class="hero">
+      <div class="hero__card">
+        <h1 class="hero__title">Delivering home chef meals across Hamilton.</h1>
+        <p class="hero__subtitle">
+          RideNDine keeps local chefs connected to hungry neighbors. This demo highlights the live map,
+          driver simulator, and the Centennial Parkway base powering our routing.
+        </p>
+        <div class="hero__actions">
+          <button class="button button--primary" data-bypass>Launch Driver Simulator</button>
+          <button class="button button--ghost" data-open-payment>Pay for an Order</button>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <strong>4 chefs</strong>
+            <span>Daily rotating menus</span>
+          </div>
+          <div class="metric-card">
+            <strong>100 deliveries</strong>
+            <span>Target in 6 hours</span>
+          </div>
+          <div class="metric-card">
+            <strong>20 km radius</strong>
+            <span>Hamilton delivery zone</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero__card">
+        <h2>Base of Operations</h2>
+        <p class="hero__subtitle">
+          75 Centennial Parkway, Hamilton, Ontario
+        </p>
+        <div class="route-summary">
+          <div class="route-pill">Dispatch Window: 5:00 PM</div>
+          <div class="route-pill" data-route-stat>20 km coverage</div>
+          <div class="route-pill" data-route-stat>ETA 22-28 min</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-grid">
+      <div class="info-card">
+        <h3>Home Chef Marketplace</h3>
+        <p>Showcase daily menus, prep progress, and pickup readiness.</p>
+      </div>
+      <div class="info-card">
+        <h3>Smart Delivery Zones</h3>
+        <p>Routes prioritize warm meals while balancing driver coverage.</p>
+      </div>
+      <div class="info-card">
+        <h3>Neighborhood First</h3>
+        <p>Local-first delivery means faster drop-offs and trusted couriers.</p>
+      </div>
+    </section>
+
+    <section id="chefs" class="chef-grid">
+      <div class="info-card">
+        <h3>Chef Amina</h3>
+        <p>Moroccan bowls • 24 orders queued</p>
+      </div>
+      <div class="info-card">
+        <h3>Chef Luca</h3>
+        <p>Italian classics • 30 orders queued</p>
+      </div>
+      <div class="info-card">
+        <h3>Chef Priya</h3>
+        <p>South Indian plates • 22 orders queued</p>
+      </div>
+      <a
+        class="info-card info-card--link"
+        href="https://hoang-gia-pho-site-of8l.vercel.app/hoang-gia-pho-delivery.html"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <h3>Hoang Gia Pho (featured)</h3>
+        <p>Vietnamese pho • 24 orders queued</p>
+        <span class="link-pill">Open chef menu</span>
+      </a>
+    </section>
+
+    <section id="admin" class="admin">
+      <div class="admin__login">
+        <h2>Admin Dashboard Login</h2>
+        <p class="hero__subtitle">Demo access is available now. Use the bypass to preview the dashboard.</p>
+        <form class="login-form">
+          <label>
+            Email
+            <input type="email" placeholder="admin@ridendine.com" />
+          </label>
+          <label>
+            Password
+            <input type="password" placeholder="••••••••" />
+          </label>
+          <div class="hero__actions">
+            <button type="button" class="button button--primary" data-bypass>Bypass Login</button>
+            <button type="button" class="button button--ghost" data-open-payment>Open Payment Window</button>
+          </div>
+        </form>
+      </div>
+      <div class="admin__panel" data-panel hidden>
+        <h2>Admin Dashboard</h2>
+        <p class="hero__subtitle">Operational overview for the next 6-hour delivery window.</p>
+        <div class="admin-grid">
+          <div class="info-card">
+            <h3>Delivery Goal</h3>
+            <p>100 deliveries in 6 hours with buffer for late orders.</p>
+            <div class="progress">
+              <div class="progress__fill" data-progress></div>
+            </div>
+            <p class="progress__label" data-progress-label>0 / 100 delivered</p>
+          </div>
+          <div class="info-card">
+            <h3>Chef Lineup</h3>
+            <ul class="chef-list">
+              <li><strong>Chef Amina</strong> — Moroccan bowls</li>
+              <li><strong>Chef Luca</strong> — Italian classics</li>
+              <li><strong>Chef Priya</strong> — South Indian plates</li>
+              <li><strong>Hoang Gia Pho</strong> — Vietnamese pho</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <h3>Driver Coverage</h3>
+            <p>3 live drivers plus 2 on-call. Coverage radius: 20 km.</p>
+            <p class="hero__subtitle" data-sim-status>Simulation: warming up…</p>
+          </div>
+        </div>
+        <div class="admin-grid">
+          <div class="info-card">
+            <h3>Chef Orders</h3>
+            <p class="hero__subtitle">Live queues coming from the chef site and payment window.</p>
+            <ul class="order-list" data-order-list></ul>
+          </div>
+          <div class="info-card">
+            <h3>Payments</h3>
+            <p class="hero__subtitle">Completed transactions for the current shift.</p>
+            <div class="metric-card">
+              <strong data-payment-total>$0.00</strong>
+              <span>Collected today</span>
+            </div>
+            <button class="button button--primary" type="button" data-open-payment>
+              Create Payment
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section id="map-panel" class="map-panel">
+        <h2>Live Delivery Map</h2>
+        <p class="hero__subtitle">
+          Track simulated drivers leaving the Centennial Parkway base and looping past chef pickups.
+        </p>
+        <div id="map"></div>
+        <div class="route-summary">
+          <div class="route-pill">3 active drivers</div>
+          <div class="route-pill">4 chef pickups</div>
+          <div class="route-pill">Leaflet + OpenStreetMap</div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div id="drivers" class="driver-card">
+          <h3>Driver Simulator</h3>
+          <p class="hero__subtitle">Live status from nearby couriers.</p>
+          <ul class="driver-list">
+            <li class="driver-item">Ava L. <span>En route to pickup</span></li>
+            <li class="driver-item">Noah P. <span>Delivering lasagna</span></li>
+            <li class="driver-item">Mia T. <span>Returning to base</span></li>
+          </ul>
+        </div>
+
+        <div id="branches" class="branches-card">
+          <h3>Branches</h3>
+          <p class="hero__subtitle">Deployment tracks for RideNDine.</p>
+          <ul class="driver-list">
+            <li class="driver-item">main <span>GitHub Pages</span></li>
+            <li class="driver-item">stable <span>Release candidate</span></li>
+            <li class="driver-item">dev <span>Feature development</span></li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <strong>GitHub Pages is live.</strong>
+      <div class="footer__links">
+        <a href="./" target="_blank" rel="noreferrer">Visit Demo Site</a>
+        <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
+          Repository
+        </a>
+      </div>
+      <p>Theme colors remain aligned with the RideNDine brand palette.</p>
+    </footer>
+
+    <div class="modal" data-payment-modal aria-hidden="true">
+      <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="payment-title">
+        <div class="modal__header">
+          <h3 id="payment-title">Payment Window</h3>
+          <button class="button button--ghost" type="button" data-close-payment>Close</button>
+        </div>
+        <p class="hero__subtitle">Collect payments for chef orders and log them in the dashboard.</p>
+        <form class="payment-form" data-payment-form>
+          <label>
+            Customer name
+            <input name="name" type="text" placeholder="Jordan Lee" required />
+          </label>
+          <label>
+            Order total (CAD)
+            <input name="amount" type="number" min="10" max="250" step="0.01" value="28.50" required />
+          </label>
+          <label>
+            Chef
+            <select name="chef">
+              <option>Hoang Gia Pho</option>
+              <option>Chef Amina</option>
+              <option>Chef Luca</option>
+              <option>Chef Priya</option>
+            </select>
+          </label>
+          <button class="button button--primary" type="submit">Process Payment</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

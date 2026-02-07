@@ -1,0 +1,196 @@
+const base = [43.2238, -79.7654]; // 75 Centennial Pkwy, Hamilton, ON
+const dropPoints = [
+  [43.2339, -79.7481],
+  [43.2444, -79.7812],
+  [43.2172, -79.8024],
+  [43.2318, -79.7708],
+];
+
+const map = L.map("map", {
+  zoomControl: false,
+  scrollWheelZoom: false,
+}).setView(base, 13);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "&copy; OpenStreetMap contributors",
+}).addTo(map);
+
+L.control.zoom({ position: "bottomright" }).addTo(map);
+
+const baseMarker = L.marker(base, {
+  title: "RideNDine Base - 75 Centennial Pkwy",
+}).addTo(map);
+baseMarker.bindPopup("RideNDine Base<br>75 Centennial Pkwy, Hamilton, ON");
+
+L.circle(base, {
+  radius: 20000,
+  color: "#19b7b1",
+  weight: 2,
+  fillColor: "#19b7b1",
+  fillOpacity: 0.08,
+}).addTo(map);
+
+const routeLine = L.polyline([base, ...dropPoints, base], {
+  color: "#ff7a18",
+  weight: 4,
+  opacity: 0.9,
+}).addTo(map);
+
+const driverPaths = [
+  [base, dropPoints[0], dropPoints[1], base],
+  [base, dropPoints[2], dropPoints[3], base],
+  [base, dropPoints[1], dropPoints[2], base],
+];
+
+const driverMarkers = driverPaths.map((path, index) => {
+  const marker = L.circleMarker(path[0], {
+    radius: 7,
+    color: "#19b7b1",
+    fillColor: "#19b7b1",
+    fillOpacity: 1,
+  }).addTo(map);
+  marker.bindTooltip(`Driver ${index + 1}`, { direction: "top" });
+  return { marker, path, progress: 0 };
+});
+
+function interpolatePoint(start, end, t) {
+  return [start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t];
+}
+
+function animateDrivers() {
+  driverMarkers.forEach((driver) => {
+    const segment = Math.floor(driver.progress) % (driver.path.length - 1);
+    const segmentProgress = driver.progress - Math.floor(driver.progress);
+    const start = driver.path[segment];
+    const end = driver.path[segment + 1];
+    const nextPoint = interpolatePoint(start, end, segmentProgress);
+    driver.marker.setLatLng(nextPoint);
+    driver.progress += 0.003 + segment * 0.0004;
+    if (driver.progress >= driver.path.length - 1) {
+      driver.progress = 0;
+    }
+  });
+  requestAnimationFrame(animateDrivers);
+}
+
+animateDrivers();
+
+const routeStats = document.querySelectorAll("[data-route-stat]");
+if (routeStats.length) {
+  routeStats.forEach((node, index) => {
+    node.textContent = index === 0 ? "20 km coverage" : "ETA 22-28 min";
+  });
+}
+
+const bypassButtons = document.querySelectorAll("[data-bypass]");
+const adminPanel = document.querySelector("[data-panel]");
+const adminLogin = document.querySelector(".admin__login");
+
+const openDashboard = () => {
+  if (!adminPanel || !adminLogin) {
+    return;
+  }
+  adminPanel.hidden = false;
+  adminLogin.classList.add("is-hidden");
+  adminPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+bypassButtons.forEach((button) => {
+  button.addEventListener("click", openDashboard);
+});
+
+const paymentModal = document.querySelector("[data-payment-modal]");
+const paymentButtons = document.querySelectorAll("[data-open-payment]");
+const closePaymentButton = document.querySelector("[data-close-payment]");
+const paymentForm = document.querySelector("[data-payment-form]");
+const paymentTotal = document.querySelector("[data-payment-total]");
+const orderList = document.querySelector("[data-order-list]");
+const progressFill = document.querySelector("[data-progress]");
+const progressLabel = document.querySelector("[data-progress-label]");
+const simStatus = document.querySelector("[data-sim-status]");
+
+let paymentSum = 0;
+let deliveredCount = 0;
+
+const toggleModal = (isOpen) => {
+  if (!paymentModal) return;
+  paymentModal.classList.toggle("is-visible", isOpen);
+  paymentModal.setAttribute("aria-hidden", String(!isOpen));
+};
+
+paymentButtons.forEach((button) => {
+  button.addEventListener("click", () => toggleModal(true));
+});
+
+if (closePaymentButton) {
+  closePaymentButton.addEventListener("click", () => toggleModal(false));
+}
+
+if (paymentModal) {
+  paymentModal.addEventListener("click", (event) => {
+    if (event.target === paymentModal) {
+      toggleModal(false);
+    }
+  });
+}
+
+const updateProgress = () => {
+  if (!progressFill || !progressLabel) return;
+  const percent = Math.min((deliveredCount / 100) * 100, 100);
+  progressFill.style.width = `${percent}%`;
+  progressLabel.textContent = `${deliveredCount} / 100 delivered`;
+};
+
+const addOrder = (name, chef, amount) => {
+  if (!orderList) return;
+  const item = document.createElement("li");
+  item.innerHTML = `<span>${name} • ${chef}</span><span>$${amount.toFixed(2)}</span>`;
+  orderList.prepend(item);
+  if (orderList.children.length > 5) {
+    orderList.removeChild(orderList.lastChild);
+  }
+};
+
+if (paymentForm) {
+  paymentForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(paymentForm);
+    const name = String(data.get("name") || "Guest");
+    const amount = Number(data.get("amount") || 0);
+    const chef = String(data.get("chef") || "Chef");
+    if (!amount) return;
+    paymentSum += amount;
+    deliveredCount = Math.min(deliveredCount + 1, 100);
+    if (paymentTotal) {
+      paymentTotal.textContent = `$${paymentSum.toFixed(2)}`;
+    }
+    addOrder(name, chef, amount);
+    updateProgress();
+    toggleModal(false);
+    paymentForm.reset();
+  });
+}
+
+const simulateDashboard = () => {
+  if (!orderList) return;
+  const chefs = ["Hoang Gia Pho", "Chef Amina", "Chef Luca", "Chef Priya"];
+  const names = ["Jade", "Marco", "Leila", "Andre", "Sienna", "Tariq"];
+  const amount = 18 + Math.random() * 22;
+  const name = names[Math.floor(Math.random() * names.length)];
+  const chef = chefs[Math.floor(Math.random() * chefs.length)];
+  addOrder(name, chef, amount);
+  if (simStatus) {
+    simStatus.textContent = "Simulation: dispatching live orders.";
+  }
+};
+
+setInterval(simulateDashboard, 6000);
+updateProgress();
+
+const invalidateMap = () => map.invalidateSize();
+window.addEventListener("resize", () => {
+  window.clearTimeout(window.__mapResizeTimer);
+  window.__mapResizeTimer = window.setTimeout(invalidateMap, 150);
+});
+setTimeout(invalidateMap, 400);
