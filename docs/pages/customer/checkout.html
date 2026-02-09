@@ -1,0 +1,221 @@
+<!-- Checkout Page -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/chefs')" style="cursor: pointer;">Browse Chefs</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw; max-width: 900px; margin: 0 auto;">
+  <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);">
+    <button class="button button--ghost" onclick="navigateTo('/cart')" style="margin-bottom: 20px;">
+      ← Back to Cart
+    </button>
+
+    <h1 style="margin: 0 0 24px 0;">Checkout</h1>
+
+    <!-- Order Summary -->
+    <div id="order-summary" style="background: #f7fbfa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+      <h3 style="margin: 0 0 16px 0;">Order Summary</h3>
+      <div id="summary-items">
+        <!-- Items will be rendered here -->
+      </div>
+      <div style="border-top: 2px solid #e0f2f1; margin-top: 16px; padding-top: 16px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Subtotal:</span>
+          <strong>$<span id="summary-subtotal">0.00</span></strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--muted);">
+          <span>Delivery Fee:</span>
+          <span>$<span id="summary-delivery">4.99</span></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--muted);">
+          <span>Service Fee:</span>
+          <span>$<span id="summary-service">2.00</span></span>
+        </div>
+        <div style="border-top: 2px solid #e0f2f1; margin-top: 12px; padding-top: 12px; display: flex; justify-content: space-between; font-size: 1.2rem;">
+          <strong>Total:</strong>
+          <strong style="color: var(--teal);">$<span id="summary-total">0.00</span></strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Address -->
+    <div style="margin-bottom: 24px;">
+      <h3>Delivery Address</h3>
+      <input 
+        type="text" 
+        id="delivery-address" 
+        placeholder="Enter your delivery address"
+        style="width: 100%; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem; margin-bottom: 12px;"
+      >
+      <input 
+        type="text" 
+        id="delivery-phone" 
+        placeholder="Phone number"
+        style="width: 100%; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem; margin-bottom: 12px;"
+      >
+      <textarea 
+        id="delivery-notes" 
+        placeholder="Delivery instructions (optional)"
+        style="width: 100%; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem; min-height: 80px; resize: vertical;"
+      ></textarea>
+    </div>
+
+    <!-- Payment Button -->
+    <div id="checkout-actions">
+      <button 
+        class="button button--primary" 
+        onclick="createCheckoutSession()" 
+        style="width: 100%; padding: 16px; font-size: 1.1rem;"
+        id="checkout-btn"
+      >
+        Proceed to Payment
+      </button>
+      <p style="color: var(--muted); text-align: center; margin-top: 12px; font-size: 0.9rem;">
+        🔒 Secure payment powered by Stripe
+      </p>
+    </div>
+
+    <div id="checkout-loading" style="display: none; text-align: center; padding: 40px;">
+      <div style="font-size: 3rem; margin-bottom: 16px;">⏳</div>
+      <p style="color: var(--muted);">Creating secure checkout session...</p>
+    </div>
+
+    <div id="checkout-error" style="display: none; background: #ffebee; color: #c62828; padding: 16px; border-radius: 12px; margin-top: 16px;">
+      <!-- Error message will appear here -->
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2024 RideNDine. Supporting local home chefs.</p>
+</footer>
+
+<script>
+  function renderOrderSummary() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    if (cart.length === 0) {
+      navigateTo('/cart');
+      return;
+    }
+
+    const summaryItemsEl = document.getElementById('summary-items');
+    summaryItemsEl.innerHTML = cart.map(item => `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--ink);">
+        <span>${item.quantity}x ${item.itemName}</span>
+        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+      </div>
+    `).join('');
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryFee = 4.99;
+    const serviceFee = 2.00;
+    const total = subtotal + deliveryFee + serviceFee;
+
+    document.getElementById('summary-subtotal').textContent = subtotal.toFixed(2);
+    document.getElementById('summary-delivery').textContent = deliveryFee.toFixed(2);
+    document.getElementById('summary-service').textContent = serviceFee.toFixed(2);
+    document.getElementById('summary-total').textContent = total.toFixed(2);
+  }
+
+  async function createCheckoutSession() {
+    const address = document.getElementById('delivery-address').value.trim();
+    const phone = document.getElementById('delivery-phone').value.trim();
+    const notes = document.getElementById('delivery-notes').value.trim();
+
+    if (!address) {
+      showError('Please enter a delivery address');
+      return;
+    }
+
+    if (!phone) {
+      showError('Please enter a phone number');
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (cart.length === 0) {
+      showError('Your cart is empty');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('checkout-actions').style.display = 'none';
+    document.getElementById('checkout-loading').style.display = 'block';
+    document.getElementById('checkout-error').style.display = 'none';
+
+    try {
+      // Prepare order data
+      const items = cart.map(item => ({
+        name: `${item.chefName} - ${item.itemName}`,
+        price: Math.round(item.price * 100), // Convert to cents
+        quantity: item.quantity
+      }));
+
+      // Add delivery and service fees
+      items.push({ name: 'Delivery Fee', price: 499, quantity: 1 });
+      items.push({ name: 'Service Fee', price: 200, quantity: 1 });
+
+      const response = await fetch('/api/payments/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items,
+          metadata: {
+            deliveryAddress: address,
+            deliveryPhone: phone,
+            deliveryNotes: notes,
+            cart: JSON.stringify(cart)
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create checkout session');
+      }
+
+      const data = await response.json();
+      
+      if (data.url) {
+        // Store delivery info for later
+        localStorage.setItem('pendingOrder', JSON.stringify({
+          address,
+          phone,
+          notes,
+          cart
+        }));
+        
+        // Redirect to Stripe
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      showError(error.message || 'Failed to create checkout session. Please try again.');
+      document.getElementById('checkout-actions').style.display = 'block';
+      document.getElementById('checkout-loading').style.display = 'none';
+    }
+  }
+
+  function showError(message) {
+    const errorEl = document.getElementById('checkout-error');
+    errorEl.textContent = '⚠️ ' + message;
+    errorEl.style.display = 'block';
+    setTimeout(() => {
+      errorEl.style.display = 'none';
+    }, 5000);
+  }
+
+  // Initial render
+  renderOrderSummary();
+</script>

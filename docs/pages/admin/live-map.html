@@ -1,0 +1,206 @@
+<!-- Live Delivery Map (PROTECTED - Admin Only) -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <h2>🔐 Admin Portal</h2>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;" class="active">🗺️ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>🗺️ Live Delivery Map</h1>
+      <button id="logoutBtn" class="button">Logout</button>
+    </header>
+
+    <div class="admin-content">
+      <div class="map-controls" style="margin-bottom: 16px;">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span style="font-weight: 600;">Active Drivers:</span>
+          <span id="activeDriverCount" style="color: var(--teal); font-weight: bold;">3</span>
+          <span style="margin-left: 20px; font-weight: 600;">Deliveries in Progress:</span>
+          <span id="activeDeliveryCount" style="color: var(--orange); font-weight: bold;">2</span>
+          <button class="button" onclick="toggleAutoUpdate()" style="margin-left: auto;">
+            <span id="autoUpdateText">⏸️ Pause Updates</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="map" style="height: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+
+      <div class="legend" style="margin-top: 16px; background: white; padding: 16px; border-radius: 12px;">
+        <strong>Map Legend:</strong>
+        <div style="display: flex; gap: 24px; margin-top: 8px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #19b7b1;"></div>
+            <span>Active Drivers</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff7a18;"></div>
+            <span>Delivery Locations</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #1a202c;"></div>
+            <span>RideNDine Base</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar { width: 250px; background: #1a202c; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+  .admin-brand h2 { margin: 0 0 24px 0; font-size: 1.2rem; }
+  .admin-nav { display: flex; flex-direction: column; gap: 4px; }
+  .admin-nav a { padding: 10px 12px; border-radius: 6px; color: #cbd5e0; transition: all 0.2s; }
+  .admin-nav a:hover, .admin-nav a.active { background: #2d3748; color: white; }
+  .admin-main { margin-left: 250px; flex: 1; background: var(--sand); }
+  .admin-header { background: white; padding: 20px 32px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .admin-header h1 { margin: 0; }
+  .admin-content { padding: 32px; }
+</style>
+
+<script>
+(async function() {
+  // Check admin authentication - PROTECTED ROUTE
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    if (!data.authenticated || data.role !== 'admin') {
+      navigateTo('/admin/login');
+      return;
+    }
+  } catch (error) {
+    navigateTo('/admin/login');
+    return;
+  }
+
+  // Initialize map (reusing code from app.js)
+  const base = [43.2238, -79.7654]; // 75 Centennial Pkwy, Hamilton, ON
+  const dropPoints = [
+    [43.2339, -79.7481],
+    [43.2444, -79.7812],
+    [43.2172, -79.8024],
+    [43.2318, -79.7708],
+  ];
+
+  const map = L.map("map", {
+    zoomControl: true,
+    scrollWheelZoom: true,
+  }).setView(base, 13);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
+
+  // Base marker
+  const baseMarker = L.marker(base, {
+    title: "RideNDine Base - 75 Centennial Pkwy",
+  }).addTo(map);
+  baseMarker.bindPopup("<strong>RideNDine Base</strong><br>75 Centennial Pkwy, Hamilton, ON");
+
+  // Route line
+  const routeLine = L.polyline([base, ...dropPoints, base], {
+    color: "#ff7a18",
+    weight: 4,
+    opacity: 0.7,
+  }).addTo(map);
+
+  // Delivery point markers
+  dropPoints.forEach((point, index) => {
+    const marker = L.circleMarker(point, {
+      radius: 8,
+      color: "#ff7a18",
+      fillColor: "#ff7a18",
+      fillOpacity: 0.8,
+    }).addTo(map);
+    marker.bindPopup(`Delivery Point ${index + 1}`);
+  });
+
+  // Driver paths and markers
+  const driverPaths = [
+    [base, dropPoints[0], dropPoints[1], base],
+    [base, dropPoints[2], dropPoints[3], base],
+    [base, dropPoints[1], dropPoints[2], base],
+  ];
+
+  const driverMarkers = driverPaths.map((path, index) => {
+    const marker = L.circleMarker(path[0], {
+      radius: 10,
+      color: "#19b7b1",
+      fillColor: "#19b7b1",
+      fillOpacity: 1,
+      weight: 3,
+    }).addTo(map);
+    marker.bindTooltip(`Driver ${index + 1}`, { direction: "top", permanent: false });
+    return { marker, path, progress: 0 };
+  });
+
+  // Animation
+  function interpolatePoint(start, end, t) {
+    return [start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t];
+  }
+
+  let autoUpdate = true;
+
+  function animateDrivers() {
+    if (!autoUpdate) {
+      requestAnimationFrame(animateDrivers);
+      return;
+    }
+
+    driverMarkers.forEach((driver) => {
+      const segment = Math.floor(driver.progress) % (driver.path.length - 1);
+      const segmentProgress = driver.progress - Math.floor(driver.progress);
+      const start = driver.path[segment];
+      const end = driver.path[segment + 1];
+      const nextPoint = interpolatePoint(start, end, segmentProgress);
+      driver.marker.setLatLng(nextPoint);
+      driver.progress += 0.003 + segment * 0.0004;
+      if (driver.progress >= driver.path.length - 1) {
+        driver.progress = 0;
+      }
+    });
+    requestAnimationFrame(animateDrivers);
+  }
+
+  animateDrivers();
+
+  window.toggleAutoUpdate = function() {
+    autoUpdate = !autoUpdate;
+    document.getElementById('autoUpdateText').textContent = autoUpdate ? '⏸️ Pause Updates' : '▶️ Resume Updates';
+  };
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    navigateTo('/');
+  });
+
+  // Update counts
+  document.getElementById('activeDriverCount').textContent = driverMarkers.length;
+  document.getElementById('activeDeliveryCount').textContent = dropPoints.length;
+
+  // Ensure map renders properly
+  setTimeout(() => map.invalidateSize(), 100);
+})();
+</script>

@@ -1,0 +1,189 @@
+<!-- Chef Detail & Menu Page -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/chefs')" style="cursor: pointer;">Browse Chefs</a>
+    <a onclick="navigateTo('/cart')" style="cursor: pointer;">Cart (<span id="cart-count">0</span>)</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw;">
+  <!-- Chef Header -->
+  <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 32px;">
+    <button class="button button--ghost" onclick="navigateTo('/chefs')" style="margin-bottom: 20px;">
+      ← Back to Chefs
+    </button>
+    <div style="display: flex; gap: 24px; align-items: start; flex-wrap: wrap;">
+      <div style="font-size: 5rem;">🍜</div>
+      <div style="flex: 1; min-width: 250px;">
+        <h1 id="chef-name" style="margin: 0 0 8px 0;">Chef Name</h1>
+        <p id="chef-description" style="color: var(--muted); line-height: 1.6; margin: 0;">
+          Loading chef information...
+        </p>
+        <div style="margin-top: 16px;">
+          <span style="background: #f3f9f8; padding: 8px 14px; border-radius: 999px; font-weight: 600; color: var(--teal-dark);">
+            ⭐ <span id="chef-rating">4.9</span> (<span id="chef-reviews">0</span> reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Items -->
+  <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);">
+    <h2 style="margin-top: 0;">Menu</h2>
+    <div id="menu-grid" style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+      <!-- Menu items will be loaded here -->
+    </div>
+    <div id="menu-loading" style="text-align: center; padding: 40px; color: var(--muted);">
+      Loading menu...
+    </div>
+  </div>
+
+  <!-- Cart Preview -->
+  <div id="cart-preview" style="position: fixed; bottom: 20px; right: 20px; background: var(--orange); color: white; padding: 16px 24px; border-radius: 999px; box-shadow: 0 10px 30px rgba(255, 122, 24, 0.4); cursor: pointer; display: none; font-weight: 600; z-index: 100;" onclick="navigateTo('/cart')">
+    🛒 View Cart (<span id="cart-preview-count">0</span> items) - $<span id="cart-preview-total">0.00</span>
+  </div>
+</div>
+
+<script>
+  const chefMenus = {
+    'hoang-gia-pho': {
+      name: 'Hoang Gia Pho',
+      description: 'Authentic Vietnamese cuisine with family recipes passed down for generations. Specializing in pho, banh mi, and traditional dishes.',
+      rating: 4.9,
+      reviews: 120,
+      emoji: '🍜',
+      menu: [
+        { id: 'pho-bo', name: 'Phở Bò (Beef Pho)', description: 'Traditional Vietnamese beef noodle soup with rice noodles, tender beef, and aromatic broth', price: 12.99 },
+        { id: 'pho-ga', name: 'Phở Gà (Chicken Pho)', description: 'Light and flavorful chicken pho with rice noodles and fresh herbs', price: 11.99 },
+        { id: 'banh-mi', name: 'Bánh Mì Thịt', description: 'Vietnamese baguette with grilled pork, pâté, pickled vegetables, and cilantro', price: 8.99 },
+        { id: 'bun-bo-hue', name: 'Bún Bò Huế', description: 'Spicy beef and pork noodle soup from Hue with lemongrass and chili oil', price: 13.99 },
+        { id: 'goi-cuon', name: 'Gỏi Cuốn (Spring Rolls)', description: 'Fresh rice paper rolls with shrimp, pork, vermicelli, and herbs (2 rolls)', price: 7.99 },
+        { id: 'com-tam', name: 'Cơm Tấm (Broken Rice)', description: 'Grilled pork chop served over broken rice with pickled vegetables and fish sauce', price: 11.99 }
+      ]
+    },
+    'mama-rosa': {
+      name: "Mama Rosa's Kitchen",
+      description: 'Traditional Italian cooking from Tuscany. Homemade pasta, pizza, and classic Italian comfort food made with love.',
+      rating: 4.8,
+      reviews: 95,
+      emoji: '🍝',
+      menu: [
+        { id: 'spaghetti-carbonara', name: 'Spaghetti Carbonara', description: 'Classic Roman pasta with eggs, pecorino cheese, guanciale, and black pepper', price: 14.99 },
+        { id: 'margherita-pizza', name: 'Pizza Margherita', description: 'Traditional pizza with San Marzano tomatoes, mozzarella, fresh basil, and olive oil', price: 13.99 },
+        { id: 'lasagna', name: 'Lasagna Bolognese', description: 'Layers of fresh pasta, rich meat sauce, béchamel, and Parmigiano-Reggiano', price: 15.99 },
+        { id: 'risotto', name: 'Risotto ai Funghi', description: 'Creamy Arborio rice with porcini mushrooms and Parmesan cheese', price: 14.99 }
+      ]
+    },
+    'taqueria-del-sol': {
+      name: 'Taqueria del Sol',
+      description: 'Authentic Mexican street food and regional specialties. Fresh tacos, burritos, and traditional dishes with bold flavors.',
+      rating: 4.7,
+      reviews: 88,
+      emoji: '🌮',
+      menu: [
+        { id: 'tacos-al-pastor', name: 'Tacos al Pastor', description: 'Marinated pork tacos with pineapple, onion, and cilantro (3 tacos)', price: 10.99 },
+        { id: 'burrito-carne-asada', name: 'Burrito Carne Asada', description: 'Grilled steak burrito with rice, beans, cheese, and fresh salsa', price: 12.99 },
+        { id: 'quesadilla', name: 'Quesadilla Supreme', description: 'Flour tortilla filled with cheese, choice of meat, peppers, and onions', price: 9.99 },
+        { id: 'elote', name: 'Elote (Mexican Street Corn)', description: 'Grilled corn with mayo, cotija cheese, chili powder, and lime', price: 5.99 }
+      ]
+    },
+    'bangkok-street': {
+      name: 'Bangkok Street Eats',
+      description: 'Thai street food and traditional dishes bursting with flavor. Pad Thai, curries, and aromatic dishes from Bangkok.',
+      rating: 4.9,
+      reviews: 102,
+      emoji: '🍛',
+      menu: [
+        { id: 'pad-thai', name: 'Pad Thai', description: 'Stir-fried rice noodles with shrimp, eggs, peanuts, and tamarind sauce', price: 11.99 },
+        { id: 'green-curry', name: 'Green Curry', description: 'Spicy green curry with chicken, bamboo shoots, and Thai basil', price: 13.99 },
+        { id: 'tom-yum', name: 'Tom Yum Goong', description: 'Hot and sour Thai soup with shrimp, mushrooms, lemongrass, and lime', price: 10.99 },
+        { id: 'mango-sticky-rice', name: 'Mango Sticky Rice', description: 'Sweet sticky rice with fresh mango and coconut cream', price: 7.99 }
+      ]
+    }
+  };
+
+  // Get chef slug from URL
+  const pathParts = window.location.pathname.split('/');
+  const chefSlug = pathParts[pathParts.length - 1] || 'hoang-gia-pho';
+  
+  // Load chef data
+  const chefData = chefMenus[chefSlug] || chefMenus['hoang-gia-pho'];
+  
+  document.getElementById('chef-name').textContent = chefData.name;
+  document.getElementById('chef-description').textContent = chefData.description;
+  document.getElementById('chef-rating').textContent = chefData.rating;
+  document.getElementById('chef-reviews').textContent = chefData.reviews;
+
+  // Render menu
+  const menuGrid = document.getElementById('menu-grid');
+  menuGrid.innerHTML = chefData.menu.map(item => `
+    <div class="info-card" style="display: flex; flex-direction: column;">
+      <h3 style="margin: 0 0 8px 0; font-size: 1.1rem;">${item.name}</h3>
+      <p style="color: var(--muted); line-height: 1.5; margin: 0 0 12px 0; flex: 1; font-size: 0.9rem;">
+        ${item.description}
+      </p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+        <strong style="font-size: 1.2rem; color: var(--teal);">$${item.price.toFixed(2)}</strong>
+        <button 
+          class="button button--primary" 
+          onclick="addToCart('${chefSlug}', '${item.id}', '${item.name}', ${item.price})"
+          style="padding: 8px 16px; font-size: 0.9rem;"
+        >
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('menu-loading').style.display = 'none';
+
+  // Cart functions
+  function addToCart(chefSlug, itemId, itemName, price) {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem = cart.find(i => i.chefSlug === chefSlug && i.itemId === itemId);
+    
+    if (existingItem) {
+      existingItem.quantity++;
+    } else {
+      cart.push({
+        chefSlug,
+        chefName: chefData.name,
+        itemId,
+        itemName,
+        price,
+        quantity: 1
+      });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+    showCartNotification(itemName);
+  }
+
+  function updateCartDisplay() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    document.getElementById('cart-count').textContent = count;
+    document.getElementById('cart-preview-count').textContent = count;
+    document.getElementById('cart-preview-total').textContent = total.toFixed(2);
+    document.getElementById('cart-preview').style.display = count > 0 ? 'block' : 'none';
+  }
+
+  function showCartNotification(itemName) {
+    const notification = document.createElement('div');
+    notification.textContent = `✓ Added ${itemName} to cart`;
+    notification.style.cssText = 'position: fixed; top: 80px; right: 20px; background: var(--teal); color: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 8px 20px rgba(25, 183, 177, 0.3); z-index: 1000; font-weight: 600;';
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2000);
+  }
+
+  updateCartDisplay();
+</script>

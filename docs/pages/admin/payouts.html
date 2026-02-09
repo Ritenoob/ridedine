@@ -1,0 +1,213 @@
+<!-- Payouts Ledger -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <h2>🔐 Admin Portal</h2>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;" class="active">💰 Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>Payouts Ledger</h1>
+      <button id="logoutBtn" class="button">Logout</button>
+    </header>
+
+    <div class="admin-content">
+      <div class="metric-grid" style="margin-bottom: 24px;">
+        <div class="metric-card">
+          <div class="metric-label">Total Pending</div>
+          <div class="metric-value">$8,450</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Paid This Week</div>
+          <div class="metric-value" style="color: #48bb78;">$12,340</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Paid This Month</div>
+          <div class="metric-value">$45,890</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">All Time</div>
+          <div class="metric-value">$142,580</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="chefFilter" class="filter-select">
+          <option value="">All Chefs</option>
+          <option value="hoang-gia-pho">Hoang Gia Pho</option>
+          <option value="mama-italia">Mama Italia</option>
+          <option value="spice-route">Spice Route</option>
+        </select>
+        <select id="statusFilter" class="filter-select">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="paid">Paid</option>
+        </select>
+        <input type="date" id="dateFilter" class="filter-select">
+        <button class="button button--primary" onclick="exportPayouts()">📥 Export CSV</button>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Payout ID</th>
+              <th>Chef</th>
+              <th>Period</th>
+              <th>Orders</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="payoutsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar { width: 250px; background: #1a202c; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+  .admin-brand h2 { margin: 0 0 24px 0; font-size: 1.2rem; }
+  .admin-nav { display: flex; flex-direction: column; gap: 4px; }
+  .admin-nav a { padding: 10px 12px; border-radius: 6px; color: #cbd5e0; transition: all 0.2s; }
+  .admin-nav a:hover, .admin-nav a.active { background: #2d3748; color: white; }
+  .admin-main { margin-left: 250px; flex: 1; background: var(--sand); }
+  .admin-header { background: white; padding: 20px 32px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .admin-header h1 { margin: 0; }
+  .admin-content { padding: 32px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .metric-label { font-size: 0.875rem; color: #718096; margin-bottom: 8px; }
+  .metric-value { font-size: 2rem; font-weight: bold; color: var(--teal); }
+  .filter-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-select { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+  .table-container { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: #f7fafc; padding: 16px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+  .data-table td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+  .data-table tr:hover { background: #f7fafc; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.875rem; font-weight: 600; }
+  .status-pending { background: #fef5e7; color: #b7791f; }
+  .status-processing { background: #ebf8ff; color: #2c5282; }
+  .status-paid { background: #c6f6d5; color: #22543d; }
+  .action-btn-sm { padding: 6px 12px; background: var(--teal); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; margin-right: 4px; }
+  .action-btn-sm:hover { background: var(--teal-dark); }
+</style>
+
+<script>
+(async function() {
+  // Check admin authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    if (!data.authenticated || data.role !== 'admin') {
+      navigateTo('/admin/login');
+      return;
+    }
+  } catch (error) {
+    navigateTo('/admin/login');
+    return;
+  }
+
+  // Mock payout data
+  const payouts = [
+    { id: 'PO-2024-001', chef: 'Hoang Gia Pho', period: 'Jan 1-7, 2024', orders: 45, amount: 2340.50, status: 'paid', date: '2024-01-08' },
+    { id: 'PO-2024-002', chef: 'Mama Italia', period: 'Jan 1-7, 2024', orders: 38, amount: 1980.25, status: 'paid', date: '2024-01-08' },
+    { id: 'PO-2024-003', chef: 'Spice Route', period: 'Jan 1-7, 2024', orders: 52, amount: 2710.00, status: 'paid', date: '2024-01-08' },
+    { id: 'PO-2024-004', chef: 'Hoang Gia Pho', period: 'Jan 8-14, 2024', orders: 48, amount: 2495.75, status: 'processing', date: '2024-01-15' },
+    { id: 'PO-2024-005', chef: 'Mama Italia', period: 'Jan 8-14, 2024', orders: 41, amount: 2134.50, status: 'processing', date: '2024-01-15' },
+    { id: 'PO-2024-006', chef: 'Spice Route', period: 'Jan 8-14, 2024', orders: 55, amount: 2865.25, status: 'pending', date: '2024-01-15' },
+    { id: 'PO-2024-007', chef: 'Hoang Gia Pho', period: 'Jan 15-21, 2024', orders: 42, amount: 2185.00, status: 'pending', date: '2024-01-22' },
+    { id: 'PO-2024-008', chef: 'Mama Italia', period: 'Jan 15-21, 2024', orders: 36, amount: 1872.75, status: 'pending', date: '2024-01-22' }
+  ];
+
+  function renderPayouts(data) {
+    const tbody = document.getElementById('payoutsTable');
+    tbody.innerHTML = data.map(payout => {
+      let statusClass = 'status-pending';
+      if (payout.status === 'processing') statusClass = 'status-processing';
+      if (payout.status === 'paid') statusClass = 'status-paid';
+      
+      return `
+        <tr>
+          <td><strong>${payout.id}</strong></td>
+          <td>${payout.chef}</td>
+          <td>${payout.period}</td>
+          <td>${payout.orders}</td>
+          <td>$${payout.amount.toFixed(2)}</td>
+          <td><span class="status-badge ${statusClass}">${payout.status.toUpperCase()}</span></td>
+          <td>${new Date(payout.date).toLocaleDateString()}</td>
+          <td>
+            <button class="action-btn-sm" onclick="viewPayout('${payout.id}')">View</button>
+            ${payout.status === 'pending' ? '<button class="action-btn-sm" onclick="processPayout(\'' + payout.id + '\')">Process</button>' : ''}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.viewPayout = function(id) {
+    const payout = payouts.find(p => p.id === id);
+    if (payout) {
+      alert(`Payout Details:\n\nID: ${payout.id}\nChef: ${payout.chef}\nPeriod: ${payout.period}\nOrders: ${payout.orders}\nAmount: $${payout.amount.toFixed(2)}\nStatus: ${payout.status}`);
+    }
+  };
+
+  window.processPayout = function(id) {
+    const payout = payouts.find(p => p.id === id);
+    if (payout) {
+      payout.status = 'processing';
+      renderPayouts(payouts);
+      alert(`Payout ${id} is now being processed.`);
+    }
+  };
+
+  window.exportPayouts = function() {
+    alert('Export functionality would generate CSV file with payout data.');
+  };
+
+  // Filter handlers
+  document.getElementById('chefFilter').addEventListener('change', filterPayouts);
+  document.getElementById('statusFilter').addEventListener('change', filterPayouts);
+  document.getElementById('dateFilter').addEventListener('change', filterPayouts);
+
+  function filterPayouts() {
+    const chef = document.getElementById('chefFilter').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value.toLowerCase();
+    
+    let filtered = payouts;
+    if (chef) filtered = filtered.filter(p => p.chef.toLowerCase().includes(chef));
+    if (status) filtered = filtered.filter(p => p.status === status);
+    
+    renderPayouts(filtered);
+  }
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    navigateTo('/');
+  });
+
+  renderPayouts(payouts);
+})();
+</script>

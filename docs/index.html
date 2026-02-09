@@ -1,204 +1,158 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RideNDine | Home Chef Delivery</title>
-    <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <meta name="theme-color" content="#ff7a18" />
-    <link rel="preconnect" href="https://unpkg.com" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <header class="header">
-      <div class="header__brand">
-        <img src="./assets/logo.svg" alt="RideNDine" />
-      </div>
-      <nav class="header__nav">
-        <a href="#customer">Customers</a>
-        <a href="#admin">Admin Dashboard</a>
-        <a href="#map-panel">Live Map</a>
-        <a href="#drivers">Drivers</a>
-        <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
-          Repo
-        </a>
-      </nav>
-    </header>
-
-    <section id="customer" class="hero">
-      <div class="hero__card">
-        <h1 class="hero__title">Delivering home chef meals across Hamilton.</h1>
-        <p class="hero__subtitle">
-          RideNDine keeps local chefs connected to hungry neighbors. This demo highlights the live map,
-          driver simulator, and the Centennial Parkway base powering our routing.
-        </p>
-        <div class="hero__actions">
-          <button class="button button--primary">Launch Driver Simulator</button>
-          <button class="button button--ghost">View Chef Orders</button>
-        </div>
-        <div class="metric-grid">
-          <div class="metric-card">
-            <strong>4 chefs</strong>
-            <span>Daily rotating menus</span>
-          </div>
-          <div class="metric-card">
-            <strong>100 deliveries</strong>
-            <span>Target in 6 hours</span>
-          </div>
-        </div>
-      </div>
-      <div class="hero__card">
-        <h2>Base of Operations</h2>
-        <p class="hero__subtitle">
-          75 Centennial Parkway, Hamilton, Ontario
-        </p>
-        <div class="route-summary">
-          <div class="route-pill">Dispatch Window: 5:00 PM</div>
-          <div class="route-pill" data-route-stat>6.4 mi loop</div>
-          <div class="route-pill" data-route-stat>ETA 22-28 min</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="info-grid">
-      <div class="info-card">
-        <h3>Home Chef Marketplace</h3>
-        <p>Showcase daily menus, prep progress, and pickup readiness.</p>
-      </div>
-      <div class="info-card">
-        <h3>Smart Delivery Zones</h3>
-        <p>Routes prioritize warm meals while balancing driver coverage.</p>
-      </div>
-      <div class="info-card">
-        <h3>Neighborhood First</h3>
-        <p>Local-first delivery means faster drop-offs and trusted couriers.</p>
-      </div>
-    </section>
-
-    <section class="chef-grid">
-      <div class="info-card">
-        <h3>Chef Amina</h3>
-        <p>Moroccan bowls • 24 orders queued</p>
-      </div>
-      <div class="info-card">
-        <h3>Chef Luca</h3>
-        <p>Italian classics • 30 orders queued</p>
-      </div>
-      <div class="info-card">
-        <h3>Chef Priya</h3>
-        <p>South Indian plates • 22 orders queued</p>
-      </div>
-      <div class="info-card">
-        <h3>Chef Mateo</h3>
-        <p>Latin comfort food • 24 orders queued</p>
-      </div>
-    </section>
-
-    <section id="admin" class="admin">
-      <div class="admin__login">
-        <h2>Admin Dashboard Login</h2>
-        <p class="hero__subtitle">Demo access is available now. Use the bypass to preview the dashboard.</p>
-        <form class="login-form">
-          <label>
-            Email
-            <input type="email" placeholder="admin@ridendine.com" />
-          </label>
-          <label>
-            Password
-            <input type="password" placeholder="••••••••" />
-          </label>
-          <div class="hero__actions">
-            <button type="button" class="button button--primary" data-bypass>Bypass Login</button>
-            <button type="button" class="button button--ghost">Request Access</button>
-          </div>
-        </form>
-      </div>
-      <div class="admin__panel" data-panel hidden>
-        <h2>Admin Dashboard</h2>
-        <p class="hero__subtitle">Operational overview for the next 6-hour delivery window.</p>
-        <div class="admin-grid">
-          <div class="info-card">
-            <h3>Delivery Goal</h3>
-            <p>100 deliveries in 6 hours with buffer for late orders.</p>
-          </div>
-          <div class="info-card">
-            <h3>Chef Lineup</h3>
-            <ul class="chef-list">
-              <li><strong>Chef Amina</strong> — Moroccan bowls</li>
-              <li><strong>Chef Luca</strong> — Italian classics</li>
-              <li><strong>Chef Priya</strong> — South Indian plates</li>
-              <li><strong>Chef Mateo</strong> — Latin comfort food</li>
-            </ul>
-          </div>
-          <div class="info-card">
-            <h3>Driver Coverage</h3>
-            <p>3 live drivers plus 2 on-call. Coverage radius: 8 km.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <main class="main">
-      <section id="map-panel" class="map-panel">
-        <h2>Live Delivery Map</h2>
-        <p class="hero__subtitle">
-          Track simulated drivers leaving the Centennial Parkway base and looping past chef pickups.
-        </p>
-        <div id="map"></div>
-        <div class="route-summary">
-          <div class="route-pill">3 active drivers</div>
-          <div class="route-pill">4 chef pickups</div>
-          <div class="route-pill">OpenStreetMap</div>
-        </div>
-      </section>
-
-      <aside class="sidebar">
-        <div id="drivers" class="driver-card">
-          <h3>Driver Simulator</h3>
-          <p class="hero__subtitle">Live status from nearby couriers.</p>
-          <ul class="driver-list">
-            <li class="driver-item">Ava L. <span>En route to pickup</span></li>
-            <li class="driver-item">Noah P. <span>Delivering lasagna</span></li>
-            <li class="driver-item">Mia T. <span>Returning to base</span></li>
-          </ul>
-        </div>
-
-        <div id="branches" class="branches-card">
-          <h3>Branches</h3>
-          <p class="hero__subtitle">Deployment tracks for RideNDine.</p>
-          <ul class="driver-list">
-            <li class="driver-item">main <span>GitHub Pages</span></li>
-            <li class="driver-item">stable <span>Release candidate</span></li>
-            <li class="driver-item">dev <span>Feature development</span></li>
-          </ul>
-        </div>
-      </aside>
-    </main>
-
-    <footer class="footer">
-      <strong>GitHub Pages is live.</strong>
-      <div class="footer__links">
-        <a href="./" target="_blank" rel="noreferrer">Visit Demo Site</a>
-        <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
-          Repository
-        </a>
-      </div>
-      <p>Theme colors remain aligned with the RideNDine brand palette.</p>
-    </footer>
-
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <script src="./app.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RideNDine | Home Chef Delivery Platform</title>
+  
+  <!-- Icons & Manifest -->
+  <link rel="icon" href="/assets/app-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/assets/app-icon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#ff7a18" />
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://unpkg.com" />
+  
+  <!-- Leaflet CSS (for map pages) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="/styles.css" />
+  
+  <!-- Meta Description -->
+  <meta name="description" content="RideNDine connects home chefs with hungry neighbors across Hamilton. Order fresh, home-cooked meals for delivery." />
+  
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="RideNDine | Home Chef Delivery" />
+  <meta property="og:description" content="Fresh home-cooked meals from local chefs, delivered to your door." />
+  
+  <style>
+    /* DEV BUILD Banner */
+    .dev-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      z-index: 10000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .dev-banner.hidden {
+      display: none;
+    }
+    
+    body.dev-mode {
+      padding-top: 40px;
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    }
+    
+    .loading-spinner.active {
+      display: block;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255, 122, 24, 0.1);
+      border-left-color: #ff7a18;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* App Container */
+    #app {
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <!-- DEV BUILD Banner (shown when on dev/staging) -->
+  <div id="dev-banner" class="dev-banner hidden">
+    🚧 DEV BUILD - This is a development/staging environment 🚧
+  </div>
+  
+  <!-- Loading Spinner -->
+  <div id="loading-spinner" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- Main App Container (pages load here) -->
+  <div id="app">
+    <!-- Initial loading state -->
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+      <div class="spinner"></div>
+    </div>
+  </div>
+  
+  <!-- Leaflet JS (for map pages) -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  
+  <!-- Core Scripts -->
+  <script src="/auth-client.js"></script>
+  <script src="/router.js"></script>
+  <script src="/routes.js"></script>
+  
+  <script>
+    // Show DEV banner on non-production environments
+    (function() {
+      const hostname = window.location.hostname;
+      const isDev = hostname === 'localhost' || 
+                    hostname === '127.0.0.1' || 
+                    hostname.includes('dev') ||
+                    hostname.includes('staging');
+      
+      if (isDev) {
+        const banner = document.getElementById('dev-banner');
+        if (banner) {
+          banner.classList.remove('hidden');
+          document.body.classList.add('dev-mode');
+        }
+      }
+    })();
+    
+    // Global error handler
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.error);
+    });
+    
+    // Global loading indicator helpers
+    window.showLoading = function() {
+      document.getElementById('loading-spinner')?.classList.add('active');
+    };
+    
+    window.hideLoading = function() {
+      document.getElementById('loading-spinner')?.classList.remove('active');
+    };
+  </script>
+</body>
 </html>

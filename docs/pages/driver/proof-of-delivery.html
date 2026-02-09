@@ -1,0 +1,448 @@
+<!-- Proof of Delivery -->
+<style>
+  body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .driver-app {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--sand);
+    min-height: 100vh;
+  }
+  .pod-header {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: white;
+    padding: 20px;
+  }
+  .pod-header h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+  }
+  .pod-content {
+    padding: 20px;
+  }
+  .pod-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+  }
+  .pod-card h3 {
+    margin: 0 0 16px 0;
+    color: var(--ink);
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .file-upload {
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--sand);
+  }
+  .file-upload:hover {
+    border-color: var(--teal);
+    background: #f0fdf4;
+  }
+  .file-upload input {
+    display: none;
+  }
+  .upload-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+  .upload-text {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .preview-image {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+  .signature-canvas {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .signature-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .notes-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 100px;
+  }
+  .notes-textarea:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+  .button {
+    padding: 14px 24px;
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    width: 100%;
+    font-size: 1rem;
+  }
+  .button:hover {
+    background: var(--teal-dark);
+  }
+  .button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+  }
+  .button-secondary {
+    background: white;
+    color: var(--muted);
+    border: 2px solid #e2e8f0;
+    padding: 10px 20px;
+  }
+  .button-secondary:hover {
+    background: var(--sand);
+  }
+  .order-summary {
+    background: var(--sand);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.875rem;
+  }
+  .summary-label {
+    color: var(--muted);
+  }
+  .summary-value {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .success-message {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+    display: none;
+  }
+</style>
+
+<div class="driver-app">
+  <header class="pod-header">
+    <h1>📋 Proof of Delivery</h1>
+    <p style="margin: 0; opacity: 0.9; font-size: 0.875rem;">Complete delivery confirmation</p>
+  </header>
+
+  <div class="pod-content">
+    <div class="order-summary">
+      <div class="summary-row">
+        <div class="summary-label">Order #</div>
+        <div class="summary-value" id="orderId">-</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Delivered to</div>
+        <div class="summary-value" id="deliveryAddress">-</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Payment</div>
+        <div class="summary-value" id="payment">-</div>
+      </div>
+    </div>
+
+    <div id="successMessage" class="success-message">
+      <div style="font-size: 2rem; margin-bottom: 8px;">✅</div>
+      <div style="font-weight: 600;">Delivery Confirmed!</div>
+      <div style="font-size: 0.875rem; margin-top: 4px;">Great job! Your earnings have been updated.</div>
+    </div>
+
+    <div id="podForm">
+      <div class="pod-card">
+        <h3>📸 Photo Verification</h3>
+        <div class="form-group">
+          <label class="file-upload" for="photoUpload">
+            <input type="file" id="photoUpload" accept="image/*" onchange="handlePhotoUpload(event)">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">
+              <strong>Click to take photo</strong><br>
+              Or tap to select from gallery
+            </div>
+          </label>
+          <img id="photoPreview" class="preview-image" style="display: none;">
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <h3>✍️ Customer Signature</h3>
+        <div class="form-group">
+          <canvas id="signatureCanvas" class="signature-canvas" width="500" height="200"></canvas>
+          <div class="signature-controls">
+            <button class="button button-secondary" onclick="clearSignature()">Clear</button>
+            <div style="flex: 1; text-align: right; color: var(--muted); font-size: 0.875rem; display: flex; align-items: center; justify-content: flex-end;">
+              <span id="signatureStatus">Sign above</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <h3>📝 Delivery Notes (Optional)</h3>
+        <div class="form-group">
+          <textarea id="notesTextarea" class="notes-textarea" placeholder="Add any delivery notes here...
+Examples:
+- Left at front door
+- Handed to customer
+- Left with doorman"></textarea>
+        </div>
+      </div>
+
+      <button class="button" onclick="submitProofOfDelivery()" id="submitBtn">
+        Complete Delivery
+      </button>
+      <button class="button button-secondary" onclick="navigateTo('/driver/jobs')" style="margin-top: 12px; width: 100%;">
+        ← Cancel
+      </button>
+    </div>
+
+    <div id="returnSection" style="display: none;">
+      <button class="button" onclick="navigateTo('/driver/jobs')">
+        Return to Jobs
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let deliveryData = null;
+let photoFile = null;
+let signatureData = null;
+let isDrawing = false;
+
+// Signature canvas setup
+const canvas = document.getElementById('signatureCanvas');
+const ctx = canvas.getContext('2d');
+ctx.strokeStyle = '#1e1f24';
+ctx.lineWidth = 2;
+ctx.lineCap = 'round';
+
+(async function() {
+  // Check authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    
+    if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {
+      navigateTo('/driver/login');
+      return;
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    navigateTo('/driver/login');
+    return;
+  }
+
+  // Get job ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const jobId = urlParams.get('jobId');
+
+  if (!jobId) {
+    alert('No job ID provided');
+    navigateTo('/driver/jobs');
+    return;
+  }
+
+  // Load delivery data
+  loadDeliveryData(jobId);
+
+  // Setup signature canvas
+  setupSignatureCanvas();
+})();
+
+function loadDeliveryData(jobId) {
+  const activeDelivery = localStorage.getItem('driverActiveDelivery');
+  
+  if (activeDelivery) {
+    deliveryData = JSON.parse(activeDelivery);
+  } else {
+    deliveryData = {
+      jobId: jobId,
+      orderId: '12345',
+      dropoffAddress: '456 Oak Ave, Apt 2B',
+      pay: 8.50
+    };
+  }
+
+  document.getElementById('orderId').textContent = deliveryData.orderId || 'N/A';
+  document.getElementById('deliveryAddress').textContent = deliveryData.dropoffAddress || 'N/A';
+  document.getElementById('payment').textContent = `$${(deliveryData.pay || 0).toFixed(2)}`;
+}
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  photoFile = file;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('photoPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function setupSignatureCanvas() {
+  // Mouse events
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseout', stopDrawing);
+
+  // Touch events
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  });
+
+  canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent('mouseup', {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  const rect = canvas.getBoundingClientRect();
+  ctx.beginPath();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.stroke();
+  
+  document.getElementById('signatureStatus').textContent = '✓ Signed';
+  document.getElementById('signatureStatus').style.color = 'var(--teal)';
+  signatureData = true;
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  signatureData = null;
+  document.getElementById('signatureStatus').textContent = 'Sign above';
+  document.getElementById('signatureStatus').style.color = 'var(--muted)';
+}
+
+async function submitProofOfDelivery() {
+  const submitBtn = document.getElementById('submitBtn');
+  const notes = document.getElementById('notesTextarea').value;
+
+  // Validate (optional - can submit without photo/signature in demo)
+  if (!photoFile && !signatureData) {
+    if (!confirm('No photo or signature provided. Continue anyway?')) {
+      return;
+    }
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  try {
+    // In real app, would upload photo and signature to server
+    // For now, just simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Update order status
+    try {
+      await fetch(`/api/orders/${deliveryData.orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          status: 'delivered',
+          deliveryNotes: notes,
+          deliveredAt: new Date().toISOString()
+        })
+      });
+    } catch (error) {
+      console.log('Order update failed (demo mode):', error);
+    }
+
+    // Update driver stats
+    const currentDeliveries = parseInt(localStorage.getItem('driverTodayDeliveries') || '0');
+    const currentEarnings = parseFloat(localStorage.getItem('driverTodayEarnings') || '0');
+    
+    localStorage.setItem('driverTodayDeliveries', (currentDeliveries + 1).toString());
+    localStorage.setItem('driverTodayEarnings', (currentEarnings + deliveryData.pay).toFixed(2));
+
+    // Clear active delivery
+    localStorage.removeItem('driverActiveDelivery');
+
+    // Show success message
+    document.getElementById('podForm').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('returnSection').style.display = 'block';
+
+    // Auto-redirect after 3 seconds
+    setTimeout(() => {
+      navigateTo('/driver/jobs');
+    }, 3000);
+
+  } catch (error) {
+    console.error('Submission failed:', error);
+    alert('Failed to submit proof of delivery. Please try again.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Complete Delivery';
+  }
+}
+</script>

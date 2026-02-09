@@ -1,0 +1,244 @@
+<!-- Integration Logs -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <h2>🔐 Admin Portal</h2>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;" class="active">🔌 Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>Integration Logs</h1>
+      <button id="logoutBtn" class="button">Logout</button>
+    </header>
+
+    <div class="admin-content">
+      <div class="metric-grid" style="margin-bottom: 24px;">
+        <div class="metric-card">
+          <div class="metric-label">Cooco Orders</div>
+          <div class="metric-value" id="coocoCount">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Mealbridge Orders</div>
+          <div class="metric-value" id="mealbridgeCount">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Success Rate</div>
+          <div class="metric-value" style="font-size: 1.5rem;" id="successRate">-</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Events</div>
+          <div class="metric-value" id="totalEvents">-</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="integrationFilter" class="filter-select">
+          <option value="">All Integrations</option>
+          <option value="cooco">Cooco</option>
+          <option value="mealbridge">Mealbridge</option>
+        </select>
+        <select id="statusFilter" class="filter-select">
+          <option value="">All Status</option>
+          <option value="success">Success</option>
+          <option value="error">Error</option>
+          <option value="warning">Warning</option>
+        </select>
+        <button class="button button--primary" onclick="refreshLogs()">🔄 Refresh</button>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Integration</th>
+              <th>Event Type</th>
+              <th>Status</th>
+              <th>Message</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="logsTable">
+            <tr>
+              <td colspan="6" style="text-align: center;">Loading logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="logDetail" class="detail-panel" style="display: none;">
+        <div class="detail-header">
+          <h3>Log Details</h3>
+          <button onclick="closeDetail()" class="button">Close</button>
+        </div>
+        <pre id="logContent" style="background: #f7fafc; padding: 16px; border-radius: 8px; overflow-x: auto;"></pre>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar { width: 250px; background: #1a202c; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+  .admin-brand h2 { margin: 0 0 24px 0; font-size: 1.2rem; }
+  .admin-nav { display: flex; flex-direction: column; gap: 4px; }
+  .admin-nav a { padding: 10px 12px; border-radius: 6px; color: #cbd5e0; transition: all 0.2s; }
+  .admin-nav a:hover, .admin-nav a.active { background: #2d3748; color: white; }
+  .admin-main { margin-left: 250px; flex: 1; background: var(--sand); }
+  .admin-header { background: white; padding: 20px 32px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .admin-header h1 { margin: 0; }
+  .admin-content { padding: 32px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .metric-label { font-size: 0.875rem; color: #718096; margin-bottom: 8px; }
+  .metric-value { font-size: 2rem; font-weight: bold; color: var(--teal); }
+  .filter-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-select { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+  .table-container { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: #f7fafc; padding: 16px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+  .data-table td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+  .data-table tr:hover { background: #f7fafc; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.875rem; font-weight: 600; }
+  .status-success { background: #c6f6d5; color: #22543d; }
+  .status-error { background: #fed7d7; color: #742a2a; }
+  .status-warning { background: #fef5e7; color: #b7791f; }
+  .action-btn-sm { padding: 6px 12px; background: var(--teal); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; }
+  .action-btn-sm:hover { background: var(--teal-dark); }
+  .detail-panel { margin-top: 24px; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+</style>
+
+<script>
+(async function() {
+  // Check admin authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    if (!data.authenticated || data.role !== 'admin') {
+      navigateTo('/admin/login');
+      return;
+    }
+  } catch (error) {
+    navigateTo('/admin/login');
+    return;
+  }
+
+  let logs = [];
+
+  async function loadLogs() {
+    try {
+      const res = await fetch('/api/integrations/logs');
+      const data = await res.json();
+      logs = Array.isArray(data) ? data : (data.logs || []);
+      
+      // Calculate metrics
+      const coocoLogs = logs.filter(l => l.integration === 'cooco');
+      const mealbridgeLogs = logs.filter(l => l.integration === 'mealbridge');
+      const successLogs = logs.filter(l => l.status === 'success');
+      
+      document.getElementById('coocoCount').textContent = coocoLogs.length;
+      document.getElementById('mealbridgeCount').textContent = mealbridgeLogs.length;
+      document.getElementById('totalEvents').textContent = logs.length;
+      document.getElementById('successRate').textContent = logs.length > 0 
+        ? `${((successLogs.length / logs.length) * 100).toFixed(1)}%` 
+        : '0%';
+      
+      renderLogs(logs);
+    } catch (error) {
+      console.error('Failed to fetch logs:', error);
+      document.getElementById('logsTable').innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Failed to load logs</td></tr>';
+      
+      // Set default values
+      document.getElementById('coocoCount').textContent = '0';
+      document.getElementById('mealbridgeCount').textContent = '0';
+      document.getElementById('totalEvents').textContent = '0';
+      document.getElementById('successRate').textContent = '0%';
+    }
+  }
+
+  function renderLogs(data) {
+    const tbody = document.getElementById('logsTable');
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No logs found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.slice(0, 100).map((log, index) => {
+      let statusClass = 'status-success';
+      if (log.status === 'error') statusClass = 'status-error';
+      if (log.status === 'warning') statusClass = 'status-warning';
+      
+      return `
+        <tr>
+          <td>${new Date(log.timestamp).toLocaleString()}</td>
+          <td><strong>${log.integration?.toUpperCase() || 'N/A'}</strong></td>
+          <td>${log.eventType || log.type || 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${(log.status || 'unknown').toUpperCase()}</span></td>
+          <td>${log.message || 'No message'}</td>
+          <td><button class="action-btn-sm" onclick="viewLog(${index})">View</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.viewLog = function(index) {
+    const log = logs[index];
+    if (!log) return;
+
+    const detailPanel = document.getElementById('logDetail');
+    const content = document.getElementById('logContent');
+
+    content.textContent = JSON.stringify(log, null, 2);
+
+    detailPanel.style.display = 'block';
+    detailPanel.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  window.closeDetail = function() {
+    document.getElementById('logDetail').style.display = 'none';
+  };
+
+  window.refreshLogs = function() {
+    loadLogs();
+  };
+
+  // Filter handlers
+  document.getElementById('integrationFilter').addEventListener('change', filterLogs);
+  document.getElementById('statusFilter').addEventListener('change', filterLogs);
+
+  function filterLogs() {
+    const integration = document.getElementById('integrationFilter').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value.toLowerCase();
+    
+    let filtered = logs;
+    if (integration) filtered = filtered.filter(l => (l.integration || '').toLowerCase() === integration);
+    if (status) filtered = filtered.filter(l => (l.status || '').toLowerCase() === status);
+    
+    renderLogs(filtered);
+  }
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    navigateTo('/');
+  });
+
+  loadLogs();
+})();
+</script>

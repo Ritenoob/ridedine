@@ -1,0 +1,182 @@
+<!-- Admin Login Page -->
+<div class="admin-login-container">
+  <div class="login-card">
+    <h1>🔐 Admin Login</h1>
+    <p class="login-subtitle">Enter your credentials to access the admin dashboard</p>
+    
+    <div class="demo-notice" id="demoNotice" style="display: none;">
+      <strong>Demo Mode:</strong> Use email <code>admin@ridendine.com</code> and password <code>admin123</code>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" value="admin@ridendine.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="button button--primary" style="width: 100%;">
+        Login to Admin Dashboard
+      </button>
+    </form>
+
+    <div id="demoBypassContainer" style="display: none; margin-top: 16px;">
+      <button id="demoBypass" class="button" style="width: 100%; background: #f0f0f0;">
+        Demo Mode: Bypass Login
+      </button>
+    </div>
+
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="#" onclick="navigateTo('/'); return false;" style="color: #667eea; text-decoration: none;">← Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-login-container {
+    padding: 32px;
+    max-width: 500px;
+    margin: 60px auto;
+    min-height: 100vh;
+  }
+  .login-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  }
+  .login-card h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #1a202c;
+  }
+  .login-subtitle {
+    color: #718096;
+    margin-bottom: 32px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2d3748;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+  .error-message {
+    color: #e53e3e;
+    background: #fff5f5;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .error-message.visible {
+    display: block;
+  }
+  .demo-notice {
+    background: #edf2f7;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #4a5568;
+  }
+  .demo-notice code {
+    background: #cbd5e0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+  }
+</style>
+
+<script>
+(async function() {
+  const loginForm = document.getElementById('loginForm');
+  const errorMessage = document.getElementById('errorMessage');
+  const passwordInput = document.getElementById('password');
+  const emailInput = document.getElementById('email');
+  const demoNotice = document.getElementById('demoNotice');
+  const demoBypassContainer = document.getElementById('demoBypassContainer');
+  const demoBypass = document.getElementById('demoBypass');
+
+  // Check if demo mode is enabled
+  try {
+    const healthRes = await fetch('/api/health');
+    const healthData = await healthRes.json();
+    if (healthData.demoMode) {
+      demoNotice.style.display = 'block';
+      demoBypassContainer.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Failed to check demo mode:', error);
+  }
+
+  // Check if already authenticated
+  try {
+    const sessionRes = await fetch('/api/auth/session');
+    const sessionData = await sessionRes.json();
+    if (sessionData.authenticated && sessionData.role === 'admin') {
+      navigateTo('/admin');
+    }
+  } catch (error) {
+    console.error('Failed to check session:', error);
+  }
+
+  // Demo bypass button
+  if (demoBypass) {
+    demoBypass.addEventListener('click', () => {
+      navigateTo('/admin');
+    });
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    errorMessage.classList.remove('visible');
+    errorMessage.textContent = '';
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: 'admin' })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+      
+      navigateTo('/admin');
+    } catch (error) {
+      errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
+      errorMessage.classList.add('visible');
+      passwordInput.value = '';
+      passwordInput.focus();
+    }
+  });
+})();
+</script>

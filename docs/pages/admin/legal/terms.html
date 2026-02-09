@@ -1,0 +1,157 @@
+<!-- Admin - Terms of Service -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <h2>🔐 Admin Portal</h2>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;" class="active">📄 Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>Terms of Service</h1>
+      <button id="logoutBtn" class="button">Logout</button>
+    </header>
+
+    <div class="admin-content">
+      <div class="page-card">
+        <h2>RideNDine – Terms of Service</h2>
+        
+        <section>
+          <h3>1. Acceptance of Terms</h3>
+          <p>By accessing and using the RideNDine platform, you accept and agree to be bound by the terms and provisions of this agreement.</p>
+        </section>
+
+        <section>
+          <h3>2. Platform Description</h3>
+          <p>RideNDine is a delivery platform connecting customers with local chefs and drivers for food delivery services in the Hamilton, Ontario area.</p>
+        </section>
+
+        <section>
+          <h3>3. User Responsibilities</h3>
+          <p>Users agree to:</p>
+          <ul>
+            <li>Provide accurate and complete information</li>
+            <li>Maintain the security of their account credentials</li>
+            <li>Use the platform in compliance with all applicable laws</li>
+            <li>Not engage in fraudulent or harmful activities</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>4. Chef Responsibilities</h3>
+          <p>Chefs on the platform agree to:</p>
+          <ul>
+            <li>Maintain proper food handling licenses and certifications</li>
+            <li>Prepare food in accordance with health and safety regulations</li>
+            <li>Provide accurate menu information and pricing</li>
+            <li>Fulfill orders in a timely manner</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>5. Driver Responsibilities</h3>
+          <p>Drivers agree to:</p>
+          <ul>
+            <li>Maintain valid driver's license and insurance</li>
+            <li>Deliver orders safely and promptly</li>
+            <li>Handle food with care to maintain quality</li>
+            <li>Provide professional customer service</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>6. Payment Terms</h3>
+          <p>Payment processing is handled securely through our platform. Chefs receive payouts weekly, minus applicable platform fees. Customers are charged at the time of order placement.</p>
+        </section>
+
+        <section>
+          <h3>7. Cancellations and Refunds</h3>
+          <p>Orders may be cancelled before preparation begins. Refunds are provided for undelivered orders or orders with significant quality issues, subject to review.</p>
+        </section>
+
+        <section>
+          <h3>8. Limitation of Liability</h3>
+          <p>RideNDine acts as a platform connecting users and is not responsible for the quality of food, delivery issues, or disputes between parties. We provide the platform "as is" without warranties.</p>
+        </section>
+
+        <section>
+          <h3>9. Privacy and Data</h3>
+          <p>Your use of the platform is also governed by our Privacy Policy. We collect and use data as described in that policy.</p>
+        </section>
+
+        <section>
+          <h3>10. Changes to Terms</h3>
+          <p>We reserve the right to modify these terms at any time. Continued use of the platform constitutes acceptance of modified terms.</p>
+        </section>
+
+        <section>
+          <h3>Contact</h3>
+          <p>For questions about these terms, contact us at <a href="mailto:legal@ridendine.com">legal@ridendine.com</a></p>
+        </section>
+
+        <div class="page-links">
+          <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">Privacy Policy</a>
+          <a href="#" onclick="navigateTo('/admin'); return false;">Back to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar { width: 250px; background: #1a202c; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+  .admin-brand h2 { margin: 0 0 24px 0; font-size: 1.2rem; }
+  .admin-nav { display: flex; flex-direction: column; gap: 4px; }
+  .admin-nav a { padding: 10px 12px; border-radius: 6px; color: #cbd5e0; transition: all 0.2s; }
+  .admin-nav a:hover, .admin-nav a.active { background: #2d3748; color: white; }
+  .admin-main { margin-left: 250px; flex: 1; background: var(--sand); }
+  .admin-header { background: white; padding: 20px 32px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .admin-header h1 { margin: 0; }
+  .admin-content { padding: 32px; max-width: 900px; }
+  .page-card { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .page-card h2 { margin-top: 0; }
+  .page-card section { margin-bottom: 24px; }
+  .page-card h3 { color: var(--teal); margin-top: 0; }
+  .page-card ul { line-height: 1.8; }
+  .page-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 2px solid #e2e8f0; }
+  .page-links a { padding: 10px 16px; border-radius: 8px; background: var(--sand); font-weight: 600; color: var(--teal); }
+  .page-links a:hover { background: var(--teal); color: white; }
+</style>
+
+<script>
+(async function() {
+  // Check admin authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    if (!data.authenticated || data.role !== 'admin') {
+      navigateTo('/admin/login');
+      return;
+    }
+  } catch (error) {
+    navigateTo('/admin/login');
+    return;
+  }
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    navigateTo('/');
+  });
+})();
+</script>
