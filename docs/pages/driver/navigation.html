@@ -383,7 +383,7 @@ function handleAction() {
     }
   } else if (currentStatus === 'en_route_to_customer') {
     // Navigate to proof of delivery
-    navigateTo(`/driver/proof-of-delivery?jobId=${deliveryData.jobId}`);
+    navigateTo(`/driver/pod/${deliveryData.jobId}`);
   }
 }
 </script>
