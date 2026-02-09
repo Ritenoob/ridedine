@@ -20,8 +20,10 @@ class Router {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
     
-    // GitHub Pages deployment - user pages are at username.github.io/repo-name
-    if (hostname.includes('github.io')) {
+    // GitHub Pages deployment - only match exact GitHub Pages domain pattern
+    // Matches: username.github.io or org.github.io
+    // Does NOT match: evil.com/github.io or github.io.evil.com
+    if (hostname.endsWith('.github.io') || hostname === 'github.io') {
       // For GitHub Pages, the first path segment is the repo name
       // e.g., /ridendine-demo/customer -> base path is /ridendine-demo
       const pathSegments = pathname.split('/').filter(segment => segment.length > 0);

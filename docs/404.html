@@ -14,8 +14,9 @@
         var hash = window.location.hash;
         var hostname = window.location.hostname;
         
-        // Check if we're on GitHub Pages
-        var isGitHubPages = hostname.includes('github.io');
+        // Check if we're on GitHub Pages - use endsWith for security
+        // Only matches *.github.io, not evil.com/github.io
+        var isGitHubPages = hostname.endsWith('.github.io') || hostname === 'github.io';
         
         if (isGitHubPages) {
           // Extract base path using same logic as router
