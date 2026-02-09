@@ -1,15 +1,31 @@
 require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: 'Too many login attempts, please try again later.',
+  skipSuccessfulRequests: true
+});
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use('/api/', limiter); // Apply rate limiting to all API routes
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -18,7 +34,7 @@ const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
 
 // API routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes); // Stricter rate limit for auth
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
