@@ -76,6 +76,159 @@ npm start
 
 The server will start on `http://localhost:3000`
 
+## Demo Mode
+
+### Overview
+
+RideNDine includes a **Demo Mode** that allows you to explore the platform without authentication and with simulated live data. This is perfect for:
+- Development and testing
+- Demonstrations and presentations
+- Exploring the full functionality without setting up real accounts
+- Testing order workflows end-to-end
+
+### Enabling Demo Mode
+
+Set `DEMO_MODE=true` in your `.env` file:
+
+```env
+DEMO_MODE=true
+```
+
+When demo mode is enabled, the application will:
+- ✅ Bypass password authentication for all roles
+- ✅ Display a "DEMO MODE" indicator in the UI
+- ✅ Show a role switcher to easily change between roles
+- ✅ Provide mock data (customers, chefs, drivers, orders)
+- ✅ Simulate live order workflows
+
+### Using Demo Mode
+
+**1. Start the application:**
+```bash
+npm run dev
+```
+
+**2. Navigate to any protected route:**
+- Admin Dashboard: `http://localhost:3000/admin`
+- Chef Portal: `http://localhost:3000/chef-portal/dashboard`
+- Driver Jobs: `http://localhost:3000/driver/jobs`
+
+**3. Use the Role Switcher:**
+The purple "DEMO MODE" badge in the top bar indicates demo mode is active. Use the role switcher dropdown to switch between:
+- 👤 Customer
+- 🔐 Admin
+- 👨‍🍳 Chef
+- 🚗 Driver
+
+**4. Explore Demo Data:**
+Demo mode automatically seeds the system with:
+- 8 sample customers
+- 4 sample chefs with different specialties
+- 4 sample drivers
+- 15 sample orders in various states
+- Mock payment records
+
+### Demo Mode API Endpoints
+
+When `DEMO_MODE=true`, additional API endpoints become available:
+
+#### Seed Demo Data
+```bash
+POST /api/demo/seed
+```
+Populates the system with sample customers, chefs, drivers, and orders.
+
+Response:
+```json
+{
+  "success": true,
+  "message": "Demo data seeded successfully",
+  "stats": {
+    "customers": 8,
+    "chefs": 4,
+    "drivers": 4,
+    "orders": 15,
+    "payments": 13
+  }
+}
+```
+
+#### Reset Demo Data
+```bash
+POST /api/demo/reset
+```
+Clears all demo data back to empty state.
+
+#### Advance Order Lifecycle
+```bash
+POST /api/demo/advance-order/:orderId
+```
+Moves an order through its lifecycle states:
+`pending` → `paid` → `preparing` → `ready` → `picked_up` → `delivered`
+
+#### Simulate Payment
+```bash
+POST /api/demo/simulate-payment/:orderId
+```
+Simulates a successful payment for an order without calling Stripe.
+
+#### Get Orders
+```bash
+GET /api/demo/orders?status=pending&chefId=chef_2000
+```
+Retrieves orders with optional filters (status, chefId, driverId, customerId).
+
+#### Get All Demo Data
+```bash
+GET /api/demo/data
+```
+Returns all demo data (customers, chefs, drivers, orders, payments).
+
+### Demo Mode Features
+
+#### Admin Dashboard
+- View real-time metrics (orders, revenue, active drivers/chefs)
+- See order pipeline visualization
+- Monitor recent activity
+- Advance orders through lifecycle with "Advance" buttons
+
+#### Chef Portal
+- View incoming orders in real-time
+- Start preparing orders
+- Mark orders as ready for pickup
+- Track completed orders today
+
+#### Driver App
+- View available delivery jobs
+- Accept jobs
+- Complete deliveries
+- Track earnings and statistics
+
+### Disabling Demo Mode
+
+For production or testing real authentication:
+
+**1. Update `.env`:**
+```env
+DEMO_MODE=false
+```
+
+**2. Restart the server:**
+```bash
+npm start
+```
+
+**3. Login with credentials:**
+- Admin: Use `ADMIN_PASSWORD` from `.env`
+- Chef: Use `CHEF_PASSWORD` from `.env`  
+- Driver: Use `DRIVER_PASSWORD` from `.env`
+
+### Security Note
+
+⚠️ **NEVER use `DEMO_MODE=true` in production!**
+
+Demo mode bypasses all authentication and should only be used in development, staging, or demo environments. Always set `DEMO_MODE=false` for production deployments.
+
 ### Accessing the Application
 
 **Public Routes** (no authentication required):

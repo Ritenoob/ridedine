@@ -4,35 +4,68 @@ const { createSession, deleteSession, getSession } = require('../services/sessio
 
 // Login endpoint
 router.post('/login', (req, res) => {
-  const { password, role } = req.body;
+  const { password, role, userId } = req.body;
 
-  if (!password || !role) {
-    return res.status(400).json({ error: 'Password and role are required' });
+  if (!role) {
+    return res.status(400).json({ error: 'Role is required' });
   }
 
   // Validate role
-  const validRoles = ['admin', 'chef', 'driver'];
+  const validRoles = ['admin', 'chef', 'driver', 'customer'];
   if (!validRoles.includes(role)) {
     return res.status(400).json({ error: 'Invalid role' });
   }
 
+  // DEMO MODE BYPASS - Allow login without password
+  if (process.env.DEMO_MODE === 'true') {
+    const demoUserId = userId || `demo_${role}`;
+    const sessionId = createSession(demoUserId, role);
+
+    // Set cookie
+    res.cookie('sessionId', sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    return res.json({ 
+      success: true, 
+      role,
+      userId: demoUserId,
+      demoMode: true,
+      redirect: role === 'admin' ? '/admin' : 
+                role === 'chef' ? '/chef-portal/dashboard' : 
+                role === 'driver' ? '/driver/jobs' : 
+                '/customer'
+    });
+  }
+
+  // PRODUCTION MODE - Require password
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
   // Check password against environment variables (using timing-safe comparison)
   let expectedPassword;
-  let userId;
+  let authenticatedUserId;
   
   switch (role) {
     case 'admin':
       expectedPassword = process.env.ADMIN_PASSWORD;
-      userId = 'admin';
+      authenticatedUserId = 'admin';
       break;
     case 'chef':
       expectedPassword = process.env.CHEF_PASSWORD;
-      userId = 'chef';
+      authenticatedUserId = 'chef';
       break;
     case 'driver':
       expectedPassword = process.env.DRIVER_PASSWORD;
-      userId = 'driver';
+      authenticatedUserId = 'driver';
       break;
+    case 'customer':
+      // Customer auth would be handled differently in production
+      return res.status(400).json({ error: 'Customer login not implemented' });
   }
 
   // Use timing-safe comparison to prevent timing attacks
@@ -50,7 +83,7 @@ router.post('/login', (req, res) => {
   }
 
   // Create session
-  const sessionId = createSession(userId, role);
+  const sessionId = createSession(authenticatedUserId, role);
 
   // Set cookie
   res.cookie('sessionId', sessionId, {
@@ -63,8 +96,11 @@ router.post('/login', (req, res) => {
   res.json({ 
     success: true, 
     role,
-    userId,
-    redirect: role === 'admin' ? '/admin' : role === 'chef' ? '/chef-portal' : '/driver'
+    userId: authenticatedUserId,
+    demoMode: false,
+    redirect: role === 'admin' ? '/admin' : 
+              role === 'chef' ? '/chef-portal/dashboard' : 
+              '/driver/jobs'
   });
 });
 

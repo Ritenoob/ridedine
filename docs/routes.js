@@ -196,7 +196,41 @@
         html = html.replace(regex, params[key]);
       });
       
-      appContainer.innerHTML = html;
+      // Determine role based on current session
+      let role = 'public';
+      const currentPath = router.currentRoute || '/';
+      
+      if (window.AuthClient && window.AuthClient.session) {
+        const session = window.AuthClient.session;
+        if (session.authenticated && session.role) {
+          role = session.role;
+        }
+      }
+      
+      // Determine role from path if not authenticated (for layout purposes)
+      if (role === 'public') {
+        if (currentPath.startsWith('/admin')) {
+          role = 'admin';
+        } else if (currentPath.startsWith('/chef-portal')) {
+          role = 'chef';
+        } else if (currentPath.startsWith('/driver')) {
+          role = 'driver';
+        } else if (currentPath.startsWith('/customer') || currentPath.startsWith('/chefs') || currentPath.startsWith('/cart') || currentPath.startsWith('/checkout')) {
+          role = 'customer';
+        }
+      }
+      
+      // Use LayoutManager to render with appropriate layout
+      if (window.LayoutManager && role !== 'public') {
+        window.LayoutManager.render({
+          role: role,
+          viewContent: html,
+          currentPath: currentPath
+        });
+      } else {
+        // For public/unauthenticated pages, inject directly
+        appContainer.innerHTML = html;
+      }
       
       // Execute any scripts in the loaded content
       const scripts = appContainer.querySelectorAll('script');

@@ -1,452 +1,374 @@
-<!-- Driver Jobs -->
-<style>
-  body {
-    margin: 0;
-    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  }
-  .driver-app {
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--sand);
-    min-height: 100vh;
-  }
-  .driver-header {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .driver-header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-  .driver-content {
-    padding: 20px;
-    padding-bottom: 80px;
-  }
-  .tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    background: white;
-    padding: 8px;
-    border-radius: 12px;
-  }
-  .tab {
-    flex: 1;
-    padding: 10px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-    color: var(--muted);
-  }
-  .tab.active {
-    background: var(--orange);
-    color: white;
-  }
-  .job-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 16px;
-  }
-  .job-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
-  }
-  .job-id {
-    font-weight: bold;
-    color: var(--ink);
-  }
-  .job-pay {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: var(--orange);
-  }
-  .job-details {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 16px 0;
-  }
-  .detail-row {
-    display: flex;
-    align-items: start;
-    gap: 12px;
-  }
-  .detail-icon {
-    font-size: 1.25rem;
-  }
-  .detail-text {
-    flex: 1;
-  }
-  .detail-label {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-  .detail-value {
-    color: var(--ink);
-  }
-  .job-meta {
-    display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #e2e8f0;
-    font-size: 0.875rem;
-    color: var(--muted);
-  }
-  .button {
-    padding: 12px 24px;
-    background: var(--orange);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.2s;
-    width: 100%;
-    font-size: 1rem;
-  }
-  .button:hover {
-    background: var(--orange-dark);
-  }
-  .button:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-  }
-  .button-secondary {
-    background: white;
-    color: var(--orange);
-    border: 2px solid var(--orange);
-  }
-  .button-secondary:hover {
-    background: #fff5f0;
-  }
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
-  .empty-state h3 {
-    margin: 16px 0 8px;
-    color: var(--ink);
-  }
-  .nav-menu {
-    background: white;
-    border-top: 1px solid #e2e8f0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.2s;
-  }
-  .nav-item.active {
-    color: var(--orange);
-    background: #fff5f0;
-  }
-  .nav-icon {
-    font-size: 1.5rem;
-  }
-  .nav-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  .status-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  .badge-new {
-    background: #fef3c7;
-    color: #92400e;
-  }
-  .badge-active {
-    background: #d1fae5;
-    color: #065f46;
-  }
-</style>
+<!-- Driver Jobs Content -->
+<div class="page-header">
+  <h1 class="page-header__title">Available Jobs</h1>
+  <p class="page-header__subtitle">View and manage your delivery jobs</p>
+</div>
 
-<div class="driver-app">
-  <header class="driver-header">
-    <h1>📦 Delivery Jobs</h1>
-    <button class="button button-secondary" onclick="loadJobs()" style="padding: 8px 16px; width: auto;">
+<!-- Quick Stats -->
+<section class="section">
+  <div class="grid grid--3">
+    <div class="metric-card">
+      <div class="metric-card__label">Available Jobs</div>
+      <div class="metric-card__value" id="availableJobs">-</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card__label">My Active Jobs</div>
+      <div class="metric-card__value" id="activeJobs">-</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card__label">Completed Today</div>
+      <div class="metric-card__value" id="completedToday">-</div>
+    </div>
+  </div>
+</section>
+
+<!-- My Active Deliveries -->
+<section class="section" id="myJobsSection" style="display: none;">
+  <div class="section__header">
+    <h2 class="section__title">My Active Deliveries</h2>
+  </div>
+  <div id="myJobsContainer" class="grid grid--2">
+  </div>
+</section>
+
+<!-- Available Jobs -->
+<section class="section">
+  <div class="section__header">
+    <h2 class="section__title">Available Jobs</h2>
+    <button class="button button--sm button--primary" onclick="refreshJobs()">
       🔄 Refresh
     </button>
-  </header>
-
-  <div class="driver-content">
-    <div class="tabs">
-      <button class="tab active" data-tab="available" onclick="switchTab('available')">Available</button>
-      <button class="tab" data-tab="active" onclick="switchTab('active')">Active</button>
-    </div>
-
-    <div id="jobsList">
-      <div class="empty-state">
-        <div style="font-size: 3rem;">⏳</div>
-        <h3>Loading jobs...</h3>
+  </div>
+  <div id="jobsContainer" class="grid grid--2">
+    <div class="card">
+      <div class="card__body text-center text-muted">
+        Loading jobs...
       </div>
     </div>
   </div>
+</section>
 
-  <nav class="nav-menu">
-    <div class="nav-item" onclick="navigateTo('/driver')">
-      <div class="nav-icon">🏠</div>
-      <div class="nav-label">Home</div>
-    </div>
-    <div class="nav-item active" onclick="navigateTo('/driver/jobs')">
-      <div class="nav-icon">📦</div>
-      <div class="nav-label">Jobs</div>
-    </div>
-    <div class="nav-item" onclick="alert('Coming soon: Earnings section')">
-      <div class="nav-icon">💰</div>
-      <div class="nav-label">Earnings</div>
-    </div>
-    <div class="nav-item" onclick="alert('Coming soon: Profile section')">
-      <div class="nav-icon">👤</div>
-      <div class="nav-label">Profile</div>
-    </div>
-  </nav>
-</div>
+<style>
+.job-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-border);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.job-card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.job-card--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.job-card__header {
+  padding: var(--space-4);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-card__id {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.job-card__body {
+  padding: var(--space-4);
+}
+
+.job-location {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+}
+
+.job-location__icon {
+  font-size: var(--font-size-xl);
+}
+
+.job-location__details {
+  flex: 1;
+}
+
+.job-location__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-1);
+}
+
+.job-location__address {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.job-info {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.job-info__item {
+  font-size: var(--font-size-sm);
+}
+
+.job-info__label {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.job-info__value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.job-card__footer {
+  padding: var(--space-4);
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-card__earnings {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success);
+}
+</style>
 
 <script>
-let currentTab = 'available';
-let availableJobs = [];
-let activeJobs = [];
-
 (async function() {
-  // Check authentication
-  try {
-    const res = await fetch('/api/auth/session');
-    const data = await res.json();
+  const isDemoMode = window.AppConfig?.demoMode || false;
+  const driverId = window.AppConfig?.currentUser || 'driver_3000'; // Default to first driver
+  
+  // Load jobs
+  async function loadJobs() {
+    try {
+      if (isDemoMode) {
+        const res = await fetch('/api/demo/orders');
+        const data = await res.json();
+        
+        // Update metrics
+        updateMetrics(data.orders, driverId);
+        
+        // Display jobs
+        displayJobs(data.orders, driverId);
+      }
+    } catch (error) {
+      console.error('Failed to load jobs:', error);
+      document.getElementById('jobsContainer').innerHTML = `
+        <div class="card">
+          <div class="card__body text-center text-error">
+            Failed to load jobs
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Update metrics
+  function updateMetrics(orders, currentDriverId) {
+    const available = orders.filter(o => 
+      o.status === 'ready' && !o.driverId
+    ).length;
     
-    if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {
-      navigateTo('/driver/login');
+    const active = orders.filter(o => 
+      o.driverId === currentDriverId && o.status === 'picked_up'
+    ).length;
+    
+    const today = new Date().toDateString();
+    const completed = orders.filter(o => {
+      const orderDate = new Date(o.createdAt).toDateString();
+      return orderDate === today && o.driverId === currentDriverId && o.status === 'delivered';
+    }).length;
+    
+    document.getElementById('availableJobs').textContent = available;
+    document.getElementById('activeJobs').textContent = active;
+    document.getElementById('completedToday').textContent = completed;
+  }
+  
+  // Display jobs
+  function displayJobs(orders, currentDriverId) {
+    const myJobsContainer = document.getElementById('myJobsContainer');
+    const jobsContainer = document.getElementById('jobsContainer');
+    const myJobsSection = document.getElementById('myJobsSection');
+    
+    // Separate my jobs and available jobs
+    const myJobs = orders.filter(o => 
+      o.driverId === currentDriverId && o.status === 'picked_up'
+    );
+    
+    const availableJobs = orders.filter(o => 
+      o.status === 'ready' && !o.driverId
+    );
+    
+    // Display my active jobs
+    if (myJobs.length > 0) {
+      myJobsSection.style.display = 'block';
+      myJobsContainer.innerHTML = myJobs.map(order => renderJobCard(order, true)).join('');
+    } else {
+      myJobsSection.style.display = 'none';
+    }
+    
+    // Display available jobs
+    if (availableJobs.length === 0) {
+      jobsContainer.innerHTML = `
+        <div class="card">
+          <div class="card__body text-center text-muted">
+            No jobs available at the moment
+          </div>
+        </div>
+      `;
       return;
     }
-  } catch (error) {
-    console.error('Auth check failed:', error);
-    navigateTo('/driver/login');
-    return;
+    
+    jobsContainer.innerHTML = availableJobs.map(order => renderJobCard(order, false)).join('');
   }
-
-  // Load jobs
-  await loadJobs();
-
+  
+  // Render job card
+  function renderJobCard(order, isMyJob) {
+    const customer = order.customer || { name: 'Unknown', address: 'N/A' };
+    const chef = order.chef || { name: 'Unknown' };
+    const distance = (Math.random() * 5 + 1).toFixed(1); // Mock distance
+    const earnings = (parseFloat(order.total) * 0.15).toFixed(2); // 15% commission
+    
+    return `
+      <div class="job-card ${isMyJob ? 'job-card--active' : ''}">
+        <div class="job-card__header">
+          <div class="job-card__id">Order #${order.id.substring(order.id.length - 6)}</div>
+          <span class="badge badge--${order.status}">${order.status}</span>
+        </div>
+        
+        <div class="job-card__body">
+          <div class="job-location">
+            <div class="job-location__icon">🏠</div>
+            <div class="job-location__details">
+              <div class="job-location__label">Pickup From</div>
+              <div class="job-location__address">${chef.name}</div>
+            </div>
+          </div>
+          
+          <div class="job-location">
+            <div class="job-location__icon">📍</div>
+            <div class="job-location__details">
+              <div class="job-location__label">Deliver To</div>
+              <div class="job-location__address">${customer.name}<br>${customer.address}</div>
+            </div>
+          </div>
+          
+          <div class="job-info">
+            <div class="job-info__item">
+              <div class="job-info__label">Distance</div>
+              <div class="job-info__value">${distance} km</div>
+            </div>
+            <div class="job-info__item">
+              <div class="job-info__label">Order Value</div>
+              <div class="job-info__value">$${parseFloat(order.total).toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="job-card__footer">
+          <div class="job-card__earnings">+$${earnings}</div>
+          ${getJobActions(order, isMyJob)}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Get job actions based on status
+  function getJobActions(order, isMyJob) {
+    if (!isDemoMode) return '';
+    
+    if (isMyJob) {
+      return `
+        <button 
+          class="button button--sm button--success" 
+          onclick="completeDelivery('${order.id}')"
+        >
+          ✓ Complete Delivery
+        </button>
+      `;
+    } else {
+      return `
+        <button 
+          class="button button--sm button--primary" 
+          onclick="acceptJob('${order.id}')"
+        >
+          Accept Job
+        </button>
+      `;
+    }
+  }
+  
+  // Accept job
+  window.acceptJob = async function(orderId) {
+    try {
+      // In a real app, this would assign the driver
+      // For demo, we'll just advance the order
+      const res = await fetch(`/api/demo/advance-order/${orderId}`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        loadJobs();
+      } else {
+        alert('Failed to accept job: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to accept job:', error);
+      alert('Failed to accept job');
+    }
+  };
+  
+  // Complete delivery
+  window.completeDelivery = async function(orderId) {
+    try {
+      const res = await fetch(`/api/demo/advance-order/${orderId}`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        loadJobs();
+      } else {
+        alert('Failed to complete delivery: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to complete delivery:', error);
+      alert('Failed to complete delivery');
+    }
+  };
+  
+  // Refresh jobs
+  window.refreshJobs = function() {
+    loadJobs();
+  };
+  
+  // Load initial data
+  loadJobs();
+  
   // Auto-refresh every 30 seconds
   setInterval(loadJobs, 30000);
 })();
-
-async function loadJobs() {
-  try {
-    // Fetch orders from API
-    const res = await fetch('/api/orders');
-    const orders = await res.json();
-
-    if (!Array.isArray(orders)) {
-      console.warn('Orders is not an array:', orders);
-      availableJobs = generateMockJobs();
-      activeJobs = [];
-      renderJobs();
-      return;
-    }
-
-    // Filter orders that need delivery
-    const readyOrders = orders.filter(o => o.status === 'ready' || o.status === 'out_for_delivery');
-    
-    // Check for active delivery
-    const activeDelivery = localStorage.getItem('driverActiveDelivery');
-    
-    if (activeDelivery) {
-      const delivery = JSON.parse(activeDelivery);
-      activeJobs = [delivery];
-      availableJobs = readyOrders
-        .filter(o => o.id !== delivery.orderId)
-        .map(orderToJob);
-    } else {
-      activeJobs = [];
-      availableJobs = readyOrders.map(orderToJob);
-    }
-
-    // If no real jobs, add mock jobs for demo
-    if (availableJobs.length === 0) {
-      availableJobs = generateMockJobs();
-    }
-
-    renderJobs();
-  } catch (error) {
-    console.error('Failed to load jobs:', error);
-    availableJobs = generateMockJobs();
-    renderJobs();
-  }
-}
-
-function orderToJob(order) {
-  return {
-    jobId: `JOB-${order.id || Date.now()}`,
-    orderId: order.id || order.orderId,
-    pickupAddress: order.pickupAddress || '123 Restaurant St',
-    dropoffAddress: order.deliveryAddress || order.address || '456 Customer Ave',
-    distance: order.distance || '2.5 mi',
-    estimatedTime: order.estimatedTime || '15 mins',
-    pay: order.deliveryFee || 8.50,
-    customerName: order.customerName || 'Customer',
-    items: order.items || []
-  };
-}
-
-function generateMockJobs() {
-  return [
-    {
-      jobId: 'JOB-001',
-      orderId: '12345',
-      pickupAddress: '123 Main St, Pizzeria Roma',
-      dropoffAddress: '456 Oak Ave, Apt 2B',
-      distance: '2.5 mi',
-      estimatedTime: '15 mins',
-      pay: 8.50,
-      customerName: 'John D.',
-      items: [{ name: 'Margherita Pizza', quantity: 1 }]
-    },
-    {
-      jobId: 'JOB-002',
-      orderId: '12346',
-      pickupAddress: '789 Elm St, Burger Palace',
-      dropoffAddress: '321 Pine St, Suite 100',
-      distance: '3.2 mi',
-      estimatedTime: '18 mins',
-      pay: 10.00,
-      customerName: 'Sarah M.',
-      items: [{ name: 'Cheeseburger', quantity: 2 }, { name: 'Fries', quantity: 1 }]
-    },
-    {
-      jobId: 'JOB-003',
-      orderId: '12347',
-      pickupAddress: '555 Broadway, Sushi House',
-      dropoffAddress: '888 Market St',
-      distance: '1.8 mi',
-      estimatedTime: '12 mins',
-      pay: 7.50,
-      customerName: 'Mike K.',
-      items: [{ name: 'California Roll', quantity: 2 }]
-    }
-  ];
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === tab);
-  });
-  renderJobs();
-}
-
-function renderJobs() {
-  const container = document.getElementById('jobsList');
-  const jobs = currentTab === 'available' ? availableJobs : activeJobs;
-
-  if (jobs.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div style="font-size: 3rem;">${currentTab === 'available' ? '📭' : '📦'}</div>
-        <h3>No ${currentTab} jobs</h3>
-        <p>${currentTab === 'available' 
-          ? 'New delivery jobs will appear here' 
-          : 'Accept a job to start delivering'}</p>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = jobs.map(job => `
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <div class="job-id">Order #${job.orderId}</div>
-          <span class="status-badge ${currentTab === 'available' ? 'badge-new' : 'badge-active'}">
-            ${currentTab === 'available' ? 'NEW' : 'ACTIVE'}
-          </span>
-        </div>
-        <div class="job-pay">$${job.pay.toFixed(2)}</div>
-      </div>
-
-      <div class="job-details">
-        <div class="detail-row">
-          <div class="detail-icon">📍</div>
-          <div class="detail-text">
-            <div class="detail-label">PICKUP</div>
-            <div class="detail-value">${job.pickupAddress}</div>
-          </div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-icon">🏠</div>
-          <div class="detail-text">
-            <div class="detail-label">DROP-OFF</div>
-            <div class="detail-value">${job.dropoffAddress}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="job-meta">
-        <div>📏 ${job.distance}</div>
-        <div>⏱️ ${job.estimatedTime}</div>
-        <div>📦 ${job.items?.length || 1} item(s)</div>
-      </div>
-
-      ${currentTab === 'available' ? `
-        <button class="button" onclick="acceptJob('${job.jobId}')" style="margin-top: 16px;">
-          Accept Job
-        </button>
-      ` : `
-        <button class="button" onclick="navigateTo('/driver/navigation?jobId=${job.jobId}')" style="margin-top: 16px;">
-          Start Navigation
-        </button>
-      `}
-    </div>
-  `).join('');
-}
-
-function acceptJob(jobId) {
-  const job = availableJobs.find(j => j.jobId === jobId);
-  if (!job) return;
-
-  // Save as active delivery
-  const delivery = {
-    ...job,
-    acceptedAt: new Date().toISOString(),
-    status: 'en_route_to_pickup',
-    eta: job.estimatedTime
-  };
-  
-  localStorage.setItem('driverActiveDelivery', JSON.stringify(delivery));
-
-  // Navigate to navigation
-  navigateTo(`/driver/navigation?jobId=${jobId}`);
-}
 </script>
