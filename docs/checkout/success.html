@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payment Successful | RideNDine</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body {
+        padding: 32px;
+        max-width: 700px;
+        margin: 60px auto;
+      }
+      .success-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 60px 40px;
+        box-shadow: 0 12px 30px rgba(15, 30, 60, 0.08);
+        text-align: center;
+      }
+      .success-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+      }
+      .success-title {
+        font-size: 32px;
+        margin: 0 0 10px;
+        color: #1a202c;
+      }
+      .success-message {
+        color: #718096;
+        font-size: 18px;
+        margin-bottom: 30px;
+      }
+      .order-id-box {
+        background: #f7fafc;
+        border: 2px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px 0;
+      }
+      .order-id {
+        font-size: 36px;
+        font-weight: 700;
+        color: #ff7a18;
+        margin: 10px 0;
+      }
+      .order-label {
+        font-size: 14px;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+        text-align: left;
+      }
+      .info-item {
+        background: #f7fafc;
+        padding: 16px;
+        border-radius: 8px;
+      }
+      .info-item strong {
+        display: block;
+        color: #1a202c;
+        margin-bottom: 4px;
+      }
+      .info-item span {
+        color: #718096;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="success-card">
+      <div class="success-icon">✅</div>
+      <h1 class="success-title">Payment Successful!</h1>
+      <p class="success-message">
+        Your order has been confirmed and is being prepared by the chef.
+      </p>
+
+      <div class="order-id-box">
+        <div class="order-label">Your Order ID</div>
+        <div class="order-id" id="orderId">Loading...</div>
+        <div class="order-label">Save this to track your order</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Status</strong>
+          <span>Order Confirmed</span>
+        </div>
+        <div class="info-item">
+          <strong>Estimated Delivery</strong>
+          <span id="deliveryTime">Today, 5:00-6:00 PM</span>
+        </div>
+        <div class="info-item">
+          <strong>Payment</strong>
+          <span>Paid via Stripe</span>
+        </div>
+      </div>
+
+      <div class="hero__actions" style="margin-top: 40px;">
+        <button class="button button--primary" id="trackOrderBtn">Track Your Order</button>
+        <a href="/" class="button button--ghost">Back to Home</a>
+      </div>
+    </div>
+
+    <script>
+      // Get session ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+
+      if (sessionId) {
+        // Verify payment and get order details
+        fetch(`/api/payments/verify/${sessionId}`)
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('orderId').textContent = data.orderId || 'RD-0000';
+            
+            // Set up track order button
+            document.getElementById('trackOrderBtn').addEventListener('click', () => {
+              window.location.href = `/order/${data.orderId}`;
+            });
+          })
+          .catch(error => {
+            console.error('Error verifying payment:', error);
+            document.getElementById('orderId').textContent = 'RD-XXXX';
+          });
+      } else {
+        document.getElementById('orderId').textContent = 'No session found';
+      }
+    </script>
+  </body>
+</html>
