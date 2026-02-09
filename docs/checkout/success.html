@@ -4,7 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Payment Successful | RideNDine</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      // Detect base path for GitHub Pages - shared utility function
+      // Matches logic in router.js for consistency
+      (function() {
+        var basePath = '';
+        var hostname = window.location.hostname;
+        var pathname = window.location.pathname;
+        
+        // Only match exact GitHub Pages domains for security
+        if (hostname.endsWith('.github.io') || hostname === 'github.io') {
+          var pathSegments = pathname.split('/').filter(function(segment) { 
+            return segment.length > 0; 
+          });
+          
+          if (pathSegments.length > 0 && !pathSegments[0].endsWith('.html')) {
+            basePath = '/' + pathSegments[0];
+          }
+        }
+        
+        window.APP_BASE_PATH = basePath;
+        
+        // Create a base tag to fix relative URLs
+        var base = document.createElement('base');
+        base.href = basePath ? basePath + '/' : '/';
+        document.head.appendChild(base);
+      })();
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
     <style>
       body {
         padding: 32px;
@@ -105,7 +132,7 @@
 
       <div class="hero__actions" style="margin-top: 40px;">
         <button class="button button--primary" id="trackOrderBtn">Track Your Order</button>
-        <a href="/" class="button button--ghost">Back to Home</a>
+        <a href="./" class="button button--ghost">Back to Home</a>
       </div>
     </div>
 
@@ -123,7 +150,8 @@
             
             // Set up track order button
             document.getElementById('trackOrderBtn').addEventListener('click', () => {
-              window.location.href = `/order/${data.orderId}`;
+              const basePath = window.APP_BASE_PATH || '';
+              window.location.href = `${basePath}/order/${data.orderId}`;
             });
           })
           .catch(error => {
