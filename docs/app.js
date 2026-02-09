@@ -248,9 +248,21 @@ if (trackingForm && trackingStatus) {
     event.preventDefault();
     const data = new FormData(trackingForm);
     const orderId = String(data.get("orderId") || "RD-0000").toUpperCase();
-    trackingStatus.textContent = `${orderId} is out for delivery. Driver ETA 22-28 min.`;
+    // Redirect to order tracking page
+    window.location.href = `/order/${orderId}`;
   });
 }
+
+// Track order button in hero
+const trackOrderButtons = document.querySelectorAll("[data-open-tracking]");
+trackOrderButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const orderId = prompt("Enter your order ID:");
+    if (orderId && orderId.trim()) {
+      window.location.href = `/order/${orderId.trim()}`;
+    }
+  });
+});
 
 const closeButtons = document.querySelectorAll("[data-close-payment]");
 closeButtons.forEach((button) => {
