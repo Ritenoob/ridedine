@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Payment Cancelled | RideNDine</title>
     <script>
-      // Detect base path for GitHub Pages
+      // Detect base path for GitHub Pages - shared utility function
+      // Matches logic in router.js for consistency
       (function() {
         var basePath = '';
         var hostname = window.location.hostname;
         var pathname = window.location.pathname;
         
         if (hostname.includes('github.io')) {
-          var match = pathname.match(/^\/([^\/]+)/);
-          if (match && match[1] !== 'checkout') {
-            basePath = '/' + match[1];
+          var pathSegments = pathname.split('/').filter(function(segment) { 
+            return segment.length > 0; 
+          });
+          
+          if (pathSegments.length > 0 && !pathSegments[0].endsWith('.html')) {
+            basePath = '/' + pathSegments[0];
           }
         }
         
-        // Update document to use correct base path
         window.APP_BASE_PATH = basePath;
         
         // Create a base tag to fix relative URLs

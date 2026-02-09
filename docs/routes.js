@@ -214,11 +214,12 @@
       
     } catch (error) {
       console.error('Error loading page:', error);
+      const router = window.Router;
       appContainer.innerHTML = `
         <div style="padding: 2rem; text-align: center;">
           <h1>Error Loading Page</h1>
           <p>${error.message}</p>
-          <a href="${router.addBasePath('/')}" class="button button--primary" onclick="event.preventDefault(); window.navigateTo('/');">Go Home</a>
+          <a href="#" onclick="event.preventDefault(); window.navigateTo('/'); return false;" class="button button--primary">Go Home</a>
         </div>
       `;
     }

@@ -7,18 +7,26 @@
     <script>
       // SPA redirect for GitHub Pages
       // This script redirects 404s back to index.html with the path preserved
+      // Uses same base path detection logic as router.js for consistency
       (function() {
         var pathname = window.location.pathname;
         var search = window.location.search;
         var hash = window.location.hash;
+        var hostname = window.location.hostname;
         
         // Check if we're on GitHub Pages
-        var isGitHubPages = window.location.hostname.includes('github.io');
+        var isGitHubPages = hostname.includes('github.io');
         
         if (isGitHubPages) {
-          // Extract base path (e.g., /ridendine-demo)
-          var pathSegments = pathname.split('/').filter(Boolean);
-          var basePath = pathSegments[0] ? '/' + pathSegments[0] : '';
+          // Extract base path using same logic as router
+          var pathSegments = pathname.split('/').filter(function(segment) {
+            return segment.length > 0;
+          });
+          
+          var basePath = '';
+          if (pathSegments.length > 0 && !pathSegments[0].endsWith('.html')) {
+            basePath = '/' + pathSegments[0];
+          }
           
           // Redirect to index.html, preserving the full path in sessionStorage
           // The router will pick it up and navigate to the correct route

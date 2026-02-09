@@ -20,13 +20,19 @@ class Router {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
     
-    // GitHub Pages deployment
+    // GitHub Pages deployment - user pages are at username.github.io/repo-name
     if (hostname.includes('github.io')) {
-      // Extract repo name from pathname (e.g., /ridendine-demo/)
-      const match = pathname.match(/^\/([^\/]+)/);
-      if (match && match[1] !== 'index.html') {
-        return '/' + match[1];
+      // For GitHub Pages, the first path segment is the repo name
+      // e.g., /ridendine-demo/customer -> base path is /ridendine-demo
+      const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+      
+      // If we have at least one segment and it's not a file (doesn't end in .html)
+      if (pathSegments.length > 0 && !pathSegments[0].endsWith('.html')) {
+        return '/' + pathSegments[0];
       }
+      
+      // If pathname is just /index.html or /, no base path needed
+      return '';
     }
     
     // Local development or custom domain
