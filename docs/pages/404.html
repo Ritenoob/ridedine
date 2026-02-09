@@ -1,0 +1,65 @@
+<div class="error-page">
+  <div class="error-container">
+    <h1 class="error-title">404</h1>
+    <h2>Page Not Found</h2>
+    <p class="error-message">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <div class="error-actions">
+      <a href="/" class="button button--primary" onclick="event.preventDefault(); navigateTo('/')">
+        Go to Home
+      </a>
+      <a href="/customer" class="button button--ghost" onclick="event.preventDefault(); navigateTo('/customer')">
+        Browse Chefs
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .error-container {
+    text-align: center;
+    color: white;
+    max-width: 500px;
+  }
+  
+  .error-title {
+    font-size: 8rem;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .error-container h2 {
+    font-size: 2rem;
+    margin: 1rem 0;
+  }
+  
+  .error-message {
+    font-size: 1.125rem;
+    margin: 1.5rem 0;
+    opacity: 0.9;
+  }
+  
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  
+  .error-actions .button {
+    min-width: 150px;
+  }
+</style>

@@ -1,0 +1,163 @@
+<!-- Shopping Cart -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/chefs')" style="cursor: pointer;">Browse Chefs</a>
+    <a onclick="navigateTo('/order-tracking')" style="cursor: pointer;">Track Order</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw; max-width: 1000px; margin: 0 auto;">
+  <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);">
+    <h1 style="margin-top: 0;">Your Cart</h1>
+    
+    <div id="cart-items">
+      <!-- Cart items will be rendered here -->
+    </div>
+
+    <div id="empty-cart" style="display: none; text-align: center; padding: 60px 20px;">
+      <div style="font-size: 5rem; margin-bottom: 16px;">🛒</div>
+      <h2 style="color: var(--muted);">Your cart is empty</h2>
+      <p style="color: var(--muted); margin-bottom: 24px;">Start adding delicious items from our talented chefs!</p>
+      <button class="button button--primary" onclick="navigateTo('/chefs')">
+        Browse Chefs
+      </button>
+    </div>
+
+    <div id="cart-summary" style="display: none;">
+      <div style="border-top: 2px solid #f0efed; margin-top: 24px; padding-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="color: var(--muted); font-size: 1.1rem;">Subtotal:</span>
+          <strong style="font-size: 1.5rem; color: var(--teal);">$<span id="cart-subtotal">0.00</span></strong>
+        </div>
+        <p style="color: var(--muted); font-size: 0.9rem; margin: 0 0 20px 0;">
+          Delivery fee and taxes calculated at checkout
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="button button--ghost" onclick="navigateTo('/chefs')" style="flex: 1; min-width: 150px;">
+            Continue Shopping
+          </button>
+          <button class="button button--primary" onclick="proceedToCheckout()" style="flex: 2; min-width: 150px;">
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2024 RideNDine. Supporting local home chefs.</p>
+  <div class="footer__links">
+    <a onclick="navigateTo('/legal/privacy')" style="cursor: pointer;">Privacy Policy</a>
+    <a onclick="navigateTo('/legal/terms')" style="cursor: pointer;">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+  function renderCart() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartItemsEl = document.getElementById('cart-items');
+    const emptyCartEl = document.getElementById('empty-cart');
+    const cartSummaryEl = document.getElementById('cart-summary');
+
+    if (cart.length === 0) {
+      cartItemsEl.innerHTML = '';
+      emptyCartEl.style.display = 'block';
+      cartSummaryEl.style.display = 'none';
+      return;
+    }
+
+    emptyCartEl.style.display = 'none';
+    cartSummaryEl.style.display = 'block';
+
+    // Group items by chef
+    const itemsByChef = cart.reduce((acc, item) => {
+      if (!acc[item.chefSlug]) {
+        acc[item.chefSlug] = {
+          chefName: item.chefName,
+          items: []
+        };
+      }
+      acc[item.chefSlug].items.push(item);
+      return acc;
+    }, {});
+
+    cartItemsEl.innerHTML = Object.entries(itemsByChef).map(([chefSlug, data]) => `
+      <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f0efed;">
+        <h3 style="margin: 0 0 16px 0; color: var(--teal);">
+          ${data.chefName}
+          <a onclick="navigateTo('/chefs/${chefSlug}')" style="font-size: 0.9rem; font-weight: normal; color: var(--orange); cursor: pointer; margin-left: 12px;">View Menu →</a>
+        </h3>
+        ${data.items.map((item, index) => `
+          <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 12px; background: #f7fbfa; border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 150px;">
+              <strong>${item.itemName}</strong>
+              <div style="color: var(--muted); font-size: 0.9rem;">$${item.price.toFixed(2)} each</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <div style="display: flex; gap: 8px; align-items: center; background: white; border-radius: 8px; padding: 4px;">
+                <button 
+                  onclick="updateQuantity('${chefSlug}', '${item.itemId}', ${item.quantity - 1})"
+                  style="border: none; background: #f0efed; color: var(--ink); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold;"
+                >−</button>
+                <span style="min-width: 30px; text-align: center; font-weight: 600;">${item.quantity}</span>
+                <button 
+                  onclick="updateQuantity('${chefSlug}', '${item.itemId}', ${item.quantity + 1})"
+                  style="border: none; background: var(--teal); color: white; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold;"
+                >+</button>
+              </div>
+              <strong style="min-width: 70px; text-align: right; color: var(--teal);">$${(item.price * item.quantity).toFixed(2)}</strong>
+              <button 
+                onclick="removeItem('${chefSlug}', '${item.itemId}')"
+                style="border: none; background: #ffebee; color: #c62828; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;"
+              >Remove</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+    // Update subtotal
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById('cart-subtotal').textContent = subtotal.toFixed(2);
+  }
+
+  function updateQuantity(chefSlug, itemId, newQuantity) {
+    if (newQuantity < 1) {
+      removeItem(chefSlug, itemId);
+      return;
+    }
+
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const item = cart.find(i => i.chefSlug === chefSlug && i.itemId === itemId);
+    if (item) {
+      item.quantity = newQuantity;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+  }
+
+  function removeItem(chefSlug, itemId) {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    cart = cart.filter(i => !(i.chefSlug === chefSlug && i.itemId === itemId));
+    localStorage.setItem('cart', JSON.stringify(cart));
+    renderCart();
+  }
+
+  function proceedToCheckout() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (cart.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+    navigateTo('/checkout');
+  }
+
+  // Initial render
+  renderCart();
+</script>

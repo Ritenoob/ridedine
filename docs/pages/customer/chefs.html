@@ -1,0 +1,187 @@
+<!-- Chef Marketplace -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/order-tracking')" style="cursor: pointer;">Track Order</a>
+    <a onclick="navigateTo('/cart')" style="cursor: pointer;">Cart (<span id="cart-count">0</span>)</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw;">
+  <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 32px;">
+    <h1 style="margin-top: 0;">Browse Our Chefs</h1>
+    <p style="color: var(--muted); margin-bottom: 20px;">Discover talented home chefs and their specialties</p>
+    
+    <!-- Search/Filter Section -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Search by name or cuisine..." 
+        style="flex: 1; min-width: 200px; border: 1px solid #e4e4e4; border-radius: 12px; padding: 10px 14px; font-size: 1rem;"
+        oninput="filterChefs()"
+      >
+      <select 
+        id="cuisine-filter" 
+        style="border: 1px solid #e4e4e4; border-radius: 12px; padding: 10px 14px; font-size: 1rem; min-width: 150px;"
+        onchange="filterChefs()"
+      >
+        <option value="">All Cuisines</option>
+        <option value="vietnamese">Vietnamese</option>
+        <option value="italian">Italian</option>
+        <option value="mexican">Mexican</option>
+        <option value="thai">Thai</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Chefs Grid -->
+  <div class="chef-grid" id="chef-grid">
+    <!-- Hoang Gia Pho -->
+    <div class="info-card chef-card" data-name="hoang gia pho" data-cuisine="vietnamese" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/hoang-gia-pho')">
+      <div style="background: linear-gradient(135deg, #ff7a18 0%, #d85c0f 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
+        <div style="font-size: 3rem; margin-bottom: 8px;">🍜</div>
+        <h3 style="margin: 0; color: white;">Hoang Gia Pho</h3>
+      </div>
+      <div style="margin-top: 12px;">
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          <strong>Cuisine:</strong> Vietnamese
+        </p>
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          Authentic Vietnamese cuisine with family recipes passed down for generations. 
+          Specializing in pho, banh mi, and traditional dishes.
+        </p>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
+          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
+            ⭐ 4.9 (120 reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Italian Chef -->
+    <div class="info-card chef-card" data-name="mama rosa's kitchen" data-cuisine="italian" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/mama-rosa')">
+      <div style="background: linear-gradient(135deg, #19b7b1 0%, #0e8f8b 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
+        <div style="font-size: 3rem; margin-bottom: 8px;">🍝</div>
+        <h3 style="margin: 0; color: white;">Mama Rosa's Kitchen</h3>
+      </div>
+      <div style="margin-top: 12px;">
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          <strong>Cuisine:</strong> Italian
+        </p>
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          Traditional Italian cooking from Tuscany. Homemade pasta, pizza, and 
+          classic Italian comfort food made with love.
+        </p>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
+          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
+            ⭐ 4.8 (95 reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mexican Chef -->
+    <div class="info-card chef-card" data-name="taqueria del sol" data-cuisine="mexican" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/taqueria-del-sol')">
+      <div style="background: linear-gradient(135deg, #ff7a18 0%, #d85c0f 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
+        <div style="font-size: 3rem; margin-bottom: 8px;">🌮</div>
+        <h3 style="margin: 0; color: white;">Taqueria del Sol</h3>
+      </div>
+      <div style="margin-top: 12px;">
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          <strong>Cuisine:</strong> Mexican
+        </p>
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          Authentic Mexican street food and regional specialties. Fresh tacos, 
+          burritos, and traditional dishes with bold flavors.
+        </p>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
+          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
+            ⭐ 4.7 (88 reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thai Chef -->
+    <div class="info-card chef-card" data-name="bangkok street eats" data-cuisine="thai" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/bangkok-street')">
+      <div style="background: linear-gradient(135deg, #19b7b1 0%, #0e8f8b 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
+        <div style="font-size: 3rem; margin-bottom: 8px;">🍛</div>
+        <h3 style="margin: 0; color: white;">Bangkok Street Eats</h3>
+      </div>
+      <div style="margin-top: 12px;">
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          <strong>Cuisine:</strong> Thai
+        </p>
+        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+          Thai street food and traditional dishes bursting with flavor. Pad Thai, 
+          curries, and aromatic dishes from Bangkok.
+        </p>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
+          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
+            ⭐ 4.9 (102 reviews)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="no-results" style="display: none; text-align: center; padding: 60px 20px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+    <h3>No chefs found</h3>
+    <p style="color: var(--muted);">Try adjusting your search or filters</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2024 RideNDine. Supporting local home chefs.</p>
+  <div class="footer__links">
+    <a onclick="navigateTo('/legal/privacy')" style="cursor: pointer;">Privacy Policy</a>
+    <a onclick="navigateTo('/legal/terms')" style="cursor: pointer;">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+  // Update cart count
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const countEl = document.getElementById('cart-count');
+    if (countEl) countEl.textContent = count;
+  }
+  updateCartCount();
+
+  // Filter chefs
+  function filterChefs() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const cuisineFilter = document.getElementById('cuisine-filter').value.toLowerCase();
+    const chefCards = document.querySelectorAll('.chef-card');
+    let visibleCount = 0;
+
+    chefCards.forEach(card => {
+      const name = card.getAttribute('data-name');
+      const cuisine = card.getAttribute('data-cuisine');
+      const matchesSearch = !searchTerm || name.includes(searchTerm) || cuisine.includes(searchTerm);
+      const matchesCuisine = !cuisineFilter || cuisine === cuisineFilter;
+      
+      if (matchesSearch && matchesCuisine) {
+        card.style.display = 'block';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  // Hover effect
+  document.querySelectorAll('.chef-card').forEach(card => {
+    card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-4px)');
+    card.addEventListener('mouseleave', () => card.style.transform = 'translateY(0)');
+  });
+</script>

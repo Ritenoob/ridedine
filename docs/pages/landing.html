@@ -1,0 +1,144 @@
+<div class="landing-page">
+  <!-- Header -->
+  <header class="header">
+    <div class="header__brand">
+      <img src="/assets/logo.svg" alt="RideNDine" />
+    </div>
+    <nav class="header__nav">
+      <a href="/customer" onclick="event.preventDefault(); navigateTo('/customer')">Order Food</a>
+      <a href="/order-tracking" onclick="event.preventDefault(); navigateTo('/order-tracking')">Track Order</a>
+      <a href="/chef-portal/login" onclick="event.preventDefault(); navigateTo('/chef-portal/login')">Chef Portal</a>
+      <a href="/driver/login" onclick="event.preventDefault(); navigateTo('/driver/login')">Driver App</a>
+      <a href="/admin/login" onclick="event.preventDefault(); navigateTo('/admin/login')">Admin</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero__card">
+      <h1 class="hero__title">Delivering home chef meals across Hamilton.</h1>
+      <p class="hero__subtitle">
+        RideNDine connects local home chefs with hungry neighbors. 
+        Order fresh, home-cooked meals for fast delivery.
+      </p>
+      <div class="hero__actions">
+        <button class="button button--primary" onclick="navigateTo('/customer')">
+          Browse Chefs & Order
+        </button>
+        <button class="button button--ghost" onclick="navigateTo('/order-tracking')">
+          Track My Order
+        </button>
+      </div>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <strong>Local Chefs</strong>
+          <span>Fresh daily menus</span>
+        </div>
+        <div class="metric-card">
+          <strong>Fast Delivery</strong>
+          <span>22-28 min average</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Grid -->
+  <section class="info-grid">
+    <div class="info-card">
+      <h3>🍳 Home Chef Marketplace</h3>
+      <p>Discover talented local chefs serving authentic, home-cooked meals daily.</p>
+    </div>
+    <div class="info-card">
+      <h3>🗺️ Smart Routing</h3>
+      <p>Optimized delivery routes ensure your meal arrives hot and fresh.</p>
+    </div>
+    <div class="info-card">
+      <h3>🏘️ Neighborhood First</h3>
+      <p>Supporting local food entrepreneurs and connecting communities through food.</p>
+    </div>
+  </section>
+
+  <!-- Portal Access -->
+  <section class="portal-access">
+    <h2>Access Portals</h2>
+    <p class="hero__subtitle">
+      Different access points for customers, chefs, drivers, and administrators.
+    </p>
+    <div class="portal-grid">
+      <div class="info-card">
+        <h3>👥 Customers</h3>
+        <p>Browse chefs, order meals, and track your delivery in real-time.</p>
+        <button class="button button--primary" onclick="navigateTo('/customer')">
+          Start Ordering
+        </button>
+      </div>
+      <div class="info-card">
+        <h3>👨‍🍳 Chefs</h3>
+        <p>Manage your menu, track orders, and grow your home chef business.</p>
+        <button class="button button--ghost" onclick="navigateTo('/chef-portal/login')">
+          Chef Login
+        </button>
+      </div>
+      <div class="info-card">
+        <h3>🚗 Drivers</h3>
+        <p>View available jobs, navigate routes, and complete deliveries.</p>
+        <button class="button button--ghost" onclick="navigateTo('/driver/login')">
+          Driver Login
+        </button>
+      </div>
+      <div class="info-card">
+        <h3>⚙️ Admin</h3>
+        <p>Platform operations, analytics, and system management.</p>
+        <button class="button button--ghost" onclick="navigateTo('/admin/login')">
+          Admin Login
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <strong>RideNDine Platform</strong>
+    <div class="footer__links">
+      <a href="/legal/terms.html">Terms of Service</a>
+      <a href="/legal/privacy.html">Privacy Policy</a>
+      <a href="https://github.com/SeanCFAFinlay/ridendine-demo" target="_blank" rel="noreferrer">
+        GitHub Repository
+      </a>
+    </div>
+    <p>© 2026 RideNDine. Connecting chefs and communities.</p>
+  </footer>
+</div>
+
+<style>
+  .landing-page {
+    min-height: 100vh;
+  }
+  
+  .portal-access {
+    max-width: 1200px;
+    margin: 4rem auto;
+    padding: 0 1rem;
+    text-align: center;
+  }
+  
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .portal-grid .info-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .portal-grid .button {
+    margin-top: auto;
+    width: 100%;
+    max-width: 200px;
+  }
+</style>

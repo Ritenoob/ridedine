@@ -1,0 +1,293 @@
+<!-- Order Tracking Page -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/chefs')" style="cursor: pointer;">Browse Chefs</a>
+    <a onclick="navigateTo('/cart')" style="cursor: pointer;">Cart (<span id="cart-count">0</span>)</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw; max-width: 900px; margin: 0 auto;">
+  <!-- Search Form -->
+  <div id="search-section" style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 32px;">
+    <h1 style="margin-top: 0;">Track Your Order</h1>
+    <p style="color: var(--muted); margin-bottom: 20px;">
+      Enter your order ID to track your delivery in real-time
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <input 
+        type="text" 
+        id="order-id-input" 
+        placeholder="Enter order ID (e.g., ORD-12345)"
+        style="flex: 1; min-width: 250px; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem;"
+        onkeypress="if(event.key==='Enter') trackOrderById()"
+      >
+      <button class="button button--primary" onclick="trackOrderById()">
+        Track Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Tracking Results -->
+  <div id="tracking-loading" style="display: none; background: #ffffff; border-radius: 24px; padding: 60px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+    <h3>Loading order information...</h3>
+    <p style="color: var(--muted);">Please wait</p>
+  </div>
+
+  <div id="tracking-error" style="display: none; background: #ffffff; border-radius: 24px; padding: 40px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
+    <div style="font-size: 5rem; margin-bottom: 16px;">❌</div>
+    <h3>Order Not Found</h3>
+    <p style="color: var(--muted); margin-bottom: 24px;" id="error-message">
+      We couldn't find an order with that ID. Please check and try again.
+    </p>
+    <button class="button button--ghost" onclick="resetTracking()">
+      Try Again
+    </button>
+  </div>
+
+  <div id="tracking-content" style="display: none;">
+    <!-- Order Info Header -->
+    <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <h2 style="margin: 0 0 8px 0;">Order #<span id="display-order-id">12345</span></h2>
+          <p style="color: var(--muted); margin: 0;">
+            Status: <strong style="color: var(--orange);" id="order-status-text">Processing</strong>
+          </p>
+        </div>
+        <button class="button button--ghost" onclick="resetTracking()">
+          Track Different Order
+        </button>
+      </div>
+
+      <!-- Progress Steps -->
+      <div id="progress-steps" style="margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; position: relative; margin-bottom: 12px;">
+          <div style="position: absolute; top: 20px; left: 0; right: 0; height: 4px; background: #e0f2f1; z-index: 0;">
+            <div id="progress-bar" style="height: 100%; background: var(--teal); width: 0%; transition: width 0.5s ease;"></div>
+          </div>
+          
+          <div class="progress-step" data-step="placed" style="flex: 1; text-align: center; position: relative; z-index: 1;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">📝</div>
+            <div style="font-size: 0.85rem; font-weight: 600;">Placed</div>
+          </div>
+          
+          <div class="progress-step" data-step="preparing" style="flex: 1; text-align: center; position: relative; z-index: 1;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👨‍🍳</div>
+            <div style="font-size: 0.85rem; font-weight: 600;">Preparing</div>
+          </div>
+          
+          <div class="progress-step" data-step="ready" style="flex: 1; text-align: center; position: relative; z-index: 1;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✅</div>
+            <div style="font-size: 0.85rem; font-weight: 600;">Ready</div>
+          </div>
+          
+          <div class="progress-step" data-step="picked-up" style="flex: 1; text-align: center; position: relative; z-index: 1;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🚗</div>
+            <div style="font-size: 0.85rem; font-weight: 600;">En Route</div>
+          </div>
+          
+          <div class="progress-step" data-step="delivered" style="flex: 1; text-align: center; position: relative; z-index: 1;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🎉</div>
+            <div style="font-size: 0.85rem; font-weight: 600;">Delivered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Info -->
+    <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 24px;">
+      <h3 style="margin-top: 0;">Delivery Information</h3>
+      <div style="display: grid; gap: 16px;">
+        <div style="padding: 16px; background: #f7fbfa; border-radius: 12px;">
+          <div style="color: var(--muted); font-size: 0.9rem; margin-bottom: 4px;">Estimated Delivery</div>
+          <strong style="font-size: 1.1rem;" id="estimated-time">Calculating...</strong>
+        </div>
+        <div style="padding: 16px; background: #f7fbfa; border-radius: 12px;">
+          <div style="color: var(--muted); font-size: 0.9rem; margin-bottom: 4px;">Driver Status</div>
+          <strong style="font-size: 1.1rem;" id="driver-status">Waiting for assignment...</strong>
+        </div>
+        <div id="driver-info" style="display: none; padding: 16px; background: #fff2e8; border-radius: 12px; border: 2px solid var(--orange);">
+          <div style="color: var(--muted); font-size: 0.9rem; margin-bottom: 4px;">Your Driver</div>
+          <strong style="font-size: 1.1rem;" id="driver-name">Loading...</strong>
+          <div style="margin-top: 8px; color: var(--muted); font-size: 0.9rem;" id="driver-vehicle">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);">
+      <h3 style="margin-top: 0;">Order Items</h3>
+      <div id="order-items-list" style="color: var(--muted);">
+        Loading items...
+      </div>
+      <div style="border-top: 2px solid #f0efed; margin-top: 16px; padding-top: 16px; display: flex; justify-content: space-between;">
+        <strong>Total:</strong>
+        <strong style="color: var(--teal); font-size: 1.2rem;">$<span id="order-total">0.00</span></strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2024 RideNDine. Supporting local home chefs.</p>
+  <div class="footer__links">
+    <a onclick="navigateTo('/legal/privacy')" style="cursor: pointer;">Privacy Policy</a>
+    <a onclick="navigateTo('/legal/terms')" style="cursor: pointer;">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+  // Update cart count
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const countEl = document.getElementById('cart-count');
+    if (countEl) countEl.textContent = count;
+  }
+  updateCartCount();
+
+  // Check if order ID is in URL
+  const pathParts = window.location.pathname.split('/');
+  if (pathParts[1] === 'order' && pathParts[2]) {
+    const orderId = pathParts[2];
+    document.getElementById('order-id-input').value = orderId;
+    trackOrderById();
+  }
+
+  async function trackOrderById() {
+    const input = document.getElementById('order-id-input').value.trim();
+    if (!input) {
+      showError('Please enter an order ID');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('search-section').style.display = 'none';
+    document.getElementById('tracking-loading').style.display = 'block';
+    document.getElementById('tracking-error').style.display = 'none';
+    document.getElementById('tracking-content').style.display = 'none';
+
+    try {
+      const response = await fetch(`/api/orders/${input}/tracking`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Order not found');
+      }
+
+      const data = await response.json();
+      displayTrackingInfo(data);
+
+    } catch (error) {
+      console.error('Tracking error:', error);
+      showError(error.message || 'Failed to load order information');
+    }
+  }
+
+  function displayTrackingInfo(data) {
+    document.getElementById('tracking-loading').style.display = 'none';
+    document.getElementById('tracking-content').style.display = 'block';
+
+    // Display order ID and status
+    document.getElementById('display-order-id').textContent = data.orderId || data.orderNumber || 'Unknown';
+    document.getElementById('order-status-text').textContent = data.status || 'Processing';
+
+    // Update progress bar
+    updateProgressBar(data.status);
+
+    // Display ETA
+    if (data.estimatedDeliveryTime || data.eta) {
+      const eta = data.estimatedDeliveryTime || data.eta;
+      document.getElementById('estimated-time').textContent = eta;
+    } else {
+      document.getElementById('estimated-time').textContent = 'Calculating...';
+    }
+
+    // Display driver status
+    if (data.driverStatusText || data.driverStatus) {
+      document.getElementById('driver-status').textContent = data.driverStatusText || data.driverStatus;
+    }
+
+    // Display driver info if available (but NOT address or coordinates per privacy requirement)
+    if (data.driver && data.driver.name) {
+      document.getElementById('driver-info').style.display = 'block';
+      document.getElementById('driver-name').textContent = data.driver.name;
+      if (data.driver.vehicle) {
+        document.getElementById('driver-vehicle').textContent = `${data.driver.vehicle.make || ''} ${data.driver.vehicle.model || ''} - ${data.driver.vehicle.licensePlate || ''}`.trim();
+      }
+    }
+
+    // Display order items
+    if (data.items && data.items.length > 0) {
+      const itemsHtml = data.items.map(item => `
+        <div style="padding: 8px 0; border-bottom: 1px solid #f0efed; display: flex; justify-content: space-between;">
+          <span>${item.quantity || 1}x ${item.name}</span>
+          <span>$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
+        </div>
+      `).join('');
+      document.getElementById('order-items-list').innerHTML = itemsHtml;
+    }
+
+    // Display total
+    if (data.total) {
+      document.getElementById('order-total').textContent = data.total.toFixed(2);
+    } else if (data.items) {
+      const total = data.items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+      document.getElementById('order-total').textContent = total.toFixed(2);
+    }
+  }
+
+  function updateProgressBar(status) {
+    const statusMap = {
+      'placed': 0,
+      'confirmed': 20,
+      'preparing': 40,
+      'ready': 60,
+      'picked-up': 80,
+      'picked_up': 80,
+      'en-route': 80,
+      'delivered': 100
+    };
+
+    const normalizedStatus = (status || '').toLowerCase().replace(/ /g, '-');
+    const progress = statusMap[normalizedStatus] || 0;
+    
+    document.getElementById('progress-bar').style.width = progress + '%';
+
+    // Highlight completed steps
+    document.querySelectorAll('.progress-step').forEach(step => {
+      const stepName = step.getAttribute('data-step');
+      const stepProgress = statusMap[stepName] || 0;
+      const circle = step.querySelector('div');
+      
+      if (stepProgress <= progress) {
+        circle.style.background = 'var(--teal)';
+        circle.style.color = 'white';
+      } else {
+        circle.style.background = '#e0f2f1';
+        circle.style.color = 'var(--ink)';
+      }
+    });
+  }
+
+  function showError(message) {
+    document.getElementById('tracking-loading').style.display = 'none';
+    document.getElementById('tracking-error').style.display = 'block';
+    document.getElementById('error-message').textContent = message;
+  }
+
+  function resetTracking() {
+    document.getElementById('search-section').style.display = 'block';
+    document.getElementById('tracking-loading').style.display = 'none';
+    document.getElementById('tracking-error').style.display = 'none';
+    document.getElementById('tracking-content').style.display = 'none';
+    document.getElementById('order-id-input').value = '';
+    document.getElementById('order-id-input').focus();
+  }
+</script>

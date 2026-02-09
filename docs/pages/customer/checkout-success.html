@@ -1,0 +1,167 @@
+<!-- Checkout Success Page -->
+<header class="header">
+  <div class="header__brand">
+    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <h1>RideNDine</h1>
+  </div>
+  <nav class="header__nav">
+    <a onclick="navigateTo('/')" style="cursor: pointer;">Home</a>
+    <a onclick="navigateTo('/chefs')" style="cursor: pointer;">Browse Chefs</a>
+  </nav>
+</header>
+
+<div style="padding: 40px 6vw; max-width: 800px; margin: 0 auto;">
+  <div id="success-loading" style="background: #ffffff; border-radius: 24px; padding: 60px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">⏳</div>
+    <h2>Verifying your order...</h2>
+    <p style="color: var(--muted);">Please wait while we confirm your payment</p>
+  </div>
+
+  <div id="success-content" style="display: none; background: #ffffff; border-radius: 24px; padding: 40px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
+    <div style="font-size: 5rem; margin-bottom: 16px;">✅</div>
+    <h1 style="color: var(--teal); margin: 0 0 16px 0;">Order Confirmed!</h1>
+    <p style="font-size: 1.2rem; color: var(--muted); margin-bottom: 24px;">
+      Thank you for your order!
+    </p>
+
+    <div style="background: #f7fbfa; border-radius: 16px; padding: 24px; margin-bottom: 24px; text-align: left;">
+      <h3 style="margin: 0 0 16px 0;">Order Details</h3>
+      <div style="display: grid; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e0f2f1;">
+          <span style="color: var(--muted);">Order Number:</span>
+          <strong id="order-number">Loading...</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e0f2f1;">
+          <span style="color: var(--muted);">Order Status:</span>
+          <strong style="color: var(--orange);" id="order-status">Processing</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e0f2f1;">
+          <span style="color: var(--muted);">Total Paid:</span>
+          <strong style="color: var(--teal);">$<span id="order-total">0.00</span></strong>
+        </div>
+        <div id="order-items-section">
+          <h4 style="margin: 16px 0 8px 0;">Items Ordered:</h4>
+          <div id="order-items" style="font-size: 0.9rem; color: var(--muted);">
+            <!-- Items will be listed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff2e8; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+      <p style="margin: 0; color: var(--orange-dark); font-weight: 600;">
+        📧 A confirmation email has been sent to your email address
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+      <button class="button button--primary" onclick="trackOrder()" id="track-order-btn">
+        Track Your Order
+      </button>
+      <button class="button button--ghost" onclick="navigateTo('/chefs')">
+        Browse More Chefs
+      </button>
+    </div>
+  </div>
+
+  <div id="error-content" style="display: none; background: #ffffff; border-radius: 24px; padding: 40px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
+    <div style="font-size: 5rem; margin-bottom: 16px;">⚠️</div>
+    <h2 style="color: #c62828;">Unable to Verify Order</h2>
+    <p style="color: var(--muted); margin-bottom: 24px;" id="error-message">
+      We couldn't verify your payment. Please contact support if you were charged.
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+      <button class="button button--primary" onclick="navigateTo('/')">
+        Return Home
+      </button>
+      <button class="button button--ghost" onclick="navigateTo('/order-tracking')">
+        Track Order
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2024 RideNDine. Supporting local home chefs.</p>
+</footer>
+
+<script>
+  let orderId = null;
+
+  async function verifyOrder() {
+    // Get session_id from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+
+    if (!sessionId) {
+      showError('No session ID found. Please contact support if you were charged.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/payments/verify/${sessionId}`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to verify order');
+      }
+
+      const data = await response.json();
+      
+      // Display order details
+      orderId = data.orderId || data.orderNumber || 'N/A';
+      document.getElementById('order-number').textContent = orderId;
+      document.getElementById('order-status').textContent = data.status || 'Confirmed';
+      
+      const total = data.amount ? (data.amount / 100).toFixed(2) : '0.00';
+      document.getElementById('order-total').textContent = total;
+
+      // Display items if available
+      if (data.items && data.items.length > 0) {
+        const itemsHtml = data.items.map(item => 
+          `<div style="padding: 4px 0;">${item.quantity}x ${item.name} - $${((item.price * item.quantity) / 100).toFixed(2)}</div>`
+        ).join('');
+        document.getElementById('order-items').innerHTML = itemsHtml;
+      } else {
+        // Try to get from localStorage
+        const pendingOrder = localStorage.getItem('pendingOrder');
+        if (pendingOrder) {
+          const orderData = JSON.parse(pendingOrder);
+          const itemsHtml = orderData.cart.map(item => 
+            `<div style="padding: 4px 0;">${item.quantity}x ${item.itemName} - $${(item.price * item.quantity).toFixed(2)}</div>`
+          ).join('');
+          document.getElementById('order-items').innerHTML = itemsHtml;
+        }
+      }
+
+      // Clear cart and pending order
+      localStorage.removeItem('cart');
+      localStorage.removeItem('pendingOrder');
+
+      // Show success
+      document.getElementById('success-loading').style.display = 'none';
+      document.getElementById('success-content').style.display = 'block';
+
+    } catch (error) {
+      console.error('Verification error:', error);
+      showError(error.message || 'Failed to verify order. Please contact support if you were charged.');
+    }
+  }
+
+  function showError(message) {
+    document.getElementById('success-loading').style.display = 'none';
+    document.getElementById('error-content').style.display = 'block';
+    document.getElementById('error-message').textContent = message;
+  }
+
+  function trackOrder() {
+    if (orderId && orderId !== 'N/A') {
+      navigateTo(`/order/${orderId}`);
+    } else {
+      navigateTo('/order-tracking');
+    }
+  }
+
+  // Verify order on load
+  verifyOrder();
+</script>
