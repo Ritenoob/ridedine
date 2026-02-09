@@ -16,7 +16,7 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Invalid role' });
   }
 
-  // Check password against environment variables
+  // Check password against environment variables (using timing-safe comparison)
   let expectedPassword;
   let userId;
   
@@ -35,7 +35,17 @@ router.post('/login', (req, res) => {
       break;
   }
 
-  if (password !== expectedPassword) {
+  // Use timing-safe comparison to prevent timing attacks
+  const crypto = require('crypto');
+  const passwordBuffer = Buffer.from(password);
+  const expectedBuffer = Buffer.from(expectedPassword || '');
+  
+  // Ensure buffers are same length for timing-safe comparison
+  if (passwordBuffer.length !== expectedBuffer.length) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  
+  if (!crypto.timingSafeEqual(passwordBuffer, expectedBuffer)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 

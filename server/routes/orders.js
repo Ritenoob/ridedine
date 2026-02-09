@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
-
-// In-memory order storage (shared with payments)
-const orders = new Map();
+const orderService = require('../services/orders');
 
 // Order status progression
 const STATUS_FLOW = {
@@ -19,7 +17,7 @@ const STATUS_FLOW = {
 
 // Get order details (admin only)
 router.get('/:orderId', requireAuth, (req, res) => {
-  const order = Array.from(orders.values()).find(o => o.orderId === req.params.orderId);
+  const order = orderService.getOrder(req.params.orderId);
   
   if (!order) {
     return res.status(404).json({ error: 'Order not found' });
@@ -30,7 +28,7 @@ router.get('/:orderId', requireAuth, (req, res) => {
 
 // Get redacted tracking info (public endpoint)
 router.get('/:orderId/tracking', (req, res) => {
-  const order = Array.from(orders.values()).find(o => o.orderId === req.params.orderId);
+  const order = orderService.getOrder(req.params.orderId);
   
   if (!order) {
     return res.status(404).json({ error: 'Order not found' });
@@ -107,28 +105,23 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Items are required' });
     }
 
-    const orderId = `RD-${String(Math.floor(1000 + Math.random() * 9000))}`;
     const total = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
-    const order = {
-      orderId,
+    const order = orderService.createOrder({
       items,
       chefId: chefId || 'unknown',
       chefSlug: chefSlug || 'unknown',
       customerInfo: customerInfo || {},
       status: 'pending',
       paymentStatus: 'pending',
-      createdAt: new Date().toISOString(),
       total,
       deliveryWindow: 'Today, 5:00-6:00 PM',
       etaMinutes: 45
-    };
-
-    orders.set(orderId, order);
+    });
 
     res.json({ 
       success: true, 
-      orderId,
+      orderId: order.orderId,
       order 
     });
   } catch (error) {
@@ -139,7 +132,7 @@ router.post('/', async (req, res) => {
 
 // Update order status (admin/chef only)
 router.patch('/:orderId/status', requireAuth, (req, res) => {
-  const order = Array.from(orders.values()).find(o => o.orderId === req.params.orderId);
+  const order = orderService.getOrder(req.params.orderId);
   
   if (!order) {
     return res.status(404).json({ error: 'Order not found' });
@@ -151,15 +144,14 @@ router.patch('/:orderId/status', requireAuth, (req, res) => {
     return res.status(400).json({ error: 'Status is required' });
   }
 
-  order.status = status;
-  order.updatedAt = new Date().toISOString();
+  const updatedOrder = orderService.updateOrder(req.params.orderId, { status });
 
-  res.json({ success: true, order });
+  res.json({ success: true, order: updatedOrder });
 });
 
 // List all orders (admin only)
 router.get('/', requireAuth, (req, res) => {
-  const ordersList = Array.from(orders.values());
+  const ordersList = orderService.listOrders();
   res.json({ orders: ordersList });
 });
 

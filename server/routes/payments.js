@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { requireAuth } = require('../middleware/auth');
-
-// In-memory order storage (replace with database in production)
-const orders = new Map();
+const orderService = require('../services/orders');
 
 // Create Stripe Checkout Session
 router.post('/create-checkout-session', async (req, res) => {
   try {
-    const { items, chefId, chefSlug } = req.body;
+    const { items, chefId, chefSlug, customerInfo } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Items are required' });
@@ -33,32 +31,30 @@ router.post('/create-checkout-session', async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`,
+      success_url: `${req.protocol}://${req.get('host')}/checkout/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel.html`,
       metadata: {
         chefId: chefId || 'unknown',
         chefSlug: chefSlug || 'unknown'
       }
     });
 
-    // Store pending order
-    const orderId = `RD-${String(Math.floor(1000 + Math.random() * 9000))}`;
-    orders.set(session.id, {
-      orderId,
+    // Store pending order using shared service
+    const order = orderService.createOrder({
       sessionId: session.id,
       items,
       chefId,
       chefSlug,
+      customerInfo,
       status: 'pending',
       paymentStatus: 'pending',
-      createdAt: new Date().toISOString(),
       total: session.amount_total / 100
     });
 
     res.json({ 
       sessionId: session.id,
       url: session.url,
-      orderId
+      orderId: order.orderId
     });
   } catch (error) {
     console.error('Stripe checkout error:', error);
@@ -86,12 +82,14 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
-    // Update order status
-    const order = orders.get(session.id);
+    // Update order status using shared service
+    const order = orderService.findOrderBySessionId(session.id);
     if (order) {
-      order.paymentStatus = 'paid';
-      order.status = 'confirmed';
-      order.paidAt = new Date().toISOString();
+      orderService.updateOrder(order.orderId, {
+        paymentStatus: 'paid',
+        status: 'confirmed',
+        paidAt: new Date().toISOString()
+      });
       
       // TODO: Dispatch to Mealbridge
       console.log(`✅ Order ${order.orderId} paid - ready for dispatch`);
@@ -105,7 +103,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 router.get('/verify/:sessionId', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
-    const order = orders.get(req.params.sessionId);
+    const order = orderService.findOrderBySessionId(req.params.sessionId);
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
@@ -125,7 +123,7 @@ router.get('/verify/:sessionId', async (req, res) => {
 
 // Get all orders (admin only)
 router.get('/orders', requireAuth, (req, res) => {
-  const ordersList = Array.from(orders.values());
+  const ordersList = orderService.listOrders();
   res.json({ orders: ordersList });
 });
 

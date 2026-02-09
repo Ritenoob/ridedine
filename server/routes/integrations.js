@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth, requireRole } = require('../middleware/auth');
+const orderService = require('../services/orders');
 
 // In-memory integration logs
 const integrationLogs = [];
@@ -38,15 +39,22 @@ router.post('/cooco/orders', async (req, res) => {
     
     logIntegration('cooco', 'order_received', orderData);
     
-    // Create internal order
-    const orderId = `RD-${String(Math.floor(1000 + Math.random() * 9000))}`;
+    // Create internal order using shared service
+    const order = orderService.createOrder({
+      items: orderData.items || [],
+      chefId: orderData.chefId || 'cooco-chef',
+      chefSlug: orderData.chefSlug || 'cooco',
+      customerInfo: orderData.customerInfo || {},
+      status: 'pending',
+      paymentStatus: 'pending',
+      total: orderData.total || 0
+    });
     
-    // TODO: Create order in system
-    console.log(`📦 Cooco order received: ${orderId}`, orderData);
+    console.log(`📦 Cooco order received: ${order.orderId}`, orderData);
     
     res.json({ 
       success: true, 
-      orderId,
+      orderId: order.orderId,
       message: 'Order received from Cooco' 
     });
   } catch (error) {
