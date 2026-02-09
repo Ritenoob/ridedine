@@ -1,0 +1,179 @@
+<!-- Driver Management -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <h2>🔐 Admin Portal</h2>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;" class="active">🚗 Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>Driver Management</h1>
+      <button id="logoutBtn" class="button">Logout</button>
+    </header>
+
+    <div class="admin-content">
+      <div class="metric-grid" style="margin-bottom: 24px;">
+        <div class="metric-card">
+          <div class="metric-label">Total Drivers</div>
+          <div class="metric-value">8</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Active Now</div>
+          <div class="metric-value" style="color: #48bb78;">5</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">On Delivery</div>
+          <div class="metric-value" style="color: var(--orange);">3</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Offline</div>
+          <div class="metric-value" style="color: #718096;">3</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Driver Name</th>
+              <th>Status</th>
+              <th>Vehicle</th>
+              <th>Deliveries Today</th>
+              <th>Avg Rating</th>
+              <th>Earnings Today</th>
+              <th>Last Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="driversTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar { width: 250px; background: #1a202c; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+  .admin-brand h2 { margin: 0 0 24px 0; font-size: 1.2rem; }
+  .admin-nav { display: flex; flex-direction: column; gap: 4px; }
+  .admin-nav a { padding: 10px 12px; border-radius: 6px; color: #cbd5e0; transition: all 0.2s; }
+  .admin-nav a:hover, .admin-nav a.active { background: #2d3748; color: white; }
+  .admin-main { margin-left: 250px; flex: 1; background: var(--sand); }
+  .admin-header { background: white; padding: 20px 32px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+  .admin-header h1 { margin: 0; }
+  .admin-content { padding: 32px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .metric-label { font-size: 0.875rem; color: #718096; margin-bottom: 8px; }
+  .metric-value { font-size: 2rem; font-weight: bold; color: var(--teal); }
+  .table-container { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: #f7fafc; padding: 16px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+  .data-table td { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+  .data-table tr:hover { background: #f7fafc; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.875rem; font-weight: 600; }
+  .status-active { background: #c6f6d5; color: #22543d; }
+  .status-on-delivery { background: #fed7d7; color: #742a2a; }
+  .status-inactive { background: #e2e8f0; color: #4a5568; }
+  .action-btn-sm { padding: 6px 12px; background: var(--teal); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; margin-right: 4px; }
+  .action-btn-sm:hover { background: var(--teal-dark); }
+</style>
+
+<script>
+(async function() {
+  // Check admin authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    if (!data.authenticated || data.role !== 'admin') {
+      navigateTo('/admin/login');
+      return;
+    }
+  } catch (error) {
+    navigateTo('/admin/login');
+    return;
+  }
+
+  // Mock driver data
+  const drivers = [
+    { id: 1, name: 'Mike Johnson', status: 'active', vehicle: 'Honda Civic', deliveries: 12, rating: 4.8, earnings: 142.50, lastActive: new Date() },
+    { id: 2, name: 'Sarah Chen', status: 'on-delivery', vehicle: 'Toyota Corolla', deliveries: 8, rating: 4.9, earnings: 98.00, lastActive: new Date() },
+    { id: 3, name: 'David Brown', status: 'active', vehicle: 'Ford Focus', deliveries: 15, rating: 4.7, earnings: 165.75, lastActive: new Date() },
+    { id: 4, name: 'Emma Wilson', status: 'on-delivery', vehicle: 'Mazda 3', deliveries: 10, rating: 4.9, earnings: 125.50, lastActive: new Date() },
+    { id: 5, name: 'James Lee', status: 'inactive', vehicle: 'Hyundai Elantra', deliveries: 0, rating: 4.6, earnings: 0, lastActive: new Date(Date.now() - 2*60*60*1000) },
+    { id: 6, name: 'Lisa Martinez', status: 'on-delivery', vehicle: 'Nissan Altima', deliveries: 9, rating: 4.8, earnings: 112.25, lastActive: new Date() },
+    { id: 7, name: 'Robert Taylor', status: 'active', vehicle: 'Volkswagen Jetta', deliveries: 11, rating: 4.7, earnings: 138.00, lastActive: new Date() },
+    { id: 8, name: 'Anna Garcia', status: 'inactive', vehicle: 'Kia Forte', deliveries: 0, rating: 4.5, earnings: 0, lastActive: new Date(Date.now() - 5*60*60*1000) }
+  ];
+
+  function renderDrivers() {
+    const tbody = document.getElementById('driversTable');
+    tbody.innerHTML = drivers.map(driver => {
+      let statusClass = 'status-inactive';
+      if (driver.status === 'active') statusClass = 'status-active';
+      if (driver.status === 'on-delivery') statusClass = 'status-on-delivery';
+      
+      const statusText = driver.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      return `
+        <tr>
+          <td><strong>${driver.name}</strong></td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${driver.vehicle}</td>
+          <td>${driver.deliveries}</td>
+          <td>⭐ ${driver.rating.toFixed(1)}</td>
+          <td>$${driver.earnings.toFixed(2)}</td>
+          <td>${formatTime(driver.lastActive)}</td>
+          <td>
+            <button class="action-btn-sm" onclick="viewDriver(${driver.id})">View</button>
+            <button class="action-btn-sm" onclick="trackDriver(${driver.id})">Track</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function formatTime(date) {
+    const diff = Date.now() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return date.toLocaleDateString();
+  }
+
+  window.viewDriver = function(id) {
+    const driver = drivers.find(d => d.id === id);
+    alert(`Driver Details:\n\nName: ${driver.name}\nStatus: ${driver.status}\nVehicle: ${driver.vehicle}\nDeliveries: ${driver.deliveries}\nRating: ${driver.rating}\nEarnings: $${driver.earnings.toFixed(2)}`);
+  };
+
+  window.trackDriver = function(id) {
+    navigateTo('/admin/live-map');
+  };
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    navigateTo('/');
+  });
+
+  renderDrivers();
+})();
+</script>
