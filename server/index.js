@@ -32,12 +32,24 @@ const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
 const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
+const demoRoutes = require('./routes/demo');
 
 // API routes
 app.use('/api/auth', authLimiter, authRoutes); // Stricter rate limit for auth
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
+app.use('/api/demo', demoRoutes); // Demo mode endpoints
+
+// Config endpoint - exposes public configuration to frontend
+app.get('/api/config', (req, res) => {
+  res.json({
+    demoMode: process.env.DEMO_MODE === 'true',
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    appName: 'RideNDine',
+    version: '1.0.0'
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
