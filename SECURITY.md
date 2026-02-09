@@ -68,6 +68,14 @@
 - Set `secure: true` for cookies
 - Implement HSTS headers
 
+### Static File Rate Limiting
+⚠️ **Status:** Static files not rate-limited  
+**Impact:** Potential for abuse of static file serving  
+**Mitigation for Production:**
+- Use CDN for static file serving (Cloudflare, AWS CloudFront)
+- Implement rate limiting for static routes if self-hosted
+- Monitor file access patterns for abuse
+
 ### Secret Management
 ⚠️ **Status:** Environment variables  
 **Impact:** Secrets in plain text on server  
