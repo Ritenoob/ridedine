@@ -179,7 +179,11 @@
     }
 
     try {
-      const response = await fetch(path);
+      // Add base path to fetch URL if needed
+      const router = window.Router;
+      const fetchPath = router.basePath ? router.basePath + path : path;
+      
+      const response = await fetch(fetchPath);
       if (!response.ok) {
         throw new Error(`Failed to load page: ${response.status}`);
       }
@@ -214,7 +218,7 @@
         <div style="padding: 2rem; text-align: center;">
           <h1>Error Loading Page</h1>
           <p>${error.message}</p>
-          <a href="/" class="button button--primary">Go Home</a>
+          <a href="${router.addBasePath('/')}" class="button button--primary" onclick="event.preventDefault(); window.navigateTo('/');">Go Home</a>
         </div>
       `;
     }

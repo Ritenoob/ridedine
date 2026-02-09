@@ -5,10 +5,48 @@ class Router {
     this.currentRoute = null;
     this.beforeEachHooks = [];
     
+    // Detect base path for GitHub Pages deployment
+    // Empty for local dev, '/ridendine-demo' for GitHub Pages
+    this.basePath = this.detectBasePath();
+    
     // Listen to popstate (browser back/forward)
     window.addEventListener('popstate', () => {
       this.navigate(window.location.pathname, false);
     });
+  }
+
+  // Detect the base path based on the current hostname
+  detectBasePath() {
+    const hostname = window.location.hostname;
+    const pathname = window.location.pathname;
+    
+    // GitHub Pages deployment
+    if (hostname.includes('github.io')) {
+      // Extract repo name from pathname (e.g., /ridendine-demo/)
+      const match = pathname.match(/^\/([^\/]+)/);
+      if (match && match[1] !== 'index.html') {
+        return '/' + match[1];
+      }
+    }
+    
+    // Local development or custom domain
+    return '';
+  }
+
+  // Remove base path from a pathname
+  stripBasePath(pathname) {
+    if (this.basePath && pathname.startsWith(this.basePath)) {
+      return pathname.substring(this.basePath.length) || '/';
+    }
+    return pathname;
+  }
+
+  // Add base path to a pathname
+  addBasePath(pathname) {
+    if (this.basePath && !pathname.startsWith(this.basePath)) {
+      return this.basePath + pathname;
+    }
+    return pathname;
   }
 
   // Register a route
@@ -28,9 +66,12 @@ class Router {
 
   // Navigate to a path
   async navigate(path, pushState = true) {
+    // Strip base path for route matching
+    const cleanPath = this.stripBasePath(path);
+    
     // Run before hooks
     for (const hook of this.beforeEachHooks) {
-      const result = await hook(path, this.currentRoute);
+      const result = await hook(cleanPath, this.currentRoute);
       if (result === false) {
         return; // Navigation cancelled
       }
@@ -41,7 +82,7 @@ class Router {
     let params = {};
 
     for (const [routePath, routeConfig] of this.routes.entries()) {
-      const match = this.matchPath(routePath, path);
+      const match = this.matchPath(routePath, cleanPath);
       if (match) {
         matchedRoute = routeConfig;
         params = match.params;
@@ -63,8 +104,8 @@ class Router {
       const session = await window.AuthClient.checkSession();
       if (!session.authenticated) {
         // Redirect to login based on role
-        const loginPath = this.getLoginPath(path);
-        window.location.href = loginPath;
+        const loginPath = this.getLoginPath(cleanPath);
+        window.location.href = this.addBasePath(loginPath);
         return;
       }
 
@@ -77,16 +118,17 @@ class Router {
       }
     }
 
-    // Update history
-    if (pushState && path !== window.location.pathname) {
-      window.history.pushState({}, '', path);
+    // Update history with full path (including base path)
+    const fullPath = this.addBasePath(cleanPath);
+    if (pushState && fullPath !== window.location.pathname) {
+      window.history.pushState({}, '', fullPath);
     }
 
     // Update title
     document.title = matchedRoute.title;
 
     // Execute handler
-    this.currentRoute = path;
+    this.currentRoute = cleanPath;
     await matchedRoute.handler(params);
   }
 
@@ -137,8 +179,15 @@ class Router {
 
   // Start the router
   start() {
-    const path = window.location.pathname;
-    this.navigate(path, false);
+    // Check if we were redirected from 404.html
+    const redirectPath = sessionStorage.getItem('redirectPath');
+    if (redirectPath) {
+      sessionStorage.removeItem('redirectPath');
+      this.navigate(redirectPath, true);
+    } else {
+      const path = window.location.pathname;
+      this.navigate(path, false);
+    }
   }
 }
 
