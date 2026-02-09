@@ -1,0 +1,525 @@
+<!-- Chef Menu Editor -->
+<style>
+  .chef-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  .chef-sidebar {
+    width: 250px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .chef-brand {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .chef-brand h2 {
+    margin: 0;
+    color: var(--teal);
+    font-size: 1.5rem;
+  }
+  .chef-nav {
+    padding: 20px 0;
+  }
+  .chef-nav a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--muted);
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .chef-nav a:hover, .chef-nav a.active {
+    background: #f7fafc;
+    color: var(--teal);
+    border-left-color: var(--teal);
+  }
+  .chef-main {
+    flex: 1;
+    margin-left: 250px;
+    background: var(--sand);
+  }
+  .chef-header {
+    background: white;
+    padding: 20px 32px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chef-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+  .chef-content {
+    padding: 32px;
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .menu-item-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  .menu-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+  .menu-item-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--ink);
+    margin: 0;
+  }
+  .menu-item-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--teal);
+  }
+  .menu-item-description {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 8px 0;
+    line-height: 1.5;
+  }
+  .menu-item-category {
+    display: inline-block;
+    padding: 4px 8px;
+    background: var(--sand);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .availability-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: #cbd5e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .toggle-switch.active {
+    background: var(--teal);
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s;
+  }
+  .toggle-switch.active::after {
+    left: 26px;
+  }
+  .menu-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+  .button-small {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+  }
+  .button-primary {
+    background: var(--teal);
+    color: white;
+  }
+  .button-primary:hover {
+    background: var(--teal-dark);
+  }
+  .button-secondary {
+    background: white;
+    color: var(--orange);
+    border: 1px solid var(--orange);
+  }
+  .button-secondary:hover {
+    background: #fff5f0;
+  }
+  .add-item-btn {
+    background: var(--teal);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .add-item-btn:hover {
+    background: var(--teal-dark);
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 {
+    margin: 0;
+    color: var(--ink);
+  }
+  .close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--muted);
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+
+  @media (max-width: 768px) {
+    .chef-sidebar {
+      width: 200px;
+    }
+    .chef-main {
+      margin-left: 200px;
+    }
+    .menu-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="chef-layout">
+  <aside class="chef-sidebar">
+    <div class="chef-brand">
+      <h2>👨‍🍳 Chef Portal</h2>
+    </div>
+    <nav class="chef-nav">
+      <a href="#" onclick="navigateTo('/chef-portal/dashboard'); return false;">📊 Dashboard</a>
+      <a href="#" onclick="navigateTo('/chef-portal/orders'); return false;">📋 Orders</a>
+      <a href="#" onclick="navigateTo('/chef-portal/menu'); return false;" class="active">🍽️ Menu</a>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+      <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <main class="chef-main">
+    <header class="chef-header">
+      <h1>Menu Editor</h1>
+      <button class="button add-item-btn" onclick="openAddModal()">+ Add Menu Item</button>
+    </header>
+
+    <div class="chef-content">
+      <div id="menuGrid" class="menu-grid">
+        <!-- Menu items will be rendered here -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="itemModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Menu Item</h2>
+      <button class="close-modal" onclick="closeModal()">×</button>
+    </div>
+    <form id="itemForm">
+      <input type="hidden" id="itemId">
+      <div class="form-group">
+        <label for="itemName">Item Name *</label>
+        <input type="text" id="itemName" required>
+      </div>
+      <div class="form-group">
+        <label for="itemDescription">Description</label>
+        <textarea id="itemDescription"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="itemCategory">Category *</label>
+        <select id="itemCategory" required>
+          <option value="appetizer">Appetizer</option>
+          <option value="main">Main Course</option>
+          <option value="dessert">Dessert</option>
+          <option value="beverage">Beverage</option>
+          <option value="side">Side Dish</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="itemPrice">Price ($) *</label>
+        <input type="number" id="itemPrice" step="0.01" min="0" required>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="itemAvailable" checked>
+          Available for orders
+        </label>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button type="submit" class="button button-primary" style="flex: 1;">Save Item</button>
+        <button type="button" class="button button-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let menuItems = [];
+
+(async function() {
+  // Check authentication
+  try {
+    const res = await fetch('/api/auth/session');
+    const data = await res.json();
+    
+    if (!data.demoMode && (!data.authenticated || data.role !== 'chef')) {
+      navigateTo('/chef-portal/login');
+      return;
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    navigateTo('/chef-portal/login');
+    return;
+  }
+
+  // Load menu items
+  loadMenuItems();
+})();
+
+function loadMenuItems() {
+  // Load from localStorage (in real app, would fetch from API)
+  const stored = localStorage.getItem('chefMenuItems');
+  if (stored) {
+    menuItems = JSON.parse(stored);
+  } else {
+    // Default sample items
+    menuItems = [
+      {
+        id: '1',
+        name: 'Margherita Pizza',
+        description: 'Fresh mozzarella, tomato sauce, basil',
+        category: 'main',
+        price: 14.99,
+        available: true
+      },
+      {
+        id: '2',
+        name: 'Caesar Salad',
+        description: 'Romaine lettuce, parmesan, croutons, Caesar dressing',
+        category: 'appetizer',
+        price: 8.99,
+        available: true
+      },
+      {
+        id: '3',
+        name: 'Tiramisu',
+        description: 'Classic Italian dessert with coffee and mascarpone',
+        category: 'dessert',
+        price: 6.99,
+        available: true
+      }
+    ];
+    saveMenuItems();
+  }
+  renderMenu();
+}
+
+function saveMenuItems() {
+  localStorage.setItem('chefMenuItems', JSON.stringify(menuItems));
+}
+
+function renderMenu() {
+  const grid = document.getElementById('menuGrid');
+  
+  if (menuItems.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted);">
+        <div style="font-size: 3rem;">🍽️</div>
+        <h3>No menu items yet</h3>
+        <p>Add your first menu item to get started</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = menuItems.map(item => `
+    <div class="menu-item-card">
+      <div class="menu-item-category">${item.category}</div>
+      <div class="menu-item-header">
+        <h3 class="menu-item-title">${item.name}</h3>
+        <div class="menu-item-price">$${item.price.toFixed(2)}</div>
+      </div>
+      <p class="menu-item-description">${item.description || 'No description'}</p>
+      
+      <div class="availability-toggle">
+        <div class="toggle-switch ${item.available ? 'active' : ''}" 
+             onclick="toggleAvailability('${item.id}')"></div>
+        <span style="color: var(--muted); font-size: 0.875rem;">
+          ${item.available ? 'Available' : 'Unavailable'}
+        </span>
+      </div>
+
+      <div class="menu-item-actions">
+        <button class="button button-small button-primary" onclick="editItem('${item.id}')">
+          Edit
+        </button>
+        <button class="button button-small button-secondary" onclick="deleteItem('${item.id}')">
+          Delete
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleAvailability(itemId) {
+  const item = menuItems.find(i => i.id === itemId);
+  if (item) {
+    item.available = !item.available;
+    saveMenuItems();
+    renderMenu();
+  }
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Add Menu Item';
+  document.getElementById('itemForm').reset();
+  document.getElementById('itemId').value = '';
+  document.getElementById('itemModal').classList.add('active');
+}
+
+function editItem(itemId) {
+  const item = menuItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  document.getElementById('modalTitle').textContent = 'Edit Menu Item';
+  document.getElementById('itemId').value = item.id;
+  document.getElementById('itemName').value = item.name;
+  document.getElementById('itemDescription').value = item.description || '';
+  document.getElementById('itemCategory').value = item.category;
+  document.getElementById('itemPrice').value = item.price;
+  document.getElementById('itemAvailable').checked = item.available;
+  document.getElementById('itemModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('itemModal').classList.remove('active');
+}
+
+function deleteItem(itemId) {
+  if (!confirm('Are you sure you want to delete this menu item?')) return;
+  
+  menuItems = menuItems.filter(i => i.id !== itemId);
+  saveMenuItems();
+  renderMenu();
+}
+
+document.getElementById('itemForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  const itemId = document.getElementById('itemId').value;
+  const itemData = {
+    id: itemId || Date.now().toString(),
+    name: document.getElementById('itemName').value,
+    description: document.getElementById('itemDescription').value,
+    category: document.getElementById('itemCategory').value,
+    price: parseFloat(document.getElementById('itemPrice').value),
+    available: document.getElementById('itemAvailable').checked
+  };
+
+  if (itemId) {
+    // Edit existing
+    const index = menuItems.findIndex(i => i.id === itemId);
+    if (index !== -1) {
+      menuItems[index] = itemData;
+    }
+  } else {
+    // Add new
+    menuItems.push(itemData);
+  }
+
+  saveMenuItems();
+  renderMenu();
+  closeModal();
+});
+
+async function handleLogout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+  navigateTo('/');
+}
+</script>
