@@ -75,7 +75,12 @@ class Router {
   // Navigate to a path
   async navigate(path, pushState = true) {
     // Strip base path for route matching
-    const cleanPath = this.stripBasePath(path);
+    let cleanPath = this.stripBasePath(path);
+    
+    // Normalize path - remove trailing slash unless it's root
+    if (cleanPath !== '/' && cleanPath.endsWith('/')) {
+      cleanPath = cleanPath.slice(0, -1);
+    }
     
     // Run before hooks
     for (const hook of this.beforeEachHooks) {
