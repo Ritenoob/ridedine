@@ -259,7 +259,7 @@
 (async function() {
   // Check authentication
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await window.apiFetch('/api/auth/session');
     const data = await res.json();
     
     if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {
@@ -326,7 +326,7 @@ function showActiveDelivery(delivery) {
 
 async function handleLogout() {
   try {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await window.apiFetch('/api/auth/logout', { method: 'POST' });
   } catch (error) {
     console.error('Logout failed:', error);
   }

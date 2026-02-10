@@ -246,17 +246,14 @@
           };
 
           // Create Stripe checkout session
-          const response = await fetch('/api/payments/create-checkout-session', {
+          const response = await window.apiFetch('/api/payments/create-checkout-session', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+            body: {
               items: cartItems,
               chefId,
               chefSlug,
               customerInfo
-            })
+            }
           });
 
           if (!response.ok) {

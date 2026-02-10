@@ -183,7 +183,7 @@
   if (isDemoMode) {
     // Seed demo data if not already seeded
     try {
-      await fetch('/api/demo/seed', { method: 'POST' });
+      await window.apiFetch('/api/demo/seed', { method: 'POST' });
     } catch (error) {
       console.error('Failed to seed demo data:', error);
     }
@@ -193,7 +193,7 @@
   async function loadMetrics() {
     try {
       if (isDemoMode) {
-        const res = await fetch('/api/demo/data');
+        const res = await window.apiFetch('/api/demo/data');
         const data = await res.json();
         
         // Calculate metrics from demo data
@@ -338,7 +338,7 @@
   // Advance order (demo mode only)
   window.advanceOrder = async function(orderId) {
     try {
-      const res = await fetch(`/api/demo/advance-order/${orderId}`, {
+      const res = await window.apiFetch(`/api/demo/advance-order/${orderId}`, {
         method: 'POST'
       });
       const data = await res.json();

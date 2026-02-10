@@ -2,46 +2,17 @@
 class AuthClient {
   constructor() {
     this.session = null;
-    this.apiBaseUrl = this.detectApiBaseUrl();
   }
 
-  // Detect API base URL
-  // For GitHub Pages (static hosting), API is not available
-  // For local development, API is at same origin
-  detectApiBaseUrl() {
-    // Use config if available
-    if (window.RideNDineConfig && window.RideNDineConfig.apiBaseUrl !== undefined) {
-      return window.RideNDineConfig.apiBaseUrl;
-    }
-    
-    // Fallback detection
-    const hostname = window.location.hostname;
-    
-    // GitHub Pages deployment - no backend API available
-    if (hostname.endsWith('.github.io')) {
-      console.info('GitHub Pages deployment detected - backend API not available');
-      return null;
-    }
-    
-    // Local development or custom domain with backend
-    return window.location.origin;
+  // Get API base URL for backward compatibility
+  get apiBaseUrl() {
+    return window.getApiBaseUrl ? window.getApiBaseUrl() : '';
   }
 
   // Check current session
   async checkSession() {
-    // If no API available (GitHub Pages), return unauthenticated session in demo mode
-    if (!this.apiBaseUrl) {
-      console.info('No backend API - returning demo mode session');
-      this.session = {
-        authenticated: false,
-        demoMode: true,
-        role: null
-      };
-      return this.session;
-    }
-
     try {
-      const response = await fetch(`${this.apiBaseUrl}/api/auth/session`);
+      const response = await window.apiFetch('/api/auth/session');
       const data = await response.json();
       this.session = data;
       return data;
@@ -59,18 +30,10 @@ class AuthClient {
 
   // Login
   async login(password, role) {
-    // If no API available, show message to user
-    if (!this.apiBaseUrl) {
-      throw new Error('Backend API not available. This is a static demo deployment. To use authentication features, deploy the backend server.');
-    }
-
     try {
-      const response = await fetch(`${this.apiBaseUrl}/api/auth/login`, {
+      const response = await window.apiFetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ password, role })
+        body: { password, role }
       });
 
       const data = await response.json();
@@ -89,14 +52,8 @@ class AuthClient {
 
   // Logout
   async logout() {
-    // If no API available, just clear local session
-    if (!this.apiBaseUrl) {
-      this.session = null;
-      return { success: true };
-    }
-
     try {
-      const response = await fetch(`${this.apiBaseUrl}/api/auth/logout`, {
+      const response = await window.apiFetch('/api/auth/logout', {
         method: 'POST'
       });
 
@@ -126,12 +83,12 @@ class AuthClient {
 
   // Check if backend API is available
   hasBackend() {
-    return this.apiBaseUrl !== null;
+    return true; // Backend is always considered available with the new system
   }
 
   // Get API base URL (for making API calls)
   getApiBaseUrl() {
-    return this.apiBaseUrl || '';
+    return window.getApiBaseUrl ? window.getApiBaseUrl() : '';
   }
 }
 

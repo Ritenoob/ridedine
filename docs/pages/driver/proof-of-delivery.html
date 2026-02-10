@@ -255,7 +255,7 @@ ctx.lineCap = 'round';
 (async function() {
   // Check authentication
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await window.apiFetch('/api/auth/session');
     const data = await res.json();
     
     if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {

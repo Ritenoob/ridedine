@@ -164,7 +164,7 @@
   async function loadJobs() {
     try {
       if (isDemoMode) {
-        const res = await fetch('/api/demo/orders');
+        const res = await window.apiFetch('/api/demo/orders');
         const data = await res.json();
         
         // Update metrics
