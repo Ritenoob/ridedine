@@ -135,11 +135,14 @@ class Router {
         return;
       }
 
-      // Check role
-      if (matchedRoute.allowedRoles.length > 0) {
-        if (!matchedRoute.allowedRoles.includes(session.role)) {
-          alert('Access denied: insufficient permissions');
-          return;
+      // In demo mode, bypass role checks - allow access to all roles
+      if (!session.demoMode) {
+        // Check role only in production mode
+        if (matchedRoute.allowedRoles.length > 0) {
+          if (!matchedRoute.allowedRoles.includes(session.role)) {
+            alert('Access denied: insufficient permissions');
+            return;
+          }
         }
       }
     }

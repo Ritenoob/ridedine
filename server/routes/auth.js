@@ -118,13 +118,26 @@ router.post('/logout', (req, res) => {
 
 // Check session endpoint
 router.get('/session', (req, res) => {
-  // Check for demo mode
+  // Check for demo mode - allow any role access
   if (process.env.DEMO_MODE === 'true') {
+    // Check if there's a session cookie to get role preference
+    const sessionId = req.cookies.sessionId;
+    let role = 'admin'; // default role
+    let userId = 'demo';
+    
+    if (sessionId) {
+      const session = getSession(sessionId);
+      if (session && session.role) {
+        role = session.role;
+        userId = session.userId;
+      }
+    }
+    
     return res.json({ 
       authenticated: true, 
       demoMode: true,
-      role: 'admin',
-      userId: 'demo'
+      role: role,
+      userId: userId
     });
   }
 
