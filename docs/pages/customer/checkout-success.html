@@ -89,10 +89,51 @@
   let orderId = null;
 
   async function verifyOrder() {
-    // Get session_id from URL params
+    // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
+    const demoOrderId = urlParams.get('order');
 
+    // Handle demo mode (direct order ID)
+    if (demoOrderId) {
+      try {
+        // Fetch order details from API
+        const orderResponse = await fetch(`/api/orders/${demoOrderId}/tracking`);
+        
+        if (orderResponse.ok) {
+          const orderData = await orderResponse.json();
+          
+          orderId = orderData.orderId || demoOrderId;
+          document.getElementById('order-number').textContent = orderId;
+          document.getElementById('order-status').textContent = orderData.customerStatus || 'Confirmed';
+          document.getElementById('order-total').textContent = orderData.total || '0.00';
+
+          // Display items
+          if (orderData.items && orderData.items.length > 0) {
+            const itemsHtml = orderData.items.map(item => 
+              `<div style="padding: 4px 0;">${item.quantity}x ${item.name} - $${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>`
+            ).join('');
+            document.getElementById('order-items').innerHTML = itemsHtml;
+          }
+        }
+
+        // Clear cart
+        if (window.CartService) {
+          window.CartService.clearCart();
+        }
+        
+        // Show success
+        document.getElementById('success-loading').style.display = 'none';
+        document.getElementById('success-content').style.display = 'block';
+        
+      } catch (error) {
+        console.error('Error loading order:', error);
+        showError('Order created successfully! Order #' + demoOrderId);
+      }
+      return;
+    }
+
+    // Handle production mode (Stripe session)
     if (!sessionId) {
       showError('No session ID found. Please contact support if you were charged.');
       return;
@@ -135,7 +176,9 @@
       }
 
       // Clear cart and pending order
-      localStorage.removeItem('cart');
+      if (window.CartService) {
+        window.CartService.clearCart();
+      }
       localStorage.removeItem('pendingOrder');
 
       // Show success
