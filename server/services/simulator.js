@@ -3,8 +3,6 @@
  * Generates and simulates 100 orders with realistic progression through lifecycle
  */
 
-const crypto = require('crypto');
-
 // Simulator state
 let simulatorState = {
   isRunning: false,
