@@ -13,6 +13,9 @@ app.set('trust proxy', 1);
 // ✅ Railway provides PORT; fallback for local
 const PORT = process.env.PORT || 8080;
 
+// Robust demo mode parsing (supports: true/True/1/yes/on)
+const DEMO_MODE = ['true','1','yes','y','on'].includes(String(process.env.DEMO_MODE || '').toLowerCase());
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -60,7 +63,7 @@ app.use('/api/chefs', chefRoutes);
 // Config endpoint - exposes public configuration to frontend
 app.get('/api/config', (req, res) => {
   res.json({
-    demoMode: process.env.DEMO_MODE === 'true',
+    demoMode: DEMO_MODE,
     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
     appName: 'RideNDine',
     version: '1.0.0'
@@ -71,7 +74,9 @@ app.get('/api/config', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    demoMode: process.env.DEMO_MODE === 'true',
+    demoMode: DEMO_MODE,
+    demoModeRaw: process.env.DEMO_MODE,
+    railwayEnvironment: process.env.RAILWAY_ENVIRONMENT,
     timestamp: new Date().toISOString()
   });
 });
@@ -98,11 +103,12 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 RideNDine server running on http://localhost:${PORT}`);
-  console.log(`📦 Demo Mode: ${process.env.DEMO_MODE === 'true' ? 'ENABLED' : 'DISABLED'}`);
-  console.log(`🔒 Authentication: ${process.env.DEMO_MODE === 'true' ? 'BYPASSED' : 'REQUIRED'}`);
+  console.log(`📦 Demo Mode: ${DEMO_MODE ? 'ENABLED' : 'DISABLED'}`);
+  console.log(`🔒 Authentication: ${DEMO_MODE ? 'BYPASSED' : 'REQUIRED'}`);
 });
 
 module.exports = app;
+
 
 
 
