@@ -33,6 +33,7 @@ const paymentRoutes = require('./routes/payments');
 const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
 const demoRoutes = require('./routes/demo');
+const chefRoutes = require('./routes/chefs');
 
 // API routes
 app.use('/api/auth', authLimiter, authRoutes); // Stricter rate limit for auth
@@ -40,6 +41,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/demo', demoRoutes); // Demo mode endpoints
+app.use('/api/chefs', chefRoutes); // Chef data endpoints
 
 // Config endpoint - exposes public configuration to frontend
 app.get('/api/config', (req, res) => {
