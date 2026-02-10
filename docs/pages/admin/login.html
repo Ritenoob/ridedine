@@ -143,8 +143,26 @@
 
   // Demo bypass button
   if (demoBypass) {
-    demoBypass.addEventListener('click', () => {
-      navigateTo('/admin');
+    demoBypass.addEventListener('click', async () => {
+      try {
+        // Call login API with admin role in demo mode
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'admin', userId: 'demo_admin' })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Demo login failed');
+        }
+        
+        navigateTo('/admin');
+      } catch (error) {
+        errorMessage.textContent = error.message || 'Demo login failed.';
+        errorMessage.classList.add('visible');
+      }
     });
   }
 

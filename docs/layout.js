@@ -314,14 +314,23 @@
         const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role })
+          body: JSON.stringify({ role, userId: `demo_${role}` })
         });
         
         const data = await response.json();
         
-        if (data.success) {
+        if (response.ok) {
           window.AppConfig.currentRole = role;
-          navigateTo(data.redirect);
+          
+          // Navigate to appropriate dashboard
+          const dashboards = {
+            'admin': '/admin',
+            'chef': '/chef-portal/dashboard',
+            'driver': '/driver',
+            'customer': '/customer'
+          };
+          
+          navigateTo(dashboards[role] || '/');
         } else {
           alert('Failed to switch role: ' + (data.error || 'Unknown error'));
         }

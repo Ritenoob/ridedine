@@ -57,10 +57,24 @@
       await loadPage('/pages/customer/checkout-cancel.html', 'Checkout Cancelled | RideNDine');
     }, { title: 'Checkout Cancelled | RideNDine' });
 
-    // Customer order tracking (redacted, public)
+    // Customer order tracking - general search page
+    router.addRoute('/order-tracking', async () => {
+      await loadPage('/pages/customer/order-tracking.html', 'Track Order | RideNDine');
+    }, { title: 'Track Order | RideNDine' });
+
+    // Customer order tracking (redacted, public) - specific order
     router.addRoute('/order/:orderId', async (params) => {
       await loadPage('/pages/customer/order-tracking.html', 'Track Order | RideNDine', params);
     }, { title: 'Track Order | RideNDine' });
+
+    // Legal pages
+    router.addRoute('/legal/terms', async () => {
+      await loadPage('/legal/terms.html', 'Terms of Service | RideNDine');
+    }, { title: 'Terms of Service | RideNDine' });
+
+    router.addRoute('/legal/privacy', async () => {
+      await loadPage('/legal/privacy.html', 'Privacy Policy | RideNDine');
+    }, { title: 'Privacy Policy | RideNDine' });
 
     // =========================================================================
     // ADMIN ROUTES (Require Admin Authentication)

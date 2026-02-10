@@ -195,21 +195,24 @@
   // Handle demo mode
   demoBtn.addEventListener('click', async () => {
     try {
-      const res = await fetch('/api/auth/demo', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'chef' })
+        body: JSON.stringify({ role: 'chef', userId: 'demo_chef' })
       });
 
+      const data = await res.json();
+      
       if (res.ok) {
         navigateTo('/chef-portal/dashboard');
       } else {
-        // Fallback: just navigate anyway for demo
-        navigateTo('/chef-portal/dashboard');
+        errorMessage.textContent = data.message || 'Demo login failed';
+        errorMessage.style.display = 'block';
       }
     } catch (error) {
-      console.log('Demo mode - navigating anyway');
-      navigateTo('/chef-portal/dashboard');
+      console.error('Demo mode error:', error);
+      errorMessage.textContent = 'Demo mode error: ' + error.message;
+      errorMessage.style.display = 'block';
     }
   });
 })();

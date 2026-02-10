@@ -60,12 +60,13 @@
 
 <script>
   function renderCart() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const itemsByChef = window.CartService.getItemsByChef();
     const cartItemsEl = document.getElementById('cart-items');
     const emptyCartEl = document.getElementById('empty-cart');
     const cartSummaryEl = document.getElementById('cart-summary');
+    const count = window.CartService.getCount();
 
-    if (cart.length === 0) {
+    if (count === 0) {
       cartItemsEl.innerHTML = '';
       emptyCartEl.style.display = 'block';
       cartSummaryEl.style.display = 'none';
@@ -75,25 +76,14 @@
     emptyCartEl.style.display = 'none';
     cartSummaryEl.style.display = 'block';
 
-    // Group items by chef
-    const itemsByChef = cart.reduce((acc, item) => {
-      if (!acc[item.chefSlug]) {
-        acc[item.chefSlug] = {
-          chefName: item.chefName,
-          items: []
-        };
-      }
-      acc[item.chefSlug].items.push(item);
-      return acc;
-    }, {});
-
-    cartItemsEl.innerHTML = Object.entries(itemsByChef).map(([chefSlug, data]) => `
+    // Render items grouped by chef
+    cartItemsEl.innerHTML = Object.entries(itemsByChef).map(([chefId, data]) => `
       <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f0efed;">
         <h3 style="margin: 0 0 16px 0; color: var(--teal);">
           ${data.chefName}
-          <a onclick="navigateTo('/chefs/${chefSlug}')" style="font-size: 0.9rem; font-weight: normal; color: var(--orange); cursor: pointer; margin-left: 12px;">View Menu →</a>
+          <a onclick="navigateTo('/chefs/${data.chefSlug || chefId}')" style="font-size: 0.9rem; font-weight: normal; color: var(--orange); cursor: pointer; margin-left: 12px;">View Menu →</a>
         </h3>
-        ${data.items.map((item, index) => `
+        ${data.items.map((item) => `
           <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 12px; background: #f7fbfa; border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 150px;">
               <strong>${item.itemName}</strong>
@@ -102,18 +92,18 @@
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
               <div style="display: flex; gap: 8px; align-items: center; background: white; border-radius: 8px; padding: 4px;">
                 <button 
-                  onclick="updateQuantity('${chefSlug}', '${item.itemId}', ${item.quantity - 1})"
+                  onclick="handleQuantityChange('${chefId}', '${item.itemId}', ${item.quantity - 1})"
                   style="border: none; background: #f0efed; color: var(--ink); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold;"
                 >−</button>
                 <span style="min-width: 30px; text-align: center; font-weight: 600;">${item.quantity}</span>
                 <button 
-                  onclick="updateQuantity('${chefSlug}', '${item.itemId}', ${item.quantity + 1})"
+                  onclick="handleQuantityChange('${chefId}', '${item.itemId}', ${item.quantity + 1})"
                   style="border: none; background: var(--teal); color: white; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold;"
                 >+</button>
               </div>
               <strong style="min-width: 70px; text-align: right; color: var(--teal);">$${(item.price * item.quantity).toFixed(2)}</strong>
               <button 
-                onclick="removeItem('${chefSlug}', '${item.itemId}')"
+                onclick="handleRemoveItem('${chefId}', '${item.itemId}')"
                 style="border: none; background: #ffebee; color: #c62828; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;"
               >Remove</button>
             </div>
@@ -123,35 +113,28 @@
     `).join('');
 
     // Update subtotal
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.getElementById('cart-subtotal').textContent = subtotal.toFixed(2);
+    const total = window.CartService.getTotal();
+    document.getElementById('cart-subtotal').textContent = total.toFixed(2);
   }
 
-  function updateQuantity(chefSlug, itemId, newQuantity) {
+  function handleQuantityChange(chefId, itemId, newQuantity) {
     if (newQuantity < 1) {
-      removeItem(chefSlug, itemId);
+      handleRemoveItem(chefId, itemId);
       return;
     }
 
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const item = cart.find(i => i.chefSlug === chefSlug && i.itemId === itemId);
-    if (item) {
-      item.quantity = newQuantity;
-      localStorage.setItem('cart', JSON.stringify(cart));
-      renderCart();
-    }
+    window.CartService.updateQuantity(chefId, itemId, newQuantity);
+    renderCart();
   }
 
-  function removeItem(chefSlug, itemId) {
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    cart = cart.filter(i => !(i.chefSlug === chefSlug && i.itemId === itemId));
-    localStorage.setItem('cart', JSON.stringify(cart));
+  function handleRemoveItem(chefId, itemId) {
+    window.CartService.removeItem(chefId, itemId);
     renderCart();
   }
 
   function proceedToCheckout() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    if (cart.length === 0) {
+    const count = window.CartService.getCount();
+    if (count === 0) {
       alert('Your cart is empty');
       return;
     }

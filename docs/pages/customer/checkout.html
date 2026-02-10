@@ -98,7 +98,7 @@
 
 <script>
   function renderOrderSummary() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = window.CartService.getCart();
     
     if (cart.length === 0) {
       navigateTo('/cart');
@@ -113,7 +113,7 @@
       </div>
     `).join('');
 
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = window.CartService.getTotal();
     const deliveryFee = 4.99;
     const serviceFee = 2.00;
     const total = subtotal + deliveryFee + serviceFee;
@@ -139,7 +139,7 @@
       return;
     }
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = window.CartService.getCart();
     if (cart.length === 0) {
       showError('Your cart is empty');
       return;
@@ -151,57 +151,110 @@
     document.getElementById('checkout-error').style.display = 'none';
 
     try {
-      // Prepare order data
-      const items = cart.map(item => ({
-        name: `${item.chefName} - ${item.itemName}`,
-        price: Math.round(item.price * 100), // Convert to cents
-        quantity: item.quantity
-      }));
+      // Check if in demo mode
+      const configResponse = await fetch('/api/config').catch(() => null);
+      const config = configResponse ? await configResponse.json().catch(() => null) : null;
+      const isDemoMode = config?.demoMode === true;
 
-      // Add delivery and service fees
-      items.push({ name: 'Delivery Fee', price: 499, quantity: 1 });
-      items.push({ name: 'Service Fee', price: 200, quantity: 1 });
-
-      const response = await fetch('/api/payments/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          items,
-          metadata: {
-            deliveryAddress: address,
-            deliveryPhone: phone,
-            deliveryNotes: notes,
-            cart: JSON.stringify(cart)
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create checkout session');
-      }
-
-      const data = await response.json();
-      
-      if (data.url) {
-        // Store delivery info for later
-        localStorage.setItem('pendingOrder', JSON.stringify({
-          address,
-          phone,
-          notes,
-          cart
+      if (isDemoMode) {
+        // DEMO MODE: Create order directly via API
+        const orderItems = cart.map(item => ({
+          name: item.itemName,
+          price: item.price,
+          quantity: item.quantity,
+          prepTime: item.prepTime || 15
         }));
-        
-        // Redirect to Stripe
-        window.location.href = data.url;
+
+        const subtotal = window.CartService.getTotal();
+        const deliveryFee = 4.99;
+        const serviceFee = 2.00;
+        const total = (subtotal + deliveryFee + serviceFee).toFixed(2);
+
+        // Create order
+        const orderResponse = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: orderItems,
+            chefId: cart[0]?.chefId || 'chef_2000',
+            customerInfo: { address, phone, notes },
+            deliveryAddress: address,
+            total
+          })
+        });
+
+        if (!orderResponse.ok) {
+          throw new Error('Failed to create order');
+        }
+
+        const orderData = await orderResponse.json();
+        const orderId = orderData.orderId || orderData.order?.id;
+
+        // Simulate payment
+        if (orderId) {
+          await fetch('/api/demo/simulate-payment/' + orderId, {
+            method: 'POST'
+          });
+        }
+
+        // Clear cart
+        window.CartService.clearCart();
+
+        // Redirect to success page with order ID
+        navigateTo(`/checkout/success?order=${orderId}`);
       } else {
-        throw new Error('No checkout URL received');
+        // PRODUCTION MODE: Use Stripe
+        const items = cart.map(item => ({
+          name: `${item.chefName} - ${item.itemName}`,
+          price: Math.round(item.price * 100), // Convert to cents
+          quantity: item.quantity
+        }));
+
+        // Add delivery and service fees
+        items.push({ name: 'Delivery Fee', price: 499, quantity: 1 });
+        items.push({ name: 'Service Fee', price: 200, quantity: 1 });
+
+        const response = await fetch('/api/payments/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            items,
+            metadata: {
+              deliveryAddress: address,
+              deliveryPhone: phone,
+              deliveryNotes: notes,
+              cart: JSON.stringify(cart)
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to create checkout session');
+        }
+
+        const data = await response.json();
+        
+        if (data.url) {
+          // Store delivery info for later
+          localStorage.setItem('pendingOrder', JSON.stringify({
+            address,
+            phone,
+            notes,
+            cart
+          }));
+          
+          // Redirect to Stripe
+          window.location.href = data.url;
+        } else {
+          throw new Error('No checkout URL received');
+        }
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      showError(error.message || 'Failed to create checkout session. Please try again.');
+      showError(error.message || 'Failed to complete checkout. Please try again.');
       document.getElementById('checkout-actions').style.display = 'block';
       document.getElementById('checkout-loading').style.display = 'none';
     }
