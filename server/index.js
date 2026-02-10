@@ -5,6 +5,9 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
+
+// Trust Railway/Render/Heroku proxy (needed for rate limiting + secure cookies)
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // Rate limiting
@@ -90,4 +93,5 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
