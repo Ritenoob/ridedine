@@ -1,4 +1,8 @@
 // Simple client-side router for RideNDine
+
+// Configuration constants
+const SESSION_CHECK_TIMEOUT_MS = 5000; // 5 seconds
+
 class Router {
   constructor() {
     this.routes = new Map();
@@ -114,7 +118,20 @@ class Router {
 
     // Check authentication
     if (matchedRoute.requiresAuth) {
-      const session = await window.AuthClient.checkSession();
+      // Add timeout protection for slow/mobile connections
+      let session;
+      try {
+        session = await Promise.race([
+          window.AuthClient.checkSession(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Session check timeout')), SESSION_CHECK_TIMEOUT_MS)
+          )
+        ]);
+      } catch (error) {
+        console.warn('Session check failed or timed out:', error);
+        session = { authenticated: false };
+      }
+      
       if (!session.authenticated) {
         // Redirect to login based on role
         const loginPath = this.getLoginPath(cleanPath);
@@ -122,11 +139,14 @@ class Router {
         return;
       }
 
-      // Check role
-      if (matchedRoute.allowedRoles.length > 0) {
-        if (!matchedRoute.allowedRoles.includes(session.role)) {
-          alert('Access denied: insufficient permissions');
-          return;
+      // In demo mode, bypass role checks - allow access to all roles
+      if (!session.demoMode) {
+        // Check role only in production mode
+        if (matchedRoute.allowedRoles.length > 0) {
+          if (!matchedRoute.allowedRoles.includes(session.role)) {
+            alert('Access denied: insufficient permissions');
+            return;
+          }
         }
       }
     }

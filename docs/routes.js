@@ -178,6 +178,11 @@
       return;
     }
 
+    // Show loading spinner
+    if (window.showLoading) {
+      window.showLoading();
+    }
+
     try {
       // Add base path to fetch URL if needed
       const router = window.Router;
@@ -256,6 +261,11 @@
           <a href="#" onclick="event.preventDefault(); window.navigateTo('/'); return false;" class="button button--primary">Go Home</a>
         </div>
       `;
+    } finally {
+      // Always hide loading spinner
+      if (window.hideLoading) {
+        window.hideLoading();
+      }
     }
   }
 

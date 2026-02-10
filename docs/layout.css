@@ -260,20 +260,22 @@
   /* Stack sidebar on mobile */
   .admin-layout,
   .chef-layout {
-    flex-direction: column;
+    flex-direction: column !important;
   }
   
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: static;
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
     padding: var(--space-4) 0;
+    max-height: none !important;
   }
   
   .sidebar__nav {
     flex-direction: row;
     overflow-x: auto;
     padding: 0 var(--space-4);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
   
   .sidebar__link {
@@ -281,6 +283,7 @@
     min-width: 80px;
     text-align: center;
     padding: var(--space-2);
+    white-space: nowrap;
   }
   
   .sidebar__label {
