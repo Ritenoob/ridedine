@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { createSession, deleteSession, getSession } = require('../services/session');
 
+// Demo mode constants
+const DEFAULT_DEMO_ROLE = 'admin';
+const DEFAULT_DEMO_USER_ID = 'demo';
+
 // Login endpoint
 router.post('/login', (req, res) => {
   const { password, role, userId } = req.body;
@@ -122,8 +126,8 @@ router.get('/session', (req, res) => {
   if (process.env.DEMO_MODE === 'true') {
     // Check if there's a session cookie to get role preference
     const sessionId = req.cookies.sessionId;
-    let role = 'admin'; // default role
-    let userId = 'demo';
+    let role = DEFAULT_DEMO_ROLE;
+    let userId = DEFAULT_DEMO_USER_ID;
     
     if (sessionId) {
       const session = getSession(sessionId);

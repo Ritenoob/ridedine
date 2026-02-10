@@ -1,4 +1,8 @@
 // Simple client-side router for RideNDine
+
+// Configuration constants
+const SESSION_CHECK_TIMEOUT_MS = 5000; // 5 seconds
+
 class Router {
   constructor() {
     this.routes = new Map();
@@ -120,7 +124,7 @@ class Router {
         session = await Promise.race([
           window.AuthClient.checkSession(),
           new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Session check timeout')), 5000)
+            setTimeout(() => reject(new Error('Session check timeout')), SESSION_CHECK_TIMEOUT_MS)
           )
         ]);
       } catch (error) {
