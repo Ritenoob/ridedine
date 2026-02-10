@@ -101,11 +101,22 @@
 
     // Ensure Content-Type is set for POST/PUT/PATCH requests with body
     if (fetchOptions.body && typeof fetchOptions.body === 'object' && !(fetchOptions.body instanceof FormData)) {
-      if (!fetchOptions.headers['Content-Type']) {
-        fetchOptions.headers['Content-Type'] = 'application/json';
+      // Check if Content-Type header is already set
+      const hasContentType = fetchOptions.headers instanceof Headers 
+        ? fetchOptions.headers.has('Content-Type')
+        : fetchOptions.headers['Content-Type'];
+      
+      if (!hasContentType) {
+        if (fetchOptions.headers instanceof Headers) {
+          fetchOptions.headers.set('Content-Type', 'application/json');
+        } else {
+          fetchOptions.headers['Content-Type'] = 'application/json';
+        }
       }
-      // Stringify body if it's an object
-      fetchOptions.body = JSON.stringify(fetchOptions.body);
+      // Stringify body if it's an object (not already a string)
+      if (typeof fetchOptions.body !== 'string') {
+        fetchOptions.body = JSON.stringify(fetchOptions.body);
+      }
     }
 
     return fetch(url, fetchOptions);

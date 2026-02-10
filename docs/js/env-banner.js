@@ -6,6 +6,9 @@
 (function() {
   'use strict';
 
+  // Shared environment detection
+  const IS_GITHUB_PAGES = window.location.hostname.endsWith('.github.io');
+
   // Create and inject the banner
   function createEnvironmentBanner() {
     const banner = document.createElement('div');
@@ -122,9 +125,7 @@
                        window.location.hostname.includes('staging');
     
     // Always show on GitHub Pages to help users debug
-    const isGitHubPages = window.location.hostname.endsWith('.github.io');
-    
-    if (showBanner || isGitHubPages) {
+    if (showBanner || IS_GITHUB_PAGES) {
       const banner = createEnvironmentBanner();
       document.body.appendChild(banner);
       await updateBanner();
