@@ -14,7 +14,8 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 8080;
 
 // Robust demo mode parsing (supports: true/True/1/yes/on)
-const DEMO_MODE = ['true','1','yes','y','on'].includes(String(process.env.DEMO_MODE || '').toLowerCase());
+
+const DISABLE_RATE_LIMIT = ['true','1','yes','y','on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -43,7 +44,11 @@ app.use(cookieParser());
 if (process.env.DISABLE_RATE_LIMIT === 'true') {
   console.log('🟡 Rate limiting: DISABLED');
 } else {
+  if (!DISABLE_RATE_LIMIT) {
   app.use('/api/', limiter); // Apply rate limiting to all API routes
+} else {
+  console.log('⚠️ Rate limiting: DISABLED via DISABLE_RATE_LIMIT');
+}
 }
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
@@ -108,6 +113,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
