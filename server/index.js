@@ -60,6 +60,7 @@ const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
 const demoRoutes = require('./routes/demo');
 const chefRoutes = require('./routes/chefs');
+const simulatorRoutes = require('./routes/simulator');
 
 // Config endpoint
 app.get('/api/config', (req, res) => {
@@ -90,6 +91,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/demo', demoRoutes);
 app.use('/api/chefs', chefRoutes);
+app.use('/api/simulator', simulatorRoutes);
 
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));

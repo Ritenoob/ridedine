@@ -3,8 +3,12 @@ const router = express.Router();
 const { requireAuth, requireRole } = require('../middleware/auth');
 const orderService = require('../services/orders');
 
-// In-memory integration logs
+// In-memory integration logs and settings
 const integrationLogs = [];
+const integrationSettings = {
+  cooco: { storeName: '', importMode: 'manual', menus: {} },
+  chef: { menus: {} }
+};
 
 function logIntegration(source, event, data) {
   integrationLogs.push({
@@ -122,6 +126,58 @@ router.get('/logs', requireAuth, requireRole('admin'), (req, res) => {
     logs: recentLogs,
     total: logs.length 
   });
+});
+
+// Import menu items
+router.post('/import-menu', requireAuth, requireRole('admin'), (req, res) => {
+  try {
+    const { integrationType, storeId, items } = req.body;
+
+    if (!integrationType || !storeId || !items || !Array.isArray(items)) {
+      return res.status(400).json({ error: 'Invalid import data' });
+    }
+
+    // Store menu items
+    if (integrationType === 'cooco') {
+      integrationSettings.cooco.menus[storeId] = items;
+      logIntegration('cooco', 'menu_imported', { storeId, itemCount: items.length });
+    } else if (integrationType === 'chef') {
+      integrationSettings.chef.menus[storeId] = items;
+      logIntegration('chef', 'menu_imported', { storeId, itemCount: items.length });
+    }
+
+    console.log(`📋 Menu imported for ${storeId}: ${items.length} items`);
+
+    res.json({
+      success: true,
+      message: `Imported ${items.length} menu items for ${storeId}`
+    });
+  } catch (error) {
+    console.error('Menu import error:', error);
+    res.status(500).json({ error: 'Failed to import menu' });
+  }
+});
+
+// Save Cooco config
+router.post('/cooco-config', requireAuth, requireRole('admin'), (req, res) => {
+  try {
+    const { storeName, importMode } = req.body;
+
+    integrationSettings.cooco.storeName = storeName || '';
+    integrationSettings.cooco.importMode = importMode || 'manual';
+
+    logIntegration('cooco', 'config_updated', { storeName, importMode });
+
+    res.json({ success: true, message: 'Cooco configuration saved' });
+  } catch (error) {
+    console.error('Cooco config error:', error);
+    res.status(500).json({ error: 'Failed to save configuration' });
+  }
+});
+
+// Get integration settings
+router.get('/settings', requireAuth, requireRole('admin'), (req, res) => {
+  res.json(integrationSettings);
 });
 
 module.exports = router;

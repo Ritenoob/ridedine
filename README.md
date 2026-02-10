@@ -534,6 +534,38 @@ Update the frontend to point to your deployed backend:
 - [ ] Verify map is admin-only
 - [ ] Check integration logs accessible
 
+## Additional Documentation
+
+RideNDine includes detailed guides for specific features:
+
+- **[Simulator Guide](SIMULATOR_GUIDE.md)** - Complete guide to the order simulator with 100 orders, stores, drivers, and routing
+- **[Payment Demo Guide](PAYMENT_DEMO_GUIDE.md)** - Payment integration with demo mode and Stripe support
+- **[Integrations Guide](INTEGRATIONS_GUIDE.md)** - External integrations (Cooco, Hoang Gia Pho, Stripe, Mealbridge)
+
+## Features
+
+### Order Simulator
+- Generate 100 realistic orders with full lifecycle
+- 5 stores including Hoang Gia Pho (Vietnamese restaurant)
+- 10 drivers with real-time routing
+- Haversine distance calculation with road factors
+- Batch order support
+- Adjustable simulation speed (1x, 5x, 20x)
+- Complete KPI tracking (on-time %, utilization, etc.)
+
+### Integrations
+- **Cooco** - Menu import from meal planning app
+- **Hoang Gia Pho** - Featured chef site integration
+- **Stripe** - Payment processing with auto demo mode
+- **Mealbridge** - Internal dispatch system via simulator
+
+### Payments
+- Auto-detection of demo vs live mode
+- Mock payments in demo mode (instant success)
+- Full Stripe integration for live payments
+- Automatic order creation and status updates
+- Webhook handling for payment confirmation
+
 ### Contributing
 
 1. Fork the repository
