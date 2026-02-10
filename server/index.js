@@ -37,9 +37,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Apply rate limiting to all API routes
-app.use('/api/', limiter);
-
-// Import routes
+if (process.env.DISABLE_RATE_LIMIT === 'true') {
+  console.log('🟡 Rate limiting: DISABLED');
+} else {
+  app.use('/api/', limiter); // Apply rate limiting to all API routes
+}
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
 const orderRoutes = require('./routes/orders');
@@ -101,5 +103,6 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
