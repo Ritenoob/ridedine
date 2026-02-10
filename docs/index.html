@@ -36,30 +36,6 @@
   <meta property="og:description" content="Fresh home-cooked meals from local chefs, delivered to your door." />
   
   <style>
-    /* DEV BUILD Banner */
-    .dev-banner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 0.875rem;
-      font-weight: 600;
-      z-index: 10000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    .dev-banner.hidden {
-      display: none;
-    }
-    
-    body.dev-mode {
-      padding-top: 40px;
-    }
-    
     /* Loading Spinner */
     .loading-spinner {
       display: none;
@@ -138,11 +114,6 @@
   </style>
 </head>
 <body>
-  <!-- DEV BUILD Banner (shown when on dev/staging) -->
-  <div id="dev-banner" class="dev-banner hidden">
-    🚧 DEV BUILD - This is a development/staging environment 🚧
-  </div>
-  
   <!-- Loading Spinner -->
   <div id="loading-spinner" class="loading-spinner">
     <div class="spinner"></div>
@@ -178,25 +149,6 @@
   <script src="./routes.js"></script>
   
   <script>
-    // Show DEV banner on non-production environments
-    (function() {
-      const hostname = window.location.hostname;
-      const isDev = hostname === 'localhost' || 
-                    hostname === '127.0.0.1' || 
-                    hostname.includes('dev') ||
-                    hostname.includes('staging');
-      
-      if (isDev) {
-        const banner = document.getElementById('dev-banner');
-        if (banner) {
-          banner.classList.remove('hidden');
-          document.body.classList.add('dev-mode');
-        }
-      }
-    })();
-    
-
-    
     // Global error handler
     window.addEventListener('error', function(e) {
       console.error('Global error:', e.error);
