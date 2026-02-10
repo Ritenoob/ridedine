@@ -1,7 +1,7 @@
 <!-- Order Tracking Page -->
 <header class="header">
   <div class="header__brand">
-    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <img src="./assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
     <h1>RideNDine</h1>
   </div>
   <nav class="header__nav">
@@ -174,7 +174,7 @@
     document.getElementById('tracking-content').style.display = 'none';
 
     try {
-      const response = await fetch(`/api/orders/${input}/tracking`);
+      const response = await window.apiFetch(`/api/orders/${input}/tracking`);
       
       if (!response.ok) {
         const error = await response.json();

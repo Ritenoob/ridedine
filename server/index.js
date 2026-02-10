@@ -21,10 +21,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS: allow GitHub Pages to call this API
+// CORS: allow GitHub Pages and localhost to call this API
+const allowedOrigins = [
+  "https://seancfafinlay.github.io",
+  "http://localhost:8080",
+  "http://localhost:3000",
+  "http://127.0.0.1:8080",
+  "http://127.0.0.1:3000"
+];
+
 app.use(cors({
-  origin: "https://seancfafinlay.github.io",
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Use exact matching to prevent malicious origins like evil.com/seancfafinlay.github.io
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 // Rate limiting (can be disabled)
 if (!DISABLE_RATE_LIMIT) {

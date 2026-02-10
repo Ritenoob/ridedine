@@ -88,10 +88,11 @@
     const base = detectApiBaseUrl();
     const url = `${base}${path}`;
 
-    // Ensure credentials are included for cookie-based auth (same-origin)
+    // Always include credentials for cookie-based auth
+    // The CORS configuration on the backend will handle cross-origin cookies
     const fetchOptions = {
       ...options,
-      credentials: (base && base !== '' ? 'omit' : 'include')
+      credentials: 'include'
     };
 
     // Set default headers if not provided

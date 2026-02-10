@@ -135,7 +135,7 @@
         <header class="app-header">
           <div class="app-header__brand">
             <a href="/" onclick="event.preventDefault(); navigateTo('/'); return false;">
-              <img src="/assets/logo.svg" alt="RideNDine" class="app-logo-img" style="height: 40px; width: auto;" />
+              <img src="./assets/logo.svg" alt="RideNDine" class="app-logo-img" style="height: 40px; width: auto;" />
             </a>
           </div>
           
@@ -216,7 +216,7 @@
       return `
         <aside class="sidebar sidebar--admin">
           <div class="sidebar__logo">
-            <img src="/assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
+            <img src="./assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
           </div>
           <nav class="sidebar__nav">
             ${navItems.map(item => `
@@ -247,7 +247,7 @@
       return `
         <aside class="sidebar sidebar--chef">
           <div class="sidebar__logo">
-            <img src="/assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
+            <img src="./assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
           </div>
           <nav class="sidebar__nav">
             ${navItems.map(item => `
@@ -317,10 +317,9 @@
      */
     async switchRole(role) {
       try {
-        const response = await fetch('/api/auth/login', {
+        const response = await window.apiFetch('/api/auth/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role, userId: `demo_${role}` })
+          body: { role, userId: `demo_${role}` }
         });
         
         const data = await response.json();
@@ -351,9 +350,8 @@
      */
     async logout() {
       try {
-        const response = await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+        const response = await window.apiFetch('/api/auth/logout', {
+          method: 'POST'
         });
         
         const data = await response.json();
@@ -376,7 +374,7 @@
   async function initializeAppConfig() {
     try {
       // Fetch config from server
-      const configResponse = await fetch('/api/config');
+      const configResponse = await window.apiFetch('/api/config');
       const config = await configResponse.json();
       window.AppConfig.demoMode = config.demoMode;
       
