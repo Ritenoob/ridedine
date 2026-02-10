@@ -36,13 +36,16 @@ if (!DISABLE_RATE_LIMIT) {
   console.log('⚠️ Rate limiting: DISABLED (DISABLE_RATE_LIMIT=true)');
 }
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: 'Too many login attempts, please try again later.',
-  skipSuccessfulRequests: true,
-  validate: { xForwardedForHeader: false }
-});
+// Auth-specific rate limiter (also disabled when DISABLE_RATE_LIMIT is true)
+const authLimiter = DISABLE_RATE_LIMIT 
+  ? (req, res, next) => next()
+  : rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 5,
+      message: 'Too many login attempts, please try again later.',
+      skipSuccessfulRequests: true,
+      validate: { xForwardedForHeader: false }
+    });
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -51,14 +54,6 @@ const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
 const demoRoutes = require('./routes/demo');
 const chefRoutes = require('./routes/chefs');
-
-// API routes
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/integrations', integrationRoutes);
-app.use('/api/demo', demoRoutes);
-app.use('/api/chefs', chefRoutes);
 
 // Config endpoint
 app.get('/api/config', (req, res) => {
@@ -75,12 +70,20 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     demoMode: DEMO_MODE,
-    demoModeRaw: process.env.DEMO_MODE,
-    disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT,
-    portRaw: process.env.PORT,
+    demoModeRaw: process.env.DEMO_MODE || null,
+    disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT || null,
+    portRaw: process.env.PORT || null,
     timestamp: new Date().toISOString()
   });
 });
+
+// API routes
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/integrations', integrationRoutes);
+app.use('/api/demo', demoRoutes);
+app.use('/api/chefs', chefRoutes);
 
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));
@@ -97,7 +100,8 @@ app.get('*', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({
-    error: err.message || 'Internal server error'
+    error: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
@@ -105,6 +109,7 @@ app.listen(PORT, () => {
   console.log(`🚀 RideNDine server running on port ${PORT}`);
   console.log(`📦 Demo Mode: ${DEMO_MODE ? 'ENABLED' : 'DISABLED'} (raw=${process.env.DEMO_MODE})`);
   console.log(`🔒 Authentication: ${DEMO_MODE ? 'BYPASSED' : 'REQUIRED'}`);
+  console.log(`🧯 Rate limiting: ${DISABLE_RATE_LIMIT ? 'DISABLED' : 'ENABLED'}`);
 });
 
 module.exports = app;
