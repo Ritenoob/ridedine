@@ -361,12 +361,14 @@ git push heroku main
 
 ## Cost Estimate
 
+**Note**: Pricing information is subject to change. Please verify current pricing on respective platforms' websites.
+
 - **GitHub Pages**: Free (unlimited for public repos)
-- **Backend Hosting**:
-  - Railway: Free tier (500 hours/month)
-  - Render: Free tier (750 hours/month)
-  - Heroku: $7/month (Eco dynos)
-- **Stripe**: No monthly fee, only transaction fees
+- **Backend Hosting** (as of early 2026):
+  - Railway: Free tier available (check current limits at railway.app)
+  - Render: Free tier available (check current limits at render.com)
+  - Heroku: Starting from $5-7/month (check current pricing at heroku.com)
+- **Stripe**: No monthly fee, only transaction fees (2.9% + 30¢ per transaction)
 
 ## Summary
 

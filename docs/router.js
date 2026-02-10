@@ -27,7 +27,7 @@ class Router {
     // GitHub Pages deployment - only match exact GitHub Pages domain pattern
     // Matches: username.github.io or org.github.io
     // Does NOT match: evil.com/github.io or github.io.evil.com
-    if (hostname.endsWith('.github.io') || hostname === 'github.io') {
+    if (hostname.endsWith('.github.io')) {
       // For GitHub Pages, the first path segment is the repo name
       // e.g., /ridendine-demo/customer -> base path is /ridendine-demo
       const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
@@ -54,7 +54,7 @@ class Router {
       
       // Fallback: check if URL contains common repo name pattern
       // This is a safety fallback for edge cases
-      const match = window.location.href.match(/\.github\.io\/([^\/]+)/);
+      const match = window.location.href.match(/\.github\.io\/([^/]+)/);
       if (match && match[1] && match[1] !== 'index.html') {
         return '/' + match[1];
       }

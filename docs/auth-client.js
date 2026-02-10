@@ -18,7 +18,7 @@ class AuthClient {
     const hostname = window.location.hostname;
     
     // GitHub Pages deployment - no backend API available
-    if (hostname.endsWith('.github.io') || hostname === 'github.io') {
+    if (hostname.endsWith('.github.io')) {
       console.info('GitHub Pages deployment detected - backend API not available');
       return null;
     }

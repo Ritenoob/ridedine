@@ -26,7 +26,7 @@
     // Environment detection
     env: {
       // Detect if running on GitHub Pages
-      isGitHubPages: window.location.hostname.endsWith('.github.io') || window.location.hostname === 'github.io',
+      isGitHubPages: window.location.hostname.endsWith('.github.io'),
       
       // Detect if running on localhost
       isLocalhost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',

@@ -95,7 +95,7 @@
     document.getElementById('pathname').textContent = window.location.pathname;
     document.getElementById('full-url').textContent = window.location.href;
     
-    const isGitHubPages = window.location.hostname.endsWith('.github.io') || window.location.hostname === 'github.io';
+    const isGitHubPages = window.location.hostname.endsWith('.github.io');
     document.getElementById('is-github-pages').innerHTML = isGitHubPages 
       ? '<span class="pass">YES ✓</span>' 
       : '<span class="info">NO (Local/Custom Domain)</span>';
