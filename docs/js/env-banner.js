@@ -116,16 +116,41 @@
 
   // Initialize banner when DOM is ready
   document.addEventListener('DOMContentLoaded', async function() {
-    // Only show in development or when there's a query param override
+    // Only show in development environments for debugging
     const urlParams = new URLSearchParams(window.location.search);
-    const showBanner = urlParams.has('api') || 
-                       window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname.includes('dev') ||
-                       window.location.hostname.includes('staging');
+    const isDev = window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname.includes('dev') ||
+                  window.location.hostname.includes('staging');
     
-    // Always show on GitHub Pages to help users debug
-    if (showBanner || IS_GITHUB_PAGES) {
+    const showBanner = urlParams.has('api') || isDev;
+    
+    // On GitHub Pages, check API health first before showing debug banner
+    let shouldShowBanner = showBanner;
+    if (IS_GITHUB_PAGES && !showBanner) {
+      try {
+        // Check if API is reachable
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        const healthRes = await window.apiFetch('/api/health', { 
+          signal: controller.signal 
+        });
+        clearTimeout(timeoutId);
+        
+        if (healthRes.ok) {
+          // API is available on GitHub Pages, show debug banner
+          shouldShowBanner = true;
+        }
+      } catch (error) {
+        // API not available - don't show banner
+        // The app will handle API errors via toast notifications
+        console.info('[Env Banner] API not available, banner hidden');
+        shouldShowBanner = false;
+      }
+    }
+    
+    if (shouldShowBanner) {
       const banner = createEnvironmentBanner();
       document.body.appendChild(banner);
       await updateBanner();
