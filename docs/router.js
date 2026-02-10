@@ -114,7 +114,20 @@ class Router {
 
     // Check authentication
     if (matchedRoute.requiresAuth) {
-      const session = await window.AuthClient.checkSession();
+      // Add timeout protection for slow/mobile connections
+      let session;
+      try {
+        session = await Promise.race([
+          window.AuthClient.checkSession(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Session check timeout')), 5000)
+          )
+        ]);
+      } catch (error) {
+        console.warn('Session check failed or timed out:', error);
+        session = { authenticated: false };
+      }
+      
       if (!session.authenticated) {
         // Redirect to login based on role
         const loginPath = this.getLoginPath(cleanPath);
