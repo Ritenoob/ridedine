@@ -6,8 +6,8 @@
   <title>RideNDine | Home Chef Delivery Platform</title>
   
   <!-- Icons & Manifest -->
-  <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
+  <link rel="icon" href="./assets/logo.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/logo.svg" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#ff7a18" />
   
@@ -56,31 +56,7 @@
       display: none;
     }
     
-    /* Static Demo Banner */
-    .static-demo-banner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 0.875rem;
-      font-weight: 600;
-      z-index: 10000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    .static-demo-banner.hidden {
-      display: none;
-    }
-    
     body.dev-mode {
-      padding-top: 40px;
-    }
-    
-    body.static-demo-mode {
       padding-top: 40px;
     }
     
@@ -111,6 +87,50 @@
       to { transform: rotate(360deg); }
     }
     
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10001;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .toast.show {
+      display: block;
+    }
+    
+    .toast.error {
+      background: rgba(220, 38, 38, 0.95);
+    }
+    
+    .toast.warning {
+      background: rgba(245, 158, 11, 0.95);
+    }
+    
+    .toast.success {
+      background: rgba(34, 197, 94, 0.95);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
     /* App Container */
     #app {
       min-height: 100vh;
@@ -123,15 +143,13 @@
     🚧 DEV BUILD - This is a development/staging environment 🚧
   </div>
   
-  <!-- Static Demo Banner (shown when backend API is not available) -->
-  <div id="static-demo-banner" class="static-demo-banner hidden">
-    📱 STATIC DEMO - Backend API not available. Browse the app, but features requiring a server won't work.
-  </div>
-  
   <!-- Loading Spinner -->
   <div id="loading-spinner" class="loading-spinner">
     <div class="spinner"></div>
   </div>
+  
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
   
   <!-- Main App Container (pages load here) -->
   <div id="app">
@@ -177,19 +195,7 @@
       }
     })();
     
-    // Show static demo banner when backend is not available (GitHub Pages)
-    (function() {
-      const hostname = window.location.hostname;
-      const isGitHubPages = hostname.endsWith('.github.io');
-      
-      if (isGitHubPages) {
-        const banner = document.getElementById('static-demo-banner');
-        if (banner) {
-          banner.classList.remove('hidden');
-          document.body.classList.add('static-demo-mode');
-        }
-      }
-    })();
+
     
     // Global error handler
     window.addEventListener('error', function(e) {
@@ -198,12 +204,63 @@
     
     // Global loading indicator helpers
     window.showLoading = function() {
-      document.getElementById('loading-spinner')?.classList.add('active');
+      const spinner = document.getElementById('loading-spinner');
+      if (spinner) spinner.classList.add('active');
     };
     
     window.hideLoading = function() {
-      document.getElementById('loading-spinner')?.classList.remove('active');
+      const spinner = document.getElementById('loading-spinner');
+      if (spinner) spinner.classList.remove('active');
     };
+    
+    // Toast notification helper
+    window.showToast = function(message, type = 'info', duration = 4000) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    };
+    
+    // Backend connectivity checker
+    let backendCheckAttempts = 0;
+    window.checkBackendConnectivity = async function() {
+      try {
+        const response = await window.apiFetch('/api/health', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          backendCheckAttempts = 0; // Reset on success
+          return true;
+        } else {
+          throw new Error('Backend returned non-200 status');
+        }
+      } catch (error) {
+        backendCheckAttempts++;
+        
+        // Only show toast on first failure or every 5 attempts
+        if (backendCheckAttempts === 1 || backendCheckAttempts % 5 === 0) {
+          window.showToast('⚠️ Backend temporarily unavailable', 'warning', 5000);
+        }
+        
+        console.warn('Backend connectivity check failed:', error);
+        return false;
+      }
+    };
+    
+    // Initial backend check on load
+    window.addEventListener('DOMContentLoaded', function() {
+      window.checkBackendConnectivity();
+    });
+      document.getElementById('loading-spinner')?.classList.add('active');
+    };
+
   </script>
 </body>
 </html>
