@@ -42,89 +42,97 @@
   <!-- Chefs Grid -->
   <div class="chef-grid" id="chef-grid">
     <!-- Hoang Gia Pho -->
-    <div class="info-card chef-card" data-name="hoang gia pho" data-cuisine="vietnamese" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/hoang-gia-pho')">
-      <div style="background: linear-gradient(135deg, #ff7a18 0%, #d85c0f 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
-        <div style="font-size: 3rem; margin-bottom: 8px;">🍜</div>
-        <h3 style="margin: 0; color: white;">Hoang Gia Pho</h3>
+    <div class="info-card chef-card" data-name="hoang gia pho" data-cuisine="vietnamese" onclick="navigateTo('/chefs/hoang-gia-pho')">
+      <div class="chef-card__header chef-card__header--orange">
+        <div class="chef-card__icon">🍜</div>
+        <h3>Hoang Gia Pho</h3>
+        <div class="chef-card__badge">★ Verified Chef</div>
       </div>
-      <div style="margin-top: 12px;">
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+      <div class="chef-card__body">
+        <p class="chef-card__cuisine">
           <strong>Cuisine:</strong> Vietnamese
         </p>
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+        <p class="chef-card__description">
           Authentic Vietnamese cuisine with family recipes passed down for generations. 
           Specializing in pho, banh mi, and traditional dishes.
         </p>
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
-          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
-            ⭐ 4.9 (120 reviews)
+        <div class="chef-card__footer">
+          <span class="chef-card__rating">
+            ⭐ 4.9 <span class="muted">(120 reviews)</span>
           </span>
+          <span class="chef-card__delivery">🚗 25 min avg</span>
         </div>
       </div>
     </div>
 
     <!-- Italian Chef -->
-    <div class="info-card chef-card" data-name="mama rosa's kitchen" data-cuisine="italian" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/mama-rosa')">
-      <div style="background: linear-gradient(135deg, #19b7b1 0%, #0e8f8b 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
-        <div style="font-size: 3rem; margin-bottom: 8px;">🍝</div>
-        <h3 style="margin: 0; color: white;">Mama Rosa's Kitchen</h3>
+    <div class="info-card chef-card" data-name="mama rosa's kitchen" data-cuisine="italian" onclick="navigateTo('/chefs/mama-rosa')">
+      <div class="chef-card__header chef-card__header--teal">
+        <div class="chef-card__icon">🍝</div>
+        <h3>Mama Rosa's Kitchen</h3>
+        <div class="chef-card__badge">★ Verified Chef</div>
       </div>
-      <div style="margin-top: 12px;">
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+      <div class="chef-card__body">
+        <p class="chef-card__cuisine">
           <strong>Cuisine:</strong> Italian
         </p>
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+        <p class="chef-card__description">
           Traditional Italian cooking from Tuscany. Homemade pasta, pizza, and 
           classic Italian comfort food made with love.
         </p>
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
-          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
-            ⭐ 4.8 (95 reviews)
+        <div class="chef-card__footer">
+          <span class="chef-card__rating">
+            ⭐ 4.8 <span class="muted">(95 reviews)</span>
           </span>
+          <span class="chef-card__delivery">🚗 22 min avg</span>
         </div>
       </div>
     </div>
 
     <!-- Mexican Chef -->
-    <div class="info-card chef-card" data-name="taqueria del sol" data-cuisine="mexican" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/taqueria-del-sol')">
-      <div style="background: linear-gradient(135deg, #ff7a18 0%, #d85c0f 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
-        <div style="font-size: 3rem; margin-bottom: 8px;">🌮</div>
-        <h3 style="margin: 0; color: white;">Taqueria del Sol</h3>
+    <div class="info-card chef-card" data-name="taqueria del sol" data-cuisine="mexican" onclick="navigateTo('/chefs/taqueria-del-sol')">
+      <div class="chef-card__header chef-card__header--orange">
+        <div class="chef-card__icon">🌮</div>
+        <h3>Taqueria del Sol</h3>
+        <div class="chef-card__badge">★ Verified Chef</div>
       </div>
-      <div style="margin-top: 12px;">
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+      <div class="chef-card__body">
+        <p class="chef-card__cuisine">
           <strong>Cuisine:</strong> Mexican
         </p>
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+        <p class="chef-card__description">
           Authentic Mexican street food and regional specialties. Fresh tacos, 
           burritos, and traditional dishes with bold flavors.
         </p>
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
-          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
-            ⭐ 4.7 (88 reviews)
+        <div class="chef-card__footer">
+          <span class="chef-card__rating">
+            ⭐ 4.7 <span class="muted">(88 reviews)</span>
           </span>
+          <span class="chef-card__delivery">🚗 28 min avg</span>
         </div>
       </div>
     </div>
 
     <!-- Thai Chef -->
-    <div class="info-card chef-card" data-name="bangkok street eats" data-cuisine="thai" style="cursor: pointer; transition: transform 0.2s ease;" onclick="navigateTo('/chefs/bangkok-street')">
-      <div style="background: linear-gradient(135deg, #19b7b1 0%, #0e8f8b 100%); border-radius: 16px; padding: 40px 20px; text-align: center; margin: -20px -20px 16px; color: white;">
-        <div style="font-size: 3rem; margin-bottom: 8px;">🍛</div>
-        <h3 style="margin: 0; color: white;">Bangkok Street Eats</h3>
+    <div class="info-card chef-card" data-name="bangkok street eats" data-cuisine="thai" onclick="navigateTo('/chefs/bangkok-street')">
+      <div class="chef-card__header chef-card__header--teal">
+        <div class="chef-card__icon">🍛</div>
+        <h3>Bangkok Street Eats</h3>
+        <div class="chef-card__badge">★ Verified Chef</div>
       </div>
-      <div style="margin-top: 12px;">
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+      <div class="chef-card__body">
+        <p class="chef-card__cuisine">
           <strong>Cuisine:</strong> Thai
         </p>
-        <p style="color: var(--muted); line-height: 1.6; margin: 8px 0;">
+        <p class="chef-card__description">
           Thai street food and traditional dishes bursting with flavor. Pad Thai, 
           curries, and aromatic dishes from Bangkok.
         </p>
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0efed;">
-          <span style="background: #f3f9f8; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--teal-dark);">
-            ⭐ 4.9 (102 reviews)
+        <div class="chef-card__footer">
+          <span class="chef-card__rating">
+            ⭐ 4.9 <span class="muted">(102 reviews)</span>
           </span>
+          <span class="chef-card__delivery">🚗 24 min avg</span>
         </div>
       </div>
     </div>
@@ -144,6 +152,106 @@
     <a onclick="navigateTo('/legal/terms')" style="cursor: pointer;">Terms of Service</a>
   </div>
 </footer>
+
+<style>
+  .chef-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+  }
+  
+  .chef-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(15, 30, 60, 0.15);
+  }
+  
+  .chef-card__header {
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: -20px -20px 16px;
+    color: white;
+    position: relative;
+  }
+  
+  .chef-card__header--orange {
+    background: linear-gradient(135deg, #ff7a18 0%, #d85c0f 100%);
+  }
+  
+  .chef-card__header--teal {
+    background: linear-gradient(135deg, #19b7b1 0%, #0e8f8b 100%);
+  }
+  
+  .chef-card__icon {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  
+  .chef-card__header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+  .chef-card__badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    margin-top: 8px;
+    font-weight: 600;
+  }
+  
+  .chef-card__body {
+    margin-top: 12px;
+  }
+  
+  .chef-card__cuisine {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+  
+  .chef-card__description {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 8px 0;
+    font-size: 0.95rem;
+  }
+  
+  .chef-card__footer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0efed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .chef-card__rating {
+    background: #f3f9f8;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--teal-dark);
+  }
+  
+  .chef-card__delivery {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  
+  .chef-card__rating .muted {
+    font-weight: 400;
+    opacity: 0.8;
+  }
+</style>
 
 <script>
   // Update cart count
@@ -178,10 +286,4 @@
 
     document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
   }
-
-  // Hover effect
-  document.querySelectorAll('.chef-card').forEach(card => {
-    card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-4px)');
-    card.addEventListener('mouseleave', () => card.style.transform = 'translateY(0)');
-  });
 </script>

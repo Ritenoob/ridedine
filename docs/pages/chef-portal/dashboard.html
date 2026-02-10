@@ -132,6 +132,45 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
 }
+
+.empty-state {
+  grid-column: 1 / -1;
+  background: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-16);
+  text-align: center;
+  border: 2px dashed var(--color-border);
+}
+
+.empty-state__icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-3) 0;
+  color: var(--color-text);
+}
+
+.empty-state__message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4) 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.empty-state__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background: var(--color-background);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  display: inline-block;
+  margin: var(--space-2) 0 0 0;
+}
 </style>
 
 <script>
@@ -193,10 +232,11 @@
     
     if (activeOrders.length === 0) {
       container.innerHTML = `
-        <div class="card">
-          <div class="card__body text-center text-muted">
-            No active orders at the moment
-          </div>
+        <div class="empty-state">
+          <div class="empty-state__icon">📋</div>
+          <h3 class="empty-state__title">No Active Orders</h3>
+          <p class="empty-state__message">You're all caught up! New orders will appear here automatically.</p>
+          <p class="empty-state__hint">💡 Tip: Orders refresh every 30 seconds, or click the Refresh button above</p>
         </div>
       `;
       return;
