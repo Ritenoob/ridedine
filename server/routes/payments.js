@@ -1,10 +1,92 @@
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { requireAuth } = require('../middleware/auth');
 const orderService = require('../services/orders');
 
-// Create Stripe Checkout Session
+// Robust env parsing
+const DEMO_MODE = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DEMO_MODE || '').toLowerCase());
+const HAS_STRIPE_KEYS = !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PUBLISHABLE_KEY);
+
+// Only require stripe if keys are available
+let stripe = null;
+if (HAS_STRIPE_KEYS) {
+  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+}
+
+// Create Payment Intent or Mock Payment
+router.post('/create-intent', async (req, res) => {
+  try {
+    const { items, chefId, chefSlug, customerInfo, amount } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Items are required' });
+    }
+
+    // Calculate total
+    const total = amount || items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+
+    // If demo mode OR no Stripe keys, return mock success
+    if (DEMO_MODE || !HAS_STRIPE_KEYS) {
+      const mockPaymentId = `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Create order immediately
+      const order = orderService.createOrder({
+        sessionId: mockPaymentId,
+        items,
+        chefId,
+        chefSlug,
+        customerInfo,
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        total,
+        paidAt: new Date().toISOString(),
+        demoMode: true
+      });
+
+      return res.json({
+        status: 'succeeded',
+        paymentId: mockPaymentId,
+        orderId: order.orderId,
+        demoMode: true,
+        message: 'Demo payment succeeded automatically'
+      });
+    }
+
+    // Real Stripe payment
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(total * 100), // Convert to cents
+      currency: 'cad',
+      metadata: {
+        chefId: chefId || 'unknown',
+        chefSlug: chefSlug || 'unknown',
+        customerInfo: JSON.stringify(customerInfo || {})
+      }
+    });
+
+    // Store pending order
+    const order = orderService.createOrder({
+      sessionId: paymentIntent.id,
+      items,
+      chefId,
+      chefSlug,
+      customerInfo,
+      status: 'pending',
+      paymentStatus: 'pending',
+      total
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentId: paymentIntent.id,
+      orderId: order.orderId
+    });
+  } catch (error) {
+    console.error('Payment intent error:', error);
+    res.status(500).json({ error: 'Failed to create payment intent' });
+  }
+});
+
+// Legacy: Create Stripe Checkout Session (keep for backward compatibility)
 router.post('/create-checkout-session', async (req, res) => {
   try {
     const { items, chefId, chefSlug, customerInfo } = req.body;
@@ -14,6 +96,36 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 
     // Calculate total
+    const total = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+
+    // If demo mode OR no Stripe keys, return mock success
+    if (DEMO_MODE || !HAS_STRIPE_KEYS) {
+      const mockSessionId = `demo_session_${Date.now()}`;
+      const successUrl = `${req.protocol}://${req.get('host')}/checkout/success.html?session_id=${mockSessionId}`;
+      
+      // Create order immediately
+      const order = orderService.createOrder({
+        sessionId: mockSessionId,
+        items,
+        chefId,
+        chefSlug,
+        customerInfo,
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        total,
+        paidAt: new Date().toISOString(),
+        demoMode: true
+      });
+
+      return res.json({
+        sessionId: mockSessionId,
+        url: successUrl,
+        orderId: order.orderId,
+        demoMode: true
+      });
+    }
+
+    // Real Stripe checkout
     const lineItems = items.map(item => ({
       price_data: {
         currency: 'cad',
@@ -21,12 +133,11 @@ router.post('/create-checkout-session', async (req, res) => {
           name: item.name,
           description: item.description || '',
         },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
+        unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity || 1,
     }));
 
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -39,7 +150,7 @@ router.post('/create-checkout-session', async (req, res) => {
       }
     });
 
-    // Store pending order using shared service
+    // Store pending order
     const order = orderService.createOrder({
       sessionId: session.id,
       items,
@@ -51,7 +162,7 @@ router.post('/create-checkout-session', async (req, res) => {
       total: session.amount_total / 100
     });
 
-    res.json({ 
+    res.json({
       sessionId: session.id,
       url: session.url,
       orderId: order.orderId
@@ -64,6 +175,10 @@ router.post('/create-checkout-session', async (req, res) => {
 
 // Stripe webhook handler
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!HAS_STRIPE_KEYS) {
+    return res.json({ received: true, note: 'Webhooks disabled in demo mode' });
+  }
+
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -91,7 +206,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         paidAt: new Date().toISOString()
       });
       
-      // TODO: Dispatch to Mealbridge
       console.log(`✅ Order ${order.orderId} paid - ready for dispatch`);
     }
   }
@@ -102,12 +216,25 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 // Verify payment
 router.get('/verify/:sessionId', async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
     const order = orderService.findOrderBySessionId(req.params.sessionId);
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
+
+    // For demo mode, return order status directly
+    if (DEMO_MODE || !HAS_STRIPE_KEYS || order.demoMode) {
+      return res.json({
+        orderId: order.orderId,
+        paymentStatus: order.paymentStatus,
+        orderStatus: order.status,
+        total: order.total,
+        demoMode: true
+      });
+    }
+
+    // For real Stripe payments, verify with Stripe
+    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
 
     res.json({
       orderId: order.orderId,
