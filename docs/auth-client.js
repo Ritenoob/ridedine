@@ -9,6 +9,12 @@ class AuthClient {
   // For GitHub Pages (static hosting), API is not available
   // For local development, API is at same origin
   detectApiBaseUrl() {
+    // Use config if available
+    if (window.RideNDineConfig && window.RideNDineConfig.apiBaseUrl !== undefined) {
+      return window.RideNDineConfig.apiBaseUrl;
+    }
+    
+    // Fallback detection
     const hostname = window.location.hostname;
     
     // GitHub Pages deployment - no backend API available
