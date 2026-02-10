@@ -356,6 +356,27 @@ This repository uses a three-tier branch strategy to ensure stable releases:
 
 ### Deployment
 
+📚 **For detailed deployment instructions, see [GITHUB_PAGES_DEPLOYMENT.md](GITHUB_PAGES_DEPLOYMENT.md)**
+
+This application uses a split architecture:
+- **Frontend**: Deployed to GitHub Pages (free, automatic)
+- **Backend**: Deployed separately to Railway, Render, or Heroku
+
+#### Quick Start - GitHub Pages
+
+1. Enable GitHub Pages in Settings → Pages
+2. Select Source: GitHub Actions
+3. Push to `main` branch
+4. Access at: `https://username.github.io/ridendine-demo/`
+
+The app will work in "static demo mode" without a backend. To enable full functionality (login, payments, etc.), deploy the backend server and configure `docs/config.js` with your backend URL.
+
+For complete setup instructions, troubleshooting, and backend deployment guides, see the [deployment documentation](GITHUB_PAGES_DEPLOYMENT.md).
+
+---
+
+#### Detailed Deployment Information
+
 This application requires both frontend and backend deployment.
 
 #### Frontend Deployment (Static SPA)
@@ -363,8 +384,9 @@ This application requires both frontend and backend deployment.
 **GitHub Pages (Automatic):**
 The `/docs` folder is automatically served as a static site:
 - `main` branch → Production (https://yourusername.github.io/ridendine-demo/)
-- `dev` branch → Can be configured for staging deployment
-- Shows DEV BUILD banner on non-production domains
+- Automatic deployment via GitHub Actions
+- Works in static demo mode without backend
+- Shows STATIC DEMO banner when backend is not configured
 
 **Alternative Static Hosts:**
 - **Netlify**: Connect GitHub repo, set build dir to `docs`
@@ -374,7 +396,7 @@ The `/docs` folder is automatically served as a static site:
 **Configuration:**
 - Ensure `index.html` is in `/docs` root
 - All pages are loaded dynamically via client-side router
-- Update `APP_BASE_URL` environment variable for backend
+- Edit `docs/config.js` to set backend URL
 
 #### Backend Deployment (Node.js/Express API)
 

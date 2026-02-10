@@ -27,7 +27,7 @@ class Router {
     // GitHub Pages deployment - only match exact GitHub Pages domain pattern
     // Matches: username.github.io or org.github.io
     // Does NOT match: evil.com/github.io or github.io.evil.com
-    if (hostname.endsWith('.github.io') || hostname === 'github.io') {
+    if (hostname.endsWith('.github.io')) {
       // For GitHub Pages, the first path segment is the repo name
       // e.g., /ridendine-demo/customer -> base path is /ridendine-demo
       const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
@@ -37,7 +37,29 @@ class Router {
         return '/' + pathSegments[0];
       }
       
-      // If pathname is just /index.html or /, no base path needed
+      // If pathname is just /index.html or /, try to extract from document.baseURI
+      // This handles the case where we're at the root but should still detect the base path
+      if (document.baseURI) {
+        try {
+          const base = new URL(document.baseURI);
+          const baseSegments = base.pathname.split('/').filter(segment => segment.length > 0);
+          // First segment is typically the repo name on GitHub Pages
+          if (baseSegments.length > 0 && !baseSegments[0].endsWith('.html')) {
+            return '/' + baseSegments[0];
+          }
+        } catch (e) {
+          console.warn('Could not parse baseURI:', e);
+        }
+      }
+      
+      // Fallback: check if URL contains common repo name pattern
+      // This is a safety fallback for edge cases
+      const match = window.location.href.match(/\.github\.io\/([^/]+)/);
+      if (match && match[1] && match[1] !== 'index.html') {
+        return '/' + match[1];
+      }
+      
+      // No base path detected
       return '';
     }
     

@@ -6,9 +6,9 @@
   <title>RideNDine | Home Chef Delivery Platform</title>
   
   <!-- Icons & Manifest -->
-  <link rel="icon" href="/assets/app-icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/assets/app-icon.svg" />
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#ff7a18" />
   
   <!-- Preconnect for performance -->
@@ -23,9 +23,9 @@
   />
   
   <!-- Main Styles -->
-  <link rel="stylesheet" href="/ui.css" />
-  <link rel="stylesheet" href="/layout.css" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="./ui.css" />
+  <link rel="stylesheet" href="./layout.css" />
+  <link rel="stylesheet" href="./styles.css" />
   
   <!-- Meta Description -->
   <meta name="description" content="RideNDine connects home chefs with hungry neighbors across Hamilton. Order fresh, home-cooked meals for delivery." />
@@ -56,7 +56,31 @@
       display: none;
     }
     
+    /* Static Demo Banner */
+    .static-demo-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      z-index: 10000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .static-demo-banner.hidden {
+      display: none;
+    }
+    
     body.dev-mode {
+      padding-top: 40px;
+    }
+    
+    body.static-demo-mode {
       padding-top: 40px;
     }
     
@@ -99,6 +123,11 @@
     🚧 DEV BUILD - This is a development/staging environment 🚧
   </div>
   
+  <!-- Static Demo Banner (shown when backend API is not available) -->
+  <div id="static-demo-banner" class="static-demo-banner hidden">
+    📱 STATIC DEMO - Backend API not available. Browse the app, but features requiring a server won't work.
+  </div>
+  
   <!-- Loading Spinner -->
   <div id="loading-spinner" class="loading-spinner">
     <div class="spinner"></div>
@@ -120,10 +149,11 @@
   ></script>
   
   <!-- Core Scripts -->
-  <script src="/layout.js"></script>
-  <script src="/auth-client.js"></script>
-  <script src="/router.js"></script>
-  <script src="/routes.js"></script>
+  <script src="./config.js"></script>
+  <script src="./layout.js"></script>
+  <script src="./auth-client.js"></script>
+  <script src="./router.js"></script>
+  <script src="./routes.js"></script>
   
   <script>
     // Show DEV banner on non-production environments
@@ -139,6 +169,20 @@
         if (banner) {
           banner.classList.remove('hidden');
           document.body.classList.add('dev-mode');
+        }
+      }
+    })();
+    
+    // Show static demo banner when backend is not available (GitHub Pages)
+    (function() {
+      const hostname = window.location.hostname;
+      const isGitHubPages = hostname.endsWith('.github.io');
+      
+      if (isGitHubPages) {
+        const banner = document.getElementById('static-demo-banner');
+        if (banner) {
+          banner.classList.remove('hidden');
+          document.body.classList.add('static-demo-mode');
         }
       }
     })();
