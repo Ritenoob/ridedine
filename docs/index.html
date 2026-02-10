@@ -56,7 +56,31 @@
       display: none;
     }
     
+    /* Static Demo Banner */
+    .static-demo-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      z-index: 10000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .static-demo-banner.hidden {
+      display: none;
+    }
+    
     body.dev-mode {
+      padding-top: 40px;
+    }
+    
+    body.static-demo-mode {
       padding-top: 40px;
     }
     
@@ -99,6 +123,11 @@
     🚧 DEV BUILD - This is a development/staging environment 🚧
   </div>
   
+  <!-- Static Demo Banner (shown when backend API is not available) -->
+  <div id="static-demo-banner" class="static-demo-banner hidden">
+    📱 STATIC DEMO - Backend API not available. Browse the app, but features requiring a server won't work.
+  </div>
+  
   <!-- Loading Spinner -->
   <div id="loading-spinner" class="loading-spinner">
     <div class="spinner"></div>
@@ -139,6 +168,20 @@
         if (banner) {
           banner.classList.remove('hidden');
           document.body.classList.add('dev-mode');
+        }
+      }
+    })();
+    
+    // Show static demo banner when backend is not available (GitHub Pages)
+    (function() {
+      const hostname = window.location.hostname;
+      const isGitHubPages = hostname.endsWith('.github.io') || hostname === 'github.io';
+      
+      if (isGitHubPages) {
+        const banner = document.getElementById('static-demo-banner');
+        if (banner) {
+          banner.classList.remove('hidden');
+          document.body.classList.add('static-demo-mode');
         }
       }
     })();
