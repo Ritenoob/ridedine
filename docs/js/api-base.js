@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RideNDine API Base URL Detection & Fetch Utilities
  * 
  * Provides automatic API base URL detection with the following priority:
@@ -91,7 +91,7 @@
     // Ensure credentials are included for cookie-based auth (same-origin)
     const fetchOptions = {
       ...options,
-      credentials: 'include'
+      credentials: (base && base !== '' ? 'omit' : 'include')
     };
 
     // Set default headers if not provided
@@ -181,3 +181,4 @@
   });
 
 })();
+
