@@ -35,7 +35,8 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+    // Use exact matching to prevent malicious origins like evil.com/seancfafinlay.github.io
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(null, false);
