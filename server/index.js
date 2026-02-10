@@ -70,9 +70,9 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     demoMode: DEMO_MODE,
-    demoModeRaw: process.env.DEMO_MODE || null,
-    disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT || null,
-    portRaw: process.env.PORT || null,
+    demoModeRaw: process.env.DEMO_MODE ?? null,
+    disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT ?? null,
+    portRaw: process.env.PORT ?? null,
     timestamp: new Date().toISOString()
   });
 });
