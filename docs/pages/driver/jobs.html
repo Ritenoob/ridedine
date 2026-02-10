@@ -325,7 +325,7 @@
     try {
       // In a real app, this would assign the driver
       // For demo, we'll just advance the order
-      const res = await fetch(`/api/demo/advance-order/${orderId}`, {
+      const res = await window.apiFetch(`/api/demo/advance-order/${orderId}`, {
         method: 'POST'
       });
       const data = await res.json();
@@ -344,7 +344,7 @@
   // Complete delivery
   window.completeDelivery = async function(orderId) {
     try {
-      const res = await fetch(`/api/demo/advance-order/${orderId}`, {
+      const res = await window.apiFetch(`/api/demo/advance-order/${orderId}`, {
         method: 'POST'
       });
       const data = await res.json();
