@@ -120,7 +120,7 @@
 
   // Check if demo mode is enabled
   try {
-    const healthRes = await fetch('/api/health');
+    const healthRes = await window.apiFetch('/api/health');
     const healthData = await healthRes.json();
     if (healthData.demoMode) {
       demoNotice.style.display = 'block';
@@ -132,7 +132,7 @@
 
   // Check if already authenticated
   try {
-    const sessionRes = await fetch('/api/auth/session');
+    const sessionRes = await window.apiFetch('/api/auth/session');
     const sessionData = await sessionRes.json();
     if (sessionData.authenticated && sessionData.role === 'admin') {
       navigateTo('/admin');
@@ -146,10 +146,9 @@
     demoBypass.addEventListener('click', async () => {
       try {
         // Call login API with admin role in demo mode
-        const res = await fetch('/api/auth/login', {
+        const res = await window.apiFetch('/api/auth/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: 'admin', userId: 'demo_admin' })
+          body: { role: 'admin', userId: 'demo_admin' }
         });
 
         const data = await res.json();
@@ -176,10 +175,9 @@
     const password = passwordInput.value;
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await window.apiFetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role: 'admin' })
+        body: { email, password, role: 'admin' }
       });
 
       const data = await res.json();

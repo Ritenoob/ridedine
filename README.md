@@ -373,6 +373,45 @@ The app will work in "static demo mode" without a backend. To enable full functi
 
 For complete setup instructions, troubleshooting, and backend deployment guides, see the [deployment documentation](GITHUB_PAGES_DEPLOYMENT.md).
 
+#### Frontend Configuration for GitHub Pages
+
+The frontend automatically detects the backend API URL using a smart priority system:
+
+**1. Edit `docs/config.js` (Recommended for GitHub Pages):**
+```javascript
+window.__RIDENDINE_CONFIG__ = {
+  // Set to your Railway backend URL for GitHub Pages deployment
+  apiBaseUrl: 'https://ridendine-demo-production.up.railway.app'
+};
+```
+
+**2. Query String Override (Quick Testing):**
+Add `?api=https://your-backend-url.com` to any page URL:
+```
+https://username.github.io/ridendine-demo/?api=https://ridendine-demo-production.up.railway.app
+```
+
+**3. localStorage Override (Developer Console):**
+```javascript
+localStorage.setItem('API_BASE_URL', 'https://ridendine-demo-production.up.railway.app');
+```
+
+**4. Same-Origin Default:**
+When frontend and backend are served from the same domain (e.g., Railway serves /docs), no configuration is needed.
+
+**Priority Order:**
+1. Query string `?api=...` (highest priority)
+2. `window.__RIDENDINE_CONFIG__.apiBaseUrl` from config.js
+3. localStorage `API_BASE_URL`
+4. Same-origin default (empty string)
+
+**Environment Banner:**
+A small banner appears in the top-right corner showing:
+- Current API base URL
+- Demo Mode status (if enabled)
+
+This helps debug deployment issues without opening browser DevTools.
+
 ---
 
 #### Detailed Deployment Information

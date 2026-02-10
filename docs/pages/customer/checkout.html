@@ -152,7 +152,7 @@
 
     try {
       // Check if in demo mode
-      const configResponse = await fetch('/api/config').catch(() => null);
+      const configResponse = await window.apiFetch('/api/config').catch(() => null);
       const config = configResponse ? await configResponse.json().catch(() => null) : null;
       const isDemoMode = config?.demoMode === true;
 
@@ -171,16 +171,15 @@
         const total = (subtotal + deliveryFee + serviceFee).toFixed(2);
 
         // Create order
-        const orderResponse = await fetch('/api/orders', {
+        const orderResponse = await window.apiFetch('/api/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: {
             items: orderItems,
             chefId: cart[0]?.chefId || 'chef_2000',
             customerInfo: { address, phone, notes },
             deliveryAddress: address,
             total
-          })
+          }
         });
 
         if (!orderResponse.ok) {
@@ -192,7 +191,7 @@
 
         // Simulate payment
         if (orderId) {
-          await fetch('/api/demo/simulate-payment/' + orderId, {
+          await window.apiFetch('/api/demo/simulate-payment/' + orderId, {
             method: 'POST'
           });
         }
@@ -214,12 +213,9 @@
         items.push({ name: 'Delivery Fee', price: 499, quantity: 1 });
         items.push({ name: 'Service Fee', price: 200, quantity: 1 });
 
-        const response = await fetch('/api/payments/create-checkout-session', {
+        const response = await window.apiFetch('/api/payments/create-checkout-session', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+          body: {
             items,
             metadata: {
               deliveryAddress: address,
@@ -227,7 +223,7 @@
               deliveryNotes: notes,
               cart: JSON.stringify(cart)
             }
-          })
+          }
         });
 
         if (!response.ok) {

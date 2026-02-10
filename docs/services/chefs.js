@@ -25,15 +25,7 @@
       }
 
       try {
-        // Check if API is available
-        const apiUrl = window.AuthClient?.apiBaseUrl;
-        
-        if (!apiUrl) {
-          // Return static data for GitHub Pages
-          return this.getStaticChefs();
-        }
-
-        const response = await fetch(`${apiUrl}/api/chefs`);
+        const response = await window.apiFetch('/api/chefs');
         
         if (!response.ok) {
           throw new Error('Failed to fetch chefs');
@@ -60,16 +52,7 @@
      */
     async getChefBySlug(slug) {
       try {
-        // Check if API is available
-        const apiUrl = window.AuthClient?.apiBaseUrl;
-        
-        if (!apiUrl) {
-          // Return from static data
-          const chefs = await this.getStaticChefs();
-          return chefs.find(c => c.slug === slug) || null;
-        }
-
-        const response = await fetch(`${apiUrl}/api/chefs/slug/${slug}`);
+        const response = await window.apiFetch(`/api/chefs/slug/${slug}`);
         
         if (!response.ok) {
           // Try from cached data

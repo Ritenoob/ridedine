@@ -208,6 +208,33 @@ To test checkout flow:
 - Check [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for deployment
 - View [SECURITY.md](SECURITY.md) for security guidelines
 
+### Frontend Configuration for GitHub Pages
+
+If you deploy the frontend to GitHub Pages separately from the backend:
+
+1. **Edit `docs/config.js`**:
+   ```javascript
+   window.__RIDENDINE_CONFIG__ = {
+     apiBaseUrl: 'https://your-backend-url.railway.app'
+   };
+   ```
+
+2. **Alternative: Use Query String Override** (for quick testing):
+   ```
+   https://username.github.io/ridendine-demo/?api=https://your-backend-url.railway.app
+   ```
+
+3. **Alternative: Use localStorage** (developer console):
+   ```javascript
+   localStorage.setItem('API_BASE_URL', 'https://your-backend-url.railway.app');
+   ```
+
+The frontend automatically detects the API URL in this priority order:
+1. Query string `?api=...`
+2. Config file `window.__RIDENDINE_CONFIG__.apiBaseUrl`
+3. localStorage `API_BASE_URL`
+4. Same-origin default (when frontend and backend are served together)
+
 ## Common Commands
 
 ```bash

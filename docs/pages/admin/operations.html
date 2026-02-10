@@ -155,7 +155,7 @@
 (async function() {
   // Check admin authentication
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await window.apiFetch('/api/auth/session');
     const data = await res.json();
     if (!data.authenticated || data.role !== 'admin') {
       navigateTo('/admin/login');
@@ -169,7 +169,7 @@
   // Fetch orders for metrics
   async function loadMetrics() {
     try {
-      const res = await fetch('/api/orders');
+      const res = await window.apiFetch('/api/orders');
       const orders = await res.json();
 
       const today = new Date();
@@ -191,7 +191,7 @@
 
   // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await window.apiFetch('/api/auth/logout', { method: 'POST' });
     navigateTo('/');
   });
 

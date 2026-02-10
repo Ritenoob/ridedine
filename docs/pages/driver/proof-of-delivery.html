@@ -255,7 +255,7 @@ ctx.lineCap = 'round';
 (async function() {
   // Check authentication
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await window.apiFetch('/api/auth/session');
     const data = await res.json();
     
     if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {
@@ -405,14 +405,13 @@ async function submitProofOfDelivery() {
 
     // Update order status
     try {
-      await fetch(`/api/orders/${deliveryData.orderId}`, {
+      await window.apiFetch(`/api/orders/${deliveryData.orderId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: { 
           status: 'delivered',
           deliveryNotes: notes,
           deliveredAt: new Date().toISOString()
-        })
+        }
       });
     } catch (error) {
       console.log('Order update failed (demo mode):', error);

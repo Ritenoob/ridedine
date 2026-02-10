@@ -243,7 +243,7 @@ let activeJobs = [];
 (async function() {
   // Check authentication
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await window.apiFetch('/api/auth/session');
     const data = await res.json();
     
     if (!data.demoMode && (!data.authenticated || data.role !== 'driver')) {
@@ -266,7 +266,7 @@ let activeJobs = [];
 async function loadJobs() {
   try {
     // Fetch orders from API
-    const res = await fetch('/api/orders');
+    const res = await window.apiFetch('/api/orders');
     const orders = await res.json();
 
     if (!Array.isArray(orders)) {
