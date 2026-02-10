@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: ridendine-demo
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: true
+      - key: PORT
+        value: 3000
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CHEF_PASSWORD
+        sync: false
+      - key: DRIVER_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: COOCO_WEBHOOK_SECRET
+        sync: false
+      - key: MEALBRIDGE_API_KEY
+        sync: false
+      - key: MEALBRIDGE_BASE_URL
+        sync: false

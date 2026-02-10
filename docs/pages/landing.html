@@ -15,7 +15,7 @@
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="hero__card">
+    <div class="hero__card hero__card--gradient">
       <h1 class="hero__title">Delivering home chef meals across Hamilton.</h1>
       <p class="hero__subtitle">
         RideNDine connects local home chefs with hungry neighbors. 
@@ -30,13 +30,17 @@
         </button>
       </div>
       <div class="metric-grid">
-        <div class="metric-card">
-          <strong>Local Chefs</strong>
+        <div class="metric-card metric-card--highlight">
+          <strong>12+ Local Chefs</strong>
           <span>Fresh daily menus</span>
         </div>
-        <div class="metric-card">
+        <div class="metric-card metric-card--highlight">
           <strong>Fast Delivery</strong>
           <span>22-28 min average</span>
+        </div>
+        <div class="metric-card metric-card--highlight">
+          <strong>Hamilton-Wide</strong>
+          <span>All neighborhoods</span>
         </div>
       </div>
     </div>
@@ -115,11 +119,47 @@
     min-height: 100vh;
   }
   
+  .hero__card--gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  
+  .hero__card--gradient .hero__title {
+    color: white;
+  }
+  
+  .hero__card--gradient .hero__subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .metric-card--highlight {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+  }
+  
+  .metric-card--highlight strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .metric-card--highlight span {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
   .portal-access {
     max-width: 1200px;
     margin: 4rem auto;
     padding: 0 1rem;
     text-align: center;
+  }
+  
+  .portal-access h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
   }
   
   .portal-grid {
@@ -134,11 +174,34 @@
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .portal-grid .info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(15, 30, 60, 0.12);
+  }
+  
+  .portal-grid .info-card h3 {
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
   }
   
   .portal-grid .button {
     margin-top: auto;
     width: 100%;
     max-width: 200px;
+  }
+  
+  .info-grid {
+    margin: 2rem 0;
+  }
+  
+  .info-grid .info-card {
+    transition: transform 0.2s ease;
+  }
+  
+  .info-grid .info-card:hover {
+    transform: translateY(-2px);
   }
 </style>
