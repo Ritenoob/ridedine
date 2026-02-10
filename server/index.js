@@ -1,6 +1,7 @@
 ﻿require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
@@ -20,6 +21,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// CORS: allow GitHub Pages to call this API
+app.use(cors({
+  origin: "https://seancfafinlay.github.io",
+  credentials: true
+}));
 // Rate limiting (can be disabled)
 if (!DISABLE_RATE_LIMIT) {
   const limiter = rateLimit({
@@ -113,3 +119,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
