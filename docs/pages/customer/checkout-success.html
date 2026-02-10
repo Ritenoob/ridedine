@@ -98,7 +98,7 @@
     if (demoOrderId) {
       try {
         // Fetch order details from API
-        const orderResponse = await fetch(`/api/orders/${demoOrderId}/tracking`);
+        const orderResponse = await window.apiFetch(`/api/orders/${demoOrderId}/tracking`);
         
         if (orderResponse.ok) {
           const orderData = await orderResponse.json();
@@ -140,7 +140,7 @@
     }
 
     try {
-      const response = await fetch(`/api/payments/verify/${sessionId}`);
+      const response = await window.apiFetch(`/api/payments/verify/${sessionId}`);
       
       if (!response.ok) {
         const error = await response.json();
