@@ -1,29 +1,32 @@
 ﻿require('dotenv').config();
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
-<<<<<<< HEAD
 
-// Trust Railway/Render/Heroku proxy (needed for rate limiting + secure cookies)
+// ✅ Trust Railway/Render/Heroku proxy (MUST be set before rateLimit)
 app.set('trust proxy', 1);
-const PORT = process.env.PORT || 3000;
-=======
+
+// ✅ Railway provides PORT; fallback for local
 const PORT = process.env.PORT || 8080;
->>>>>>> 5d519c26c1e0c2c352b4fa9837d5a5e05fa4311b
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
   message: 'Too many requests from this IP, please try again later.'
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Limit each IP to 5 login attempts per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
   message: 'Too many login attempts, please try again later.',
   skipSuccessfulRequests: true
 });
@@ -32,7 +35,9 @@ const authLimiter = rateLimit({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/api/', limiter); // Apply rate limiting to all API routes
+
+// Apply rate limiting to all API routes
+app.use('/api/', limiter);
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -43,12 +48,12 @@ const demoRoutes = require('./routes/demo');
 const chefRoutes = require('./routes/chefs');
 
 // API routes
-app.use('/api/auth', authLimiter, authRoutes); // Stricter rate limit for auth
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
-app.use('/api/demo', demoRoutes); // Demo mode endpoints
-app.use('/api/chefs', chefRoutes); // Chef data endpoints
+app.use('/api/demo', demoRoutes);
+app.use('/api/chefs', chefRoutes);
 
 // Config endpoint - exposes public configuration to frontend
 app.get('/api/config', (req, res) => {
@@ -62,8 +67,8 @@ app.get('/api/config', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     demoMode: process.env.DEMO_MODE === 'true',
     timestamp: new Date().toISOString()
   });
@@ -74,7 +79,6 @@ app.use(express.static(path.join(__dirname, '..', 'docs')));
 
 // SPA fallback - serve index.html for unmatched routes
 app.get('*', (req, res) => {
-  // Don't send index.html for API routes
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
@@ -84,16 +88,16 @@ app.get('*', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  res.status(err.status || 500).json({ 
+  res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`ðŸš€ RideNDine server running on http://localhost:${PORT}`);
-  console.log(`ðŸ“¦ Demo Mode: ${process.env.DEMO_MODE === 'true' ? 'ENABLED' : 'DISABLED'}`);
-  console.log(`ðŸ”’ Authentication: ${process.env.DEMO_MODE === 'true' ? 'BYPASSED' : 'REQUIRED'}`);
+  console.log(`🚀 RideNDine server running on http://localhost:${PORT}`);
+  console.log(`📦 Demo Mode: ${process.env.DEMO_MODE === 'true' ? 'ENABLED' : 'DISABLED'}`);
+  console.log(`🔒 Authentication: ${process.env.DEMO_MODE === 'true' ? 'BYPASSED' : 'REQUIRED'}`);
 });
 
 module.exports = app;
