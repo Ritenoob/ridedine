@@ -117,7 +117,7 @@
               <strong style="font-size: 1.2rem; color: var(--teal);">$${parseFloat(item.price).toFixed(2)}</strong>
               <button 
                 class="button button--primary add-to-cart-btn" 
-                data-item='${JSON.stringify(item).replace(/'/g, "&apos;")}'
+                data-item='${encodeURIComponent(JSON.stringify(item))}'
                 style="padding: 8px 16px; font-size: 0.9rem;"
               >
                 Add to Cart
@@ -133,7 +133,7 @@
       // Attach event listeners to add-to-cart buttons
       document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-          const item = JSON.parse(this.getAttribute('data-item'));
+          const item = JSON.parse(decodeURIComponent(this.getAttribute('data-item')));
           addToCart(chef, item);
         });
       });
