@@ -189,7 +189,54 @@ app.use('/api/simulator', simulatorRoutes);
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));
 
-// SPA fallback
+// SPA fallback with specific route handling for deep routes
+// This ensures that deep routes like /admin/customers load the correct index.html
+
+// Customer/public routes
+app.get([
+  '/',
+  '/customer',
+  '/customer/*',
+  '/marketplace',
+  '/chefs',
+  '/chefs/*',
+  '/cart',
+  '/checkout',
+  '/checkout/*',
+  '/order-tracking',
+  '/order/*',
+  '/legal/*',
+  '/simulator',
+  '/simulator/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Admin routes
+app.get([
+  '/admin',
+  '/admin/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Chef portal routes
+app.get([
+  '/chef-portal',
+  '/chef-portal/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Driver portal routes
+app.get([
+  '/driver',
+  '/driver/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Generic SPA fallback for any other routes (non-API)
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });

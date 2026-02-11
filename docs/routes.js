@@ -139,6 +139,14 @@
     }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Integrations | RIDENDINE Admin' });
 
     // =========================================================================
+    // SIMULATOR ROUTE (Public for demo)
+    // =========================================================================
+
+    router.addRoute('/simulator', async () => {
+      await loadPage('/pages/simulator/index.html', 'Order & Driver Simulator | RIDENDINE');
+    }, { title: 'Order & Driver Simulator | RIDENDINE' });
+
+    // =========================================================================
     // CHEF PORTAL ROUTES (Require Chef Authentication)
     // =========================================================================
 
