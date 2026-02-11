@@ -19,7 +19,7 @@
 
     // If demo mode, allow access
     if (session.demoMode) {
-      console.log('🔓 Demo mode enabled - bypassing authentication');
+      console.log('🔧 Development mode enabled - bypassing authentication');
       showDemoBanner();
       return;
     }
@@ -88,7 +88,7 @@ function showDemoBanner() {
     z-index: 9999;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   `;
-  banner.innerHTML = '🔓 DEMO MODE - Authentication Bypassed';
+  banner.innerHTML = '🔧 DEVELOPMENT MODE - Authentication Bypassed';
   document.body.prepend(banner);
   document.body.style.paddingTop = '48px';
 }
