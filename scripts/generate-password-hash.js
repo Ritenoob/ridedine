@@ -30,14 +30,18 @@ if (password.length < 8) {
 
 console.log('Generating password hash...\n');
 
-bcrypt.hash(password, 10).then(hash => {
-  console.log('✅ Password hash generated successfully!\n');
-  console.log('Add this to your .env file:');
-  console.log('━'.repeat(60));
-  console.log(`ADMIN_PASSWORD_HASH=${hash}`);
-  console.log('━'.repeat(60));
-  console.log('\n💡 Remember to keep this hash secure and never commit it to version control!');
-}).catch(error => {
-  console.error('❌ Error generating hash:', error.message);
-  process.exit(1);
-});
+// Use async/await for cleaner error handling
+(async () => {
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    console.log('✅ Password hash generated successfully!\n');
+    console.log('Add this to your .env file:');
+    console.log('━'.repeat(60));
+    console.log(`ADMIN_PASSWORD_HASH=${hash}`);
+    console.log('━'.repeat(60));
+    console.log('\n💡 Remember to keep this hash secure and never commit it to version control!');
+  } catch (error) {
+    console.error('❌ Error generating hash:', error.message);
+    process.exit(1);
+  }
+})();

@@ -383,14 +383,27 @@
 
     function formatDate(dateString) {
       if (!dateString) return 'N/A';
-      const date = new Date(dateString);
-      return date.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
+      
+      // Check if it's already a formatted string (e.g., "Today, 5:00-6:00 PM")
+      if (typeof dateString === 'string' && dateString.includes(',') && dateString.match(/\d{1,2}:\d{2}/)) {
+        return dateString;
+      }
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          return dateString; // Return as-is if not a valid date
+        }
+        return date.toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (e) {
+        return dateString; // Return as-is on error
+      }
     }
   </script>
 </body>

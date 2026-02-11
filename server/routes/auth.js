@@ -32,18 +32,22 @@ router.post('/login', async (req, res) => {
     let loginUserId = userId || 'demo';
     let loginEmail = email || 'demo@ridendine.com';
 
-    // If email is provided, check if it's our admin
-    if (email === 'admin@ridendine.com' || email === 'sean@seanfinlay.ca') {
-      loginRole = 'admin';
-      loginUserId = 'admin_demo';
-      loginEmail = email;
-    } else if (email) {
-      // Try to find user by email in database
-      const user = await dataService.findUserByEmail(email);
-      if (user) {
-        loginRole = user.role;
-        loginUserId = user.id.toString();
-        loginEmail = user.email;
+    // If email is provided, try to find user in database
+    if (email) {
+      // First check environment-configured admin email
+      const configuredAdminEmail = process.env.ADMIN_EMAIL || 'admin@ridendine.com';
+      if (email === configuredAdminEmail) {
+        loginRole = 'admin';
+        loginUserId = 'admin_demo';
+        loginEmail = email;
+      } else {
+        // Try to find user by email in database
+        const user = await dataService.findUserByEmail(email);
+        if (user) {
+          loginRole = user.role;
+          loginUserId = user.id.toString();
+          loginEmail = user.email;
+        }
       }
     }
 

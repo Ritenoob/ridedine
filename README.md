@@ -215,8 +215,9 @@ node scripts/generate-password-hash.js YourSecurePassword
 - Login URL: `/admin/login`
 
 **Development Mode (DEMO_MODE=true):**
-- Any email/password will work
-- Or click the demo bypass button on login page
+- Any email/password will work (authentication bypassed)
+
+**Note:** Chef and Driver authentication is not yet migrated to the new JWT system. They still use session-based auth with role and password from env vars.
 
 **Driver:**
 - Username: driver

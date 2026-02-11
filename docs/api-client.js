@@ -81,8 +81,9 @@
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
         
-        // Only redirect if not already on login page
-        if (!window.location.pathname.includes('/login')) {
+        // Only redirect if not already on a login page
+        if (!window.location.pathname.endsWith('/login') && 
+            !window.location.pathname.endsWith('/login.html')) {
           const errorData = typeof data === 'object' ? data : {};
           const redirect = errorData.error?.redirect || '/admin/login';
           window.location.href = redirect;
