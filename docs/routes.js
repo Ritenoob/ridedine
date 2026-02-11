@@ -33,6 +33,16 @@
       await loadPage('/pages/customer/index.html', 'Customer | RideNDine');
     }, { title: 'Customer | RideNDine' });
 
+    // Marketplace - new home cooks browse page
+    router.addRoute('/marketplace', async () => {
+      await loadPage('/pages/marketplace.html', 'Home Cooks Marketplace | RideNDine');
+    }, { title: 'Home Cooks Marketplace | RideNDine' });
+
+    // Cook profile detail page
+    router.addRoute('/cook/:cookSlug', async (params) => {
+      await loadPage('/pages/cook-detail.html', 'Cook Profile | RideNDine', params);
+    }, { title: 'Cook Profile | RideNDine' });
+
     router.addRoute('/chefs', async () => {
       await loadPage('/pages/customer/chefs.html', 'Browse Chefs | RideNDine');
     }, { title: 'Browse Chefs | RideNDine' });
