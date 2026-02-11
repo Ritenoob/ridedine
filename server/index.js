@@ -30,6 +30,11 @@ const PORT = Number(process.env.PORT || 8080);
 const DEMO_MODE = process.env.DEMO_MODE === 'false' ? false : ['true', '1', 'yes', 'y', 'on', ''].includes(String(process.env.DEMO_MODE || 'true').toLowerCase());
 const DISABLE_RATE_LIMIT = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
 
+// Set DEMO_MODE as environment variable so it can be accessed by other modules
+if (DEMO_MODE && !process.env.DEMO_MODE) {
+  process.env.DEMO_MODE = 'true';
+}
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
