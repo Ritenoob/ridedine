@@ -24,10 +24,19 @@ router.get('/:orderId', requireAuth, (req, res) => {
     orderService.getOrder(req.params.orderId);
   
   if (!order) {
-    return res.status(404).json({ error: 'Order not found' });
+    return res.status(404).json({ 
+      success: false,
+      error: {
+        code: 'ORDER_NOT_FOUND',
+        message: 'Order not found'
+      }
+    });
   }
 
-  res.json(order);
+  res.json({
+    success: true,
+    data: order
+  });
 });
 
 // Get redacted tracking info (public endpoint)
@@ -37,7 +46,13 @@ router.get('/:orderId/tracking', (req, res) => {
     orderService.getOrder(req.params.orderId);
   
   if (!order) {
-    return res.status(404).json({ error: 'Order not found' });
+    return res.status(404).json({ 
+      success: false,
+      error: {
+        code: 'ORDER_NOT_FOUND',
+        message: 'Order not found'
+      }
+    });
   }
 
   // Calculate customer-friendly status and ETA
@@ -85,17 +100,21 @@ router.get('/:orderId/tracking', (req, res) => {
 
   // Redacted tracking response - NO chef address or precise coordinates
   res.json({
-    orderId: order.id || order.orderId,
-    status: order.status,
-    customerStatus,
-    driverStatus,
-    etaMinutes,
-    estimatedDelivery: order.estimatedDelivery || order.deliveryWindow || 'Today, 5:00-6:00 PM',
-    pickupArea: 'Local chef kitchen', // Generic label
-    createdAt: order.createdAt,
-    items: order.items,
-    total: order.total,
-    // NO chef address, NO coordinates, NO internal routing data
+    success: true,
+    data: {
+      orderId: order.id || order.orderId,
+      status: order.status,
+      customerStatus,
+      driverStatus,
+      etaMinutes,
+      estimatedDelivery: order.estimatedDelivery || order.deliveryWindow || 'Today, 5:00-6:00 PM',
+      pickupArea: 'Local chef kitchen', // Generic label
+      createdAt: order.createdAt,
+      items: order.items,
+      total: order.total,
+      lastUpdated: new Date().toISOString()
+      // NO chef address, NO coordinates, NO internal routing data
+    }
   });
 });
 
@@ -105,7 +124,13 @@ router.post('/', async (req, res) => {
     const { items, chefId, customerInfo, deliveryAddress } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'Items are required' });
+      return res.status(400).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_INPUT',
+          message: 'Items are required'
+        }
+      });
     }
 
     const total = items.reduce((sum, item) => sum + (parseFloat(item.price) * (item.quantity || 1)), 0).toFixed(2);
@@ -123,9 +148,11 @@ router.post('/', async (req, res) => {
       });
 
       res.json({ 
-        success: true, 
-        orderId: order.id,
-        order 
+        success: true,
+        data: {
+          orderId: order.id,
+          order
+        }
       });
     } else {
       // Use regular order service
@@ -141,14 +168,22 @@ router.post('/', async (req, res) => {
       });
 
       res.json({ 
-        success: true, 
-        orderId: order.orderId,
-        order 
+        success: true,
+        data: {
+          orderId: order.orderId,
+          order
+        }
       });
     }
   } catch (error) {
     console.error('Create order error:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'CREATE_ORDER_ERROR',
+        message: 'Failed to create order'
+      }
+    });
   }
 });
 
@@ -157,26 +192,54 @@ router.patch('/:orderId/status', requireAuth, (req, res) => {
   const { status } = req.body;
   
   if (!status) {
-    return res.status(400).json({ error: 'Status is required' });
+    return res.status(400).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_INPUT',
+        message: 'Status is required'
+      }
+    });
   }
 
   if (isDemoMode()) {
     // Use demo data advance function
     try {
       const result = demoData.advanceOrder(req.params.orderId);
-      res.json({ success: true, order: result.order });
+      res.json({ 
+        success: true,
+        data: {
+          order: result.order
+        }
+      });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ 
+        success: false,
+        error: {
+          code: 'UPDATE_ORDER_ERROR',
+          message: error.message
+        }
+      });
     }
   } else {
     const order = orderService.getOrder(req.params.orderId);
     
     if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.status(404).json({ 
+        success: false,
+        error: {
+          code: 'ORDER_NOT_FOUND',
+          message: 'Order not found'
+        }
+      });
     }
 
     const updatedOrder = orderService.updateOrder(req.params.orderId, { status });
-    res.json({ success: true, order: updatedOrder });
+    res.json({ 
+      success: true,
+      data: {
+        order: updatedOrder
+      }
+    });
   }
 });
 
@@ -190,10 +253,20 @@ router.get('/', requireAuth, (req, res) => {
       customerId: req.query.customerId
     };
     const ordersList = demoData.getOrders(filters);
-    res.json({ orders: ordersList });
+    res.json({ 
+      success: true,
+      data: {
+        orders: ordersList
+      }
+    });
   } else {
     const ordersList = orderService.listOrders();
-    res.json({ orders: ordersList });
+    res.json({ 
+      success: true,
+      data: {
+        orders: ordersList
+      }
+    });
   }
 });
 
