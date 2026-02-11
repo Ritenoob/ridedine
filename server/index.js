@@ -27,7 +27,7 @@ app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT || 8080);
 
 // Robust env parsing - DEMO_MODE is TRUE by default for easy access
-const DEMO_MODE = process.env.DEMO_MODE === 'false' ? false : ['true', '1', 'yes', 'y', 'on', ''].includes(String(process.env.DEMO_MODE || 'true').toLowerCase());
+const DEMO_MODE = process.env.DEMO_MODE !== 'false';
 const DISABLE_RATE_LIMIT = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
 
 // Set DEMO_MODE as environment variable so it can be accessed by other modules
@@ -203,9 +203,6 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return next();
   }
-  
-  // Check if the request is for a static file (has a file extension)
-  const hasFileExtension = /\.[a-zA-Z0-9]+$/.test(req.path);
   
   // List of static file extensions that should NOT get the SPA fallback
   const staticExtensions = ['.js', '.css', '.html', '.json', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.webmanifest', '.map'];

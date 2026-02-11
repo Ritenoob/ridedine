@@ -157,7 +157,9 @@ class Router {
         ]);
       } catch (error) {
         console.warn('Session check failed or timed out:', error);
-        session = { authenticated: false, demoMode: true };
+        // On error, default to not authenticated and not in demo mode
+        // This ensures security in production environments
+        session = { authenticated: false, demoMode: false };
       }
       
       // In demo mode, bypass authentication entirely - allow access to all roles
