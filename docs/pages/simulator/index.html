@@ -1,0 +1,192 @@
+<!-- Order & Driver Simulator Page -->
+<div class="page-header">
+  <h1 class="page-header__title">🎮 Order & Driver Simulator</h1>
+  <p class="page-header__subtitle">Deterministic simulation with 100 orders and intelligent driver assignment</p>
+</div>
+
+<section class="section">
+  <div class="grid grid--2">
+    <!-- Control Panel -->
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">⚙️ Controls</h2>
+      </div>
+      <div class="card__body">
+        <div class="form-group">
+          <label class="form-label">Speed Multiplier</label>
+          <select id="sim-speed" class="form-select">
+            <option value="1">1x (Normal)</option>
+            <option value="2">2x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+            <option value="50">50x</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <div class="button-group">
+            <button id="sim-start" class="button button--primary">
+              ▶️ Start
+            </button>
+            <button id="sim-pause" class="button button--outline" disabled>
+              ⏸️ Pause
+            </button>
+            <button id="sim-reset" class="button button--outline">
+              🔄 Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="metrics-grid" style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="metric-box">
+            <div class="metric-label">Orders Created</div>
+            <div class="metric-value" id="sim-orders-created">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Orders Delivered</div>
+            <div class="metric-value" id="sim-orders-delivered">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Available Drivers</div>
+            <div class="metric-value" id="sim-drivers-available">10</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Simulation Time</div>
+            <div class="metric-value" id="sim-time">0:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Status -->
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">📊 Status Overview</h2>
+      </div>
+      <div class="card__body">
+        <div class="status-breakdown" style="display: grid; gap: 8px;">
+          <div class="status-item">
+            <span class="badge badge--pending">Created</span>
+            <span class="status-count" id="sim-status-created">0</span>
+          </div>
+          <div class="status-item">
+            <span class="badge badge--info">Assigned</span>
+            <span class="status-count" id="sim-status-assigned">0</span>
+          </div>
+          <div class="status-item">
+            <span class="badge badge--warning">Pickup</span>
+            <span class="status-count" id="sim-status-pickup">0</span>
+          </div>
+          <div class="status-item">
+            <span class="badge badge--success">Delivered</span>
+            <span class="status-count" id="sim-status-delivered">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Orders List -->
+<section class="section">
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">📦 Orders (Showing top 50)</h2>
+    </div>
+    <div class="card__body p-0">
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Driver</th>
+              <th>ETA</th>
+            </tr>
+          </thead>
+          <tbody id="sim-orders-list">
+            <tr>
+              <td colspan="5" class="text-center text-muted">Simulation not started</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Drivers Status -->
+<section class="section">
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">🚗 Drivers</h2>
+    </div>
+    <div class="card__body p-0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Driver ID</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Current Order</th>
+            <th>Time Remaining</th>
+          </tr>
+        </thead>
+        <tbody id="sim-drivers-list">
+          <tr>
+            <td colspan="5" class="text-center text-muted">Simulation not started</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<style>
+  .button-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .button-group .button {
+    flex: 1;
+  }
+
+  .metric-box {
+    padding: 12px;
+    background: var(--sand, #fef3e2);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+  }
+
+  .status-count {
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+</style>
+
+<script src="/js/simulator.js"></script>

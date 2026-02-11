@@ -123,9 +123,7 @@ app.get('/api/config', (req, res) => {
 // Health check (shows raw env so you can confirm Railway vars are injected)
 app.get('/api/health', async (req, res) => {
   const dbConnected = dataService.isDbAvailable();
-  
-app.get('/api/version', (req, res) => res.json({ version: 'ed995bd' }));
-res.json({
+  res.json({
     status: 'ok',
     demoMode: DEMO_MODE,
     demoModeRaw: process.env.DEMO_MODE ?? null,
@@ -135,6 +133,10 @@ res.json({
     databaseUrl: process.env.DATABASE_URL ? 'configured' : 'not-configured',
     timestamp: new Date().toISOString()
   });
+});
+
+app.get('/api/version', (req, res) => {
+  res.json({ version: 'ed995bd' });
 });
 
 // New simulation and dashboard endpoints
@@ -189,7 +191,55 @@ app.use('/api/simulator', simulatorRoutes);
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));
 
-// SPA fallback
+// SPA fallback with explicit route organization
+// All routes serve the same index.html which uses client-side routing to load the appropriate page
+// Routes are organized by section for clarity and maintainability
+
+// Customer/public routes
+app.get([
+  '/',
+  '/customer',
+  '/customer/*',
+  '/marketplace',
+  '/chefs',
+  '/chefs/*',
+  '/cart',
+  '/checkout',
+  '/checkout/*',
+  '/order-tracking',
+  '/order/*',
+  '/legal/*',
+  '/simulator',
+  '/simulator/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Admin routes
+app.get([
+  '/admin',
+  '/admin/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Chef portal routes
+app.get([
+  '/chef-portal',
+  '/chef-portal/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Driver portal routes
+app.get([
+  '/driver',
+  '/driver/*',
+], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
+});
+
+// Generic SPA fallback for any other routes (non-API)
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
