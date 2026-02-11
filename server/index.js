@@ -26,8 +26,8 @@ app.set('trust proxy', 1);
 
 const PORT = Number(process.env.PORT || 8080);
 
-// Robust env parsing
-const DEMO_MODE = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DEMO_MODE || '').toLowerCase());
+// Robust env parsing - DEMO_MODE is TRUE by default for easy access
+const DEMO_MODE = process.env.DEMO_MODE === 'false' ? false : ['true', '1', 'yes', 'y', 'on', ''].includes(String(process.env.DEMO_MODE || 'true').toLowerCase());
 const DISABLE_RATE_LIMIT = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
 
 // Middleware
@@ -191,59 +191,29 @@ app.use('/api/simulator', simulatorRoutes);
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));
 
-// SPA fallback with explicit route organization
-// All routes serve the same index.html which uses client-side routing to load the appropriate page
-// Routes are organized by section for clarity and maintainability
-
-// Customer/public routes
-app.get([
-  '/',
-  '/customer',
-  '/customer/*',
-  '/marketplace',
-  '/chefs',
-  '/chefs/*',
-  '/cart',
-  '/checkout',
-  '/checkout/*',
-  '/order-tracking',
-  '/order/*',
-  '/legal/*',
-  '/simulator',
-  '/simulator/*',
-], (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
-});
-
-// Admin routes
-app.get([
-  '/admin',
-  '/admin/*',
-], (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
-});
-
-// Chef portal routes
-app.get([
-  '/chef-portal',
-  '/chef-portal/*',
-], (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
-});
-
-// Driver portal routes
-app.get([
-  '/driver',
-  '/driver/*',
-], (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
-});
-
-// Generic SPA fallback for any other routes (non-API)
-app.get('*', (req, res) => {
+// Middleware to handle SPA routing - only serve index.html for non-static file requests
+// This prevents JS/CSS/image requests from getting index.html instead of 404
+app.use((req, res, next) => {
+  // Skip API routes
   if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
+    return next();
   }
+  
+  // Check if the request is for a static file (has a file extension)
+  const hasFileExtension = /\.[a-zA-Z0-9]+$/.test(req.path);
+  
+  // List of static file extensions that should NOT get the SPA fallback
+  const staticExtensions = ['.js', '.css', '.html', '.json', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.webmanifest', '.map'];
+  const isStaticFile = staticExtensions.some(ext => req.path.endsWith(ext));
+  
+  // If it's a static file request and the file doesn't exist, let it 404
+  // Otherwise, serve index.html for SPA routing
+  if (isStaticFile) {
+    return next();
+  }
+  
+  // This is a route request (no file extension or not a static extension)
+  // Serve index.html for client-side routing
   res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
 });
 
