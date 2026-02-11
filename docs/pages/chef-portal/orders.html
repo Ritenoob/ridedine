@@ -217,6 +217,7 @@
 
   <main class="chef-main">
     <header class="chef-header">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://unpkg.com; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self' https://ridendine-demo.onrender.com; font-src 'self' data: https:;">
       <h1>Orders</h1>
       <button class="button button-primary" onclick="loadOrders()">ðŸ”„ Refresh</button>
     </header>
@@ -429,4 +430,5 @@ async function handleLogout() {
   navigateTo('/');
 }
 </script>
+
 

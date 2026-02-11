@@ -157,6 +157,7 @@
 
 <div class="driver-app">
   <header class="pod-header">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://unpkg.com; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self' https://ridendine-demo.onrender.com; font-src 'self' data: https:;">
     <h1>ðŸ“‹ Proof of Delivery</h1>
     <p style="margin: 0; opacity: 0.9; font-size: 0.875rem;">Complete delivery confirmation</p>
   </header>
@@ -445,4 +446,5 @@ async function submitProofOfDelivery() {
   }
 }
 </script>
+
 
