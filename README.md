@@ -74,7 +74,7 @@ RIDENDINE is a comprehensive delivery management platform connecting local chefs
 ### Prerequisites
 - Node.js >= 18.0.0
 - npm or yarn
-- Stripe account (for payment processing)
+- Stripe account (for payment processing - optional for testing)
 
 ### Installation
 
@@ -93,64 +93,80 @@ cp .env.example .env
 
 ### Environment Configuration
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DEMO_MODE` | Enable development mode (bypasses auth) | Yes |
-| `ADMIN_PASSWORD` | Admin dashboard password | Yes |
-| `CHEF_PASSWORD` | Chef portal password | Yes |
-| `DRIVER_PASSWORD` | Driver app password | Yes |
-| `STRIPE_SECRET_KEY` | Stripe secret key | Yes |
-| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Yes |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret | Yes |
-| `APP_BASE_URL` | Application base URL | Yes |
-| `SESSION_SECRET` | Session encryption key | Yes |
-| `GITHUB_PAGES_ORIGIN` | GitHub Pages URL for CORS | Production only |
-| `PORT` | Server port (default: 3000) | No |
+#### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DEMO_MODE` | Enable ONLY for development (bypasses auth) | `false` (production) |
+| `ADMIN_EMAIL` | Admin login email | `admin@ridendine.com` |
+| `ADMIN_PASSWORD` | Admin password (dev only) | `YourSecurePassword` |
+| `ADMIN_PASSWORD_HASH` | Bcrypt hash (production) | See below |
+| `SESSION_SECRET` | Session encryption key | Random string |
+| `PORT` | Server port | `8080` |
+
+#### Optional Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | In-memory fallback |
+| `STRIPE_SECRET_KEY` | Stripe API secret key | Not required |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Not required |
+| `GITHUB_PAGES_ORIGIN` | Frontend URL for CORS | Localhost |
+| `DISABLE_RATE_LIMIT` | Disable rate limiting | `false` |
+
+### Generate Admin Password Hash
+
+For production, use bcrypt to hash your password:
+
+```bash
+# Generate a secure password hash
+node -e "const bcrypt = require('bcrypt'); bcrypt.hash('YOUR_PASSWORD', 10, (err, hash) => console.log(hash));"
+```
+
+Copy the output and set it as `ADMIN_PASSWORD_HASH` in your `.env` file.
 
 ### Running Locally
 
 ```bash
-# Development mode with auto-reload
+# Development mode
 npm run dev
 
 # Production mode
 npm start
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:8080`
 
-## 🧪 Development Mode
+## 🔐 Authentication
 
-RIDENDINE includes a development mode for testing and demonstrations:
+### Production Mode (DEMO_MODE=false)
+
+**Admin Login:**
+- Navigate to the homepage
+- Click "Admin" link in the footer (discreet)
+- Login with email and password configured in `.env`
+
+**Security Features:**
+- ✅ Bcrypt password hashing
+- ✅ Session-based authentication with HTTP-only cookies
+- ✅ Rate limiting on login endpoints
+- ✅ Timing-safe password comparison
+- ✅ CORS protection
+- ✅ Role-based access control
+
+### Development Mode (DEMO_MODE=true)
+
+**⚠️ NEVER USE IN PRODUCTION!**
+
+When enabled for testing:
+- Authentication is bypassed
+- Any email/password combination accepted
+- Sample data automatically loaded
 
 ```bash
-# Enable in .env
+# In .env (development only)
 DEMO_MODE=true
 ```
-
-**When enabled:**
-- ✅ Authentication is bypassed for all roles
-- ✅ Role switcher appears in the header
-- ✅ Sample data is automatically loaded
-- ✅ Payment simulation is available
-
-**⚠️ Security:** Never use `DEMO_MODE=true` in production!
-
-### Demo Credentials
-
-When `DEMO_MODE=false`, use these credentials:
-
-**Admin:**
-- Username: admin
-- Password: (from `ADMIN_PASSWORD` env var)
-
-**Chef:**
-- Username: chef
-- Password: (from `CHEF_PASSWORD` env var)
-
-**Driver:**
-- Username: driver
-- Password: (from `DRIVER_PASSWORD` env var)
 
 ## 📦 Deployment
 
@@ -259,15 +275,40 @@ GITHUB_PAGES_ORIGIN=https://username.github.io
 
 ## 🔌 API Endpoints
 
+### Response Format
+
+All API endpoints return a consistent response envelope:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message"
+  }
+}
+```
+
 ### Authentication
-- `POST /api/auth/login` - User login
+- `POST /api/auth/login` - User login (requires email and password)
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/session` - Check session status
 
 ### Orders
-- `GET /api/orders/:orderId` - Get order details
-- `GET /api/orders/:orderId/tracking` - Public tracking info
+- `GET /api/orders` - List all orders (admin only)
+- `GET /api/orders/:orderId` - Get order details (admin only)
+- `GET /api/orders/:orderId/tracking` - Public tracking info (no auth required)
 - `POST /api/orders` - Create new order
+- `PATCH /api/orders/:orderId/status` - Update order status (admin only)
 
 ### Payments
 - `POST /api/payments/create-checkout-session` - Stripe checkout
@@ -312,6 +353,51 @@ Based on 4px grid (4px, 8px, 12px, 16px, 20px, 24px, 32px, 40px, 48px, 64px)
 - Tables and lists
 - Modals and toasts
 - Navigation (sidebar, header, bottom nav)
+
+## 🧪 Testing
+
+### Manual Testing
+
+1. **Start the server:**
+```bash
+npm run dev
+```
+
+2. **Test authentication:**
+```bash
+# Login as admin
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@ridendine.com", "password": "Admin0123"}' \
+  -c cookies.txt
+
+# Check session
+curl http://localhost:8080/api/auth/session -b cookies.txt
+
+# Access protected route
+curl http://localhost:8080/api/orders -b cookies.txt
+```
+
+3. **Test public endpoints:**
+```bash
+# Health check
+curl http://localhost:8080/api/health
+
+# Order tracking (no auth required)
+curl http://localhost:8080/api/orders/ORDER123/tracking
+```
+
+### Automated Tests
+
+Currently, this project uses manual testing. To add automated tests:
+
+```bash
+# Install test dependencies
+npm install --save-dev jest supertest
+
+# Run tests (when implemented)
+npm test
+```
 
 ## 🔒 Security
 
