@@ -55,7 +55,7 @@
     demoRow.style.cssText = 'display: none; align-items: center; gap: 6px;';
     
     const demoLabel = document.createElement('span');
-    demoLabel.textContent = '🚧 Demo Mode:';
+    demoLabel.textContent = '🔧 Dev Mode:';
     demoLabel.style.opacity = '0.7';
     
     const demoValue = document.createElement('span');

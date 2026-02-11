@@ -22,13 +22,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS: allow GitHub Pages and localhost to call this API
+// Use environment variable for GitHub Pages origin (makes it portable)
+// No default - must be explicitly configured for production
+const githubPagesOrigin = process.env.GITHUB_PAGES_ORIGIN;
 const allowedOrigins = [
-  "https://seancfafinlay.github.io",
   "http://localhost:8080",
   "http://localhost:3000",
   "http://127.0.0.1:8080",
   "http://127.0.0.1:3000"
 ];
+
+// Only add GitHub Pages origin if explicitly configured
+if (githubPagesOrigin) {
+  allowedOrigins.unshift(githubPagesOrigin);
+  console.log(`✅ GitHub Pages CORS enabled: ${githubPagesOrigin}`);
+} else {
+  console.log('⚠️  GitHub Pages CORS not configured (set GITHUB_PAGES_ORIGIN env var)');
+}
 
 app.use(cors({
   origin: function (origin, callback) {

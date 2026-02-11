@@ -155,8 +155,8 @@
     renderDemoBanner() {
       return `
         <div class="demo-banner">
-          <span class="demo-banner__icon">🎮</span>
-          <span class="demo-banner__text">DEMO MODE</span>
+          <span class="demo-banner__icon">🔧</span>
+          <span class="demo-banner__text">DEVELOPMENT MODE</span>
         </div>
       `;
     },

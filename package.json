@@ -1,7 +1,7 @@
 {
-  "name": "ridendine-demo",
+  "name": "ridendine",
   "version": "1.0.0",
-  "description": "RideNDine - Home chef delivery platform",
+  "description": "RIDENDINE - Delivery sales tracking dashboard for home cooks",
   "main": "server/index.js",
   "scripts": {
     "dev": "node server/index.js",
