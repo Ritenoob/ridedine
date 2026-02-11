@@ -218,3 +218,6 @@ module.exports = app;
 
 
 
+
+app.get('/api/version', (req, res) => res.json({ version: '569d679' }));
+
