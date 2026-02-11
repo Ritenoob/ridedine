@@ -2,22 +2,30 @@ const { getSession } = require('../services/session');
 
 // Authentication middleware
 function requireAuth(req, res, next) {
-  // Check for demo mode bypass
-  if (process.env.DEMO_MODE === 'true') {
-    req.user = { userId: 'demo', role: 'admin' };
-    return next();
-  }
-
   const sessionId = req.cookies.sessionId;
   
   if (!sessionId) {
-    return res.status(401).json({ error: 'Authentication required', redirect: '/admin/login.html' });
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'AUTH_REQUIRED',
+        message: 'Authentication required'
+      },
+      redirect: '/admin/login.html' 
+    });
   }
 
   const session = getSession(sessionId);
   
   if (!session) {
-    return res.status(401).json({ error: 'Session expired', redirect: '/admin/login.html' });
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired'
+      },
+      redirect: '/admin/login.html' 
+    });
   }
 
   req.user = session;
@@ -28,11 +36,23 @@ function requireAuth(req, res, next) {
 function requireRole(...roles) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({ 
+        success: false,
+        error: {
+          code: 'AUTH_REQUIRED',
+          message: 'Authentication required'
+        }
+      });
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      return res.status(403).json({ 
+        success: false,
+        error: {
+          code: 'INSUFFICIENT_PERMISSIONS',
+          message: 'Insufficient permissions'
+        }
+      });
     }
 
     next();

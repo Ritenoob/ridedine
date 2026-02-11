@@ -157,30 +157,23 @@ class Router {
         ]);
       } catch (error) {
         console.warn('Session check failed or timed out:', error);
-        // On error, default to not authenticated and not in demo mode
-        // This ensures security in production environments
-        session = { authenticated: false, demoMode: false };
+        // On error, default to not authenticated
+        session = { authenticated: false };
       }
       
-      // In demo mode, bypass authentication entirely - allow access to all roles
-      if (session.demoMode) {
-        // Demo mode: skip authentication and role checks
-        console.log('Demo mode active: bypassing authentication for', cleanPath);
-      } else {
-        // Production mode: enforce authentication
-        if (!session.authenticated) {
-          // Redirect to login based on role
-          const loginPath = this.getLoginPath(cleanPath);
-          window.location.href = this.addBasePath(loginPath);
-          return;
-        }
+      // Enforce authentication in all cases
+      if (!session.authenticated) {
+        // Redirect to login based on role
+        const loginPath = this.getLoginPath(cleanPath);
+        window.location.href = this.addBasePath(loginPath);
+        return;
+      }
 
-        // Check role only in production mode
-        if (matchedRoute.allowedRoles.length > 0) {
-          if (!matchedRoute.allowedRoles.includes(session.role)) {
-            alert('Access denied: insufficient permissions');
-            return;
-          }
+      // Check role authorization
+      if (matchedRoute.allowedRoles.length > 0) {
+        if (!matchedRoute.allowedRoles.includes(session.role)) {
+          alert('Access denied: insufficient permissions');
+          return;
         }
       }
     }

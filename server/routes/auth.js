@@ -1,195 +1,95 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const { createSession, deleteSession, getSession } = require('../services/session');
-const dataService = require('../services/dataService');
 
-// Demo mode constants
-const DEFAULT_DEMO_ROLE = 'admin';
-const DEFAULT_DEMO_USER_ID = 'demo';
-
-// Login endpoint
+// Login endpoint - production-ready authentication
 router.post('/login', async (req, res) => {
-  const { password, role, userId, email } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  // DEMO MODE BYPASS - Allow login without password or with simple role selection
-  if (process.env.DEMO_MODE === 'true') {
-    // Support email-based login or role-based login
-    let loginRole = role || 'admin';
-    let loginUserId = userId || 'demo';
-    let loginEmail = email;
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_INPUT',
+          message: 'Email and password are required'
+        }
+      });
+    }
 
-    // If email is provided, check if it's our admin
-    if (email === 'sean@seanfinlay.ca') {
-      loginRole = 'admin';
-      loginUserId = 'admin_sean';
-      loginEmail = email;
-    } else if (email) {
-      // Try to find user by email in database
-      const user = await dataService.findUserByEmail(email);
-      if (user) {
-        loginRole = user.role;
-        loginUserId = user.id.toString();
-        loginEmail = user.email;
+    // Check admin credentials from environment
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@ridendine.com';
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+    
+    // If email matches admin email
+    if (email === adminEmail) {
+      let isValid = false;
+      
+      // If hash is configured, verify with bcrypt
+      if (adminPasswordHash) {
+        isValid = await bcrypt.compare(password, adminPasswordHash);
+      } 
+      // Fallback to plain text password for development (NOT recommended for production)
+      else if (process.env.ADMIN_PASSWORD) {
+        isValid = password === process.env.ADMIN_PASSWORD;
+        console.warn('⚠️  Using plain text ADMIN_PASSWORD. Set ADMIN_PASSWORD_HASH for production!');
       }
+      
+      if (!isValid) {
+        // Use timing-safe delay to prevent timing attacks
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return res.status(401).json({ 
+          success: false,
+          error: {
+            code: 'INVALID_CREDENTIALS',
+            message: 'Invalid email or password'
+          }
+        });
+      }
+
+      // Create session
+      const sessionId = createSession('admin', 'admin', email);
+
+      // Set cookie
+      res.cookie('sessionId', sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      return res.json({ 
+        success: true,
+        data: {
+          role: 'admin',
+          userId: 'admin',
+          email: email,
+          redirect: '/admin'
+        }
+      });
     }
 
-    // Validate role
-    const validRoles = ['admin', 'chef', 'driver', 'customer'];
-    if (!validRoles.includes(loginRole)) {
-      return res.status(400).json({ error: 'Invalid role' });
-    }
-
-    const sessionId = createSession(loginUserId, loginRole, loginEmail);
-
-    // Set cookie
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    // Invalid credentials (timing-safe)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_CREDENTIALS',
+        message: 'Invalid email or password'
+      }
     });
-
-    return res.json({ 
-      success: true, 
-      role: loginRole,
-      userId: loginUserId,
-      email: loginEmail,
-      demoMode: true,
-      redirect: loginRole === 'admin' ? '/admin' : 
-                loginRole === 'chef' ? '/chef-portal/dashboard' : 
-                loginRole === 'driver' ? '/driver/jobs' : 
-                '/customer'
-    });
-  }
-
-  // PRODUCTION MODE - Require email and password
-  if (!email) {
-    // Fallback to role-based auth for backwards compatibility
-    if (!role || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    // Check password against environment variables (using timing-safe comparison)
-    let expectedPassword;
-    let authenticatedUserId;
-    
-    const validRoles = ['admin', 'chef', 'driver', 'customer'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({ error: 'Invalid role' });
-    }
-    
-    switch (role) {
-      case 'admin':
-        expectedPassword = process.env.ADMIN_PASSWORD || 'Admin0123';
-        authenticatedUserId = 'admin';
-        break;
-      case 'chef':
-        expectedPassword = process.env.CHEF_PASSWORD;
-        authenticatedUserId = 'chef';
-        break;
-      case 'driver':
-        expectedPassword = process.env.DRIVER_PASSWORD;
-        authenticatedUserId = 'driver';
-        break;
-      case 'customer':
-        return res.status(400).json({ error: 'Customer login requires email' });
-    }
-
-    // Use timing-safe comparison to prevent timing attacks
-    const crypto = require('crypto');
-    const passwordBuffer = Buffer.from(password);
-    const expectedBuffer = Buffer.from(expectedPassword || '');
-    
-    if (passwordBuffer.length !== expectedBuffer.length) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    if (!crypto.timingSafeEqual(passwordBuffer, expectedBuffer)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Create session
-    const sessionId = createSession(authenticatedUserId, role);
-
-    // Set cookie
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    return res.json({ 
-      success: true, 
-      role,
-      userId: authenticatedUserId,
-      demoMode: false,
-      redirect: role === 'admin' ? '/admin' : 
-                role === 'chef' ? '/chef-portal/dashboard' : 
-                '/driver/jobs'
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'LOGIN_ERROR',
+        message: 'An error occurred during login'
+      }
     });
   }
-
-  // Email-based authentication
-  if (!password) {
-    return res.status(400).json({ error: 'Password is required' });
-  }
-
-  // Check for master admin credentials
-  if (email === 'sean@seanfinlay.ca' && password === 'Admin0123') {
-    const sessionId = createSession('admin_sean', 'admin', email);
-
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000
-    });
-
-    return res.json({
-      success: true,
-      role: 'admin',
-      userId: 'admin_sean',
-      email: email,
-      demoMode: false,
-      redirect: '/admin'
-    });
-  }
-
-  // Check database for user
-  const user = await dataService.findUserByEmail(email);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-
-  // In demo mode or without hashed password, skip password check
-  // In production, you would verify against hashed_password
-  if (user.hashed_password) {
-    // TODO: Implement proper password hashing with bcrypt
-    return res.status(401).json({ error: 'Password authentication not yet implemented' });
-  }
-
-  // Create session for database user
-  const sessionId = createSession(user.id.toString(), user.role, user.email);
-
-  res.cookie('sessionId', sessionId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000
-  });
-
-  res.json({
-    success: true,
-    role: user.role,
-    userId: user.id.toString(),
-    email: user.email,
-    demoMode: false,
-    redirect: user.role === 'admin' ? '/admin' : 
-              user.role === 'chef' ? '/chef-portal/dashboard' : 
-              user.role === 'driver' ? '/driver/jobs' :
-              '/customer'
-  });
 });
 
 // Logout endpoint
@@ -201,51 +101,47 @@ router.post('/logout', (req, res) => {
   }
 
   res.clearCookie('sessionId');
-  res.json({ success: true, redirect: '/' });
+  res.json({ 
+    success: true, 
+    data: { redirect: '/' } 
+  });
 });
 
 // Check session endpoint
 router.get('/session', (req, res) => {
-  // Check for demo mode - allow any role access
-  if (process.env.DEMO_MODE === 'true') {
-    // Check if there's a session cookie to get role preference
-    const sessionId = req.cookies.sessionId;
-    let role = DEFAULT_DEMO_ROLE;
-    let userId = DEFAULT_DEMO_USER_ID;
-    
-    if (sessionId) {
-      const session = getSession(sessionId);
-      if (session && session.role) {
-        role = session.role;
-        userId = session.userId;
-      }
-    }
-    
-    return res.json({ 
-      authenticated: true, 
-      demoMode: true,
-      role: role,
-      userId: userId
-    });
-  }
-
   const sessionId = req.cookies.sessionId;
   
   if (!sessionId) {
-    return res.json({ authenticated: false });
+    return res.json({ 
+      success: true,
+      data: {
+        authenticated: false,
+        demoMode: false
+      }
+    });
   }
 
   const session = getSession(sessionId);
   
   if (!session) {
-    return res.json({ authenticated: false });
+    return res.json({ 
+      success: true,
+      data: {
+        authenticated: false,
+        demoMode: false
+      }
+    });
   }
 
   res.json({ 
-    authenticated: true, 
-    demoMode: false,
-    role: session.role,
-    userId: session.userId
+    success: true,
+    data: {
+      authenticated: true, 
+      demoMode: false,
+      role: session.role,
+      userId: session.userId,
+      email: session.email
+    }
   });
 });
 
