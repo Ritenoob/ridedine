@@ -93,19 +93,67 @@ cp .env.example .env
 
 ### Environment Configuration
 
+**Core Settings:**
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `DEMO_MODE` | Enable development mode (bypasses auth) | No | `false` |
+| `PORT` | Server port | No | `3000` |
+| `NODE_ENV` | Environment (development/production) | No | `development` |
+| `FRONTEND_URL` | Frontend URL for CORS | Yes (production) | `http://localhost:3000` |
+
+**Authentication (JWT-based):**
+
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `DEMO_MODE` | Enable development mode (bypasses auth) | Yes |
-| `ADMIN_PASSWORD` | Admin dashboard password | Yes |
-| `CHEF_PASSWORD` | Chef portal password | Yes |
-| `DRIVER_PASSWORD` | Driver app password | Yes |
+| `JWT_SECRET` | Secret key for JWT signing (64+ chars recommended) | Yes |
+| `JWT_EXPIRES_IN` | JWT token expiration | No (default: `24h`) |
+| `ADMIN_EMAIL` | Admin email for login | Yes |
+| `ADMIN_PASSWORD_HASH` | Bcrypt hash of admin password | Yes |
+
+**Legacy Auth (Deprecated):**
+
+| Variable | Description | Notes |
+|----------|-------------|-------|
+| `ADMIN_PASSWORD` | Plain text admin password | ⚠️ Use `ADMIN_PASSWORD_HASH` instead |
+| `CHEF_PASSWORD` | Plain text chef password | ⚠️ Deprecated |
+| `DRIVER_PASSWORD` | Plain text driver password | ⚠️ Deprecated |
+
+**Payment Integration:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
 | `STRIPE_SECRET_KEY` | Stripe secret key | Yes |
 | `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Yes |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret | Yes |
+
+**Database:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | No (uses in-memory fallback) |
+
+**Other:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
 | `APP_BASE_URL` | Application base URL | Yes |
 | `SESSION_SECRET` | Session encryption key | Yes |
-| `GITHUB_PAGES_ORIGIN` | GitHub Pages URL for CORS | Production only |
-| `PORT` | Server port (default: 3000) | No |
+| `DISABLE_RATE_LIMIT` | Disable rate limiting | No (default: `false`) |
+
+### Generating Secure Passwords
+
+To generate a secure bcrypt password hash for admin login:
+
+```bash
+# Generate hash for a password
+node scripts/generate-password-hash.js YourSecurePassword123
+
+# Copy the output to your .env file:
+# ADMIN_PASSWORD_HASH=$2b$10$...generated_hash...
+```
+
+**Important:** Never commit password hashes to version control!
 
 ### Running Locally
 
@@ -119,34 +167,56 @@ npm start
 
 The application will be available at `http://localhost:3000`
 
-## 🧪 Development Mode
+## 🧪 Development & Production Modes
 
-RIDENDINE includes a development mode for testing and demonstrations:
+### Development Mode
+
+For local development and testing, you can enable demo mode:
 
 ```bash
-# Enable in .env
+# In .env
 DEMO_MODE=true
 ```
 
 **When enabled:**
 - ✅ Authentication is bypassed for all roles
-- ✅ Role switcher appears in the header
 - ✅ Sample data is automatically loaded
 - ✅ Payment simulation is available
+- ⚠️ **NOT FOR PRODUCTION USE**
 
-**⚠️ Security:** Never use `DEMO_MODE=true` in production!
+### Production Mode (Recommended)
 
-### Demo Credentials
+For production deployment with secure authentication:
 
-When `DEMO_MODE=false`, use these credentials:
+```bash
+# In .env
+DEMO_MODE=false  # or omit this variable
+JWT_SECRET=<your-64-char-random-string>
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD_HASH=<bcrypt-hash-from-generator>
+FRONTEND_URL=https://yourdomain.com
+```
 
-**Admin:**
-- Username: admin
-- Password: (from `ADMIN_PASSWORD` env var)
+**Generate JWT Secret:**
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
 
-**Chef:**
-- Username: chef
-- Password: (from `CHEF_PASSWORD` env var)
+**Generate Password Hash:**
+```bash
+node scripts/generate-password-hash.js YourSecurePassword
+```
+
+### Login Credentials
+
+**Production Mode:**
+- Email: (from `ADMIN_EMAIL` env var)
+- Password: (the password you used to generate `ADMIN_PASSWORD_HASH`)
+- Login URL: `/admin/login`
+
+**Development Mode (DEMO_MODE=true):**
+- Any email/password will work
+- Or click the demo bypass button on login page
 
 **Driver:**
 - Username: driver
@@ -373,3 +443,107 @@ For issues, questions, or feature requests, please [open an issue](https://githu
 ---
 
 **Made with ❤️ for the Hamilton food community**
+
+## 📡 API Documentation
+
+### Authentication Endpoints
+
+**POST /api/auth/login**
+- Authenticate user and receive JWT token
+- Body: `{ email: string, password: string, role?: string }`
+- Response: `{ success: true, data: { token, user, redirect } }`
+
+**POST /api/auth/logout**
+- Clear session and logout
+- Response: `{ success: true, data: { redirect } }`
+
+**GET /api/auth/session**
+- Check current session status
+- Response: `{ success: true, data: { authenticated, user, demoMode } }`
+
+### Public Endpoints (No Auth Required)
+
+**GET /api/public/track?orderId=XXX**
+- Track order status publicly
+- Query params: `orderId` (required)
+- Response: `{ success: true, data: { orderId, status, timeline, ... } }`
+
+**GET /api/config**
+- Get public app configuration
+- Response: `{ demoMode, stripePublishableKey, appName, version }`
+
+**GET /api/health**
+- Server health check
+- Response: `{ status, demoMode, database, timestamp }`
+
+**GET /api/chefs**
+- List all chefs
+- Response: Array of chef objects
+
+**GET /api/chefs/:chefId**
+- Get chef details
+- Response: Chef object with menu items
+
+### Protected Endpoints (Require Auth)
+
+**GET /api/orders**
+- List all orders (admin only)
+- Headers: `Cookie: sessionId=...` or `Authorization: Bearer <token>`
+- Response: `{ orders: [...] }`
+
+**GET /api/orders/:orderId**
+- Get order details (admin only)
+- Response: Order object
+
+**PATCH /api/orders/:orderId/status**
+- Update order status (admin/chef only)
+- Body: `{ status: string }`
+- Response: `{ success: true, order: {...} }`
+
+**POST /api/payments/create-checkout-session**
+- Create Stripe checkout session
+- Body: `{ items, customerId, chefId }`
+- Response: `{ sessionId, url }`
+
+### Response Format
+
+All endpoints follow a consistent response envelope:
+
+**Success:**
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+**Error:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "details": { ... }  // Optional
+  }
+}
+```
+
+### Authentication
+
+The API supports two authentication methods:
+
+1. **JWT Tokens (Recommended):**
+   - Include in Authorization header: `Authorization: Bearer <token>`
+   - Tokens expire after 24 hours (configurable via `JWT_EXPIRES_IN`)
+
+2. **Session Cookies (Legacy):**
+   - Automatically sent with requests when using `credentials: 'include'`
+
+### Rate Limiting
+
+API endpoints are rate-limited to prevent abuse:
+- General endpoints: 100 requests per 15 minutes per IP
+- Auth endpoints: 5 requests per 15 minutes per IP
+- Can be disabled with `DISABLE_RATE_LIMIT=true` (dev only)
+
