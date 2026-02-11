@@ -6,6 +6,12 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
+app.use(cors({
+  origin: ["https://seancfafinlay.github.io"],
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
+app.options("*", cors());
 
 // ✅ IMPORTANT: Railway runs behind a proxy. This MUST be set before rate-limit.
 app.set('trust proxy', 1);
@@ -201,4 +207,5 @@ app.listen(PORT, async () => {
 });
 
 module.exports = app;
+
 
