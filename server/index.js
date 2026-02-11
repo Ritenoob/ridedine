@@ -191,8 +191,9 @@ app.use('/api/simulator', simulatorRoutes);
 // Serve static files from docs directory
 app.use(express.static(path.join(__dirname, '..', 'docs')));
 
-// SPA fallback with specific route handling for deep routes
-// This ensures that deep routes like /admin/customers load the correct index.html
+// SPA fallback with explicit route organization
+// All routes serve the same index.html which uses client-side routing to load the appropriate page
+// Routes are organized by section for clarity and maintainability
 
 // Customer/public routes
 app.get([
