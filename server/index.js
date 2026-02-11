@@ -6,6 +6,14 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://seancfafinlay.github.io");
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 app.use(cors({
   origin: ["https://seancfafinlay.github.io"],
   methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
@@ -207,5 +215,6 @@ app.listen(PORT, async () => {
 });
 
 module.exports = app;
+
 
 
