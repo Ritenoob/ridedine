@@ -123,7 +123,9 @@ app.get('/api/config', (req, res) => {
 // Health check (shows raw env so you can confirm Railway vars are injected)
 app.get('/api/health', async (req, res) => {
   const dbConnected = dataService.isDbAvailable();
-  res.json({
+  
+app.get('/api/version', (req, res) => res.json({ version: 'ed995bd' }));
+res.json({
     status: 'ok',
     demoMode: DEMO_MODE,
     demoModeRaw: process.env.DEMO_MODE ?? null,
@@ -219,5 +221,7 @@ module.exports = app;
 
 
 
-app.get('/api/version', (req, res) => res.json({ version: '569d679' }));
+
+
+
 
