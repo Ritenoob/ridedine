@@ -1,13 +1,27 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { createSession, deleteSession, getSession } = require('../services/session');
 const dataService = require('../services/dataService');
+const { JWT_SECRET } = require('../middleware/auth');
+
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 // Demo mode constants
 const DEFAULT_DEMO_ROLE = 'admin';
 const DEFAULT_DEMO_USER_ID = 'demo';
 
-// Login endpoint
+// Helper: Generate JWT token
+function generateToken(userId, email, role) {
+  return jwt.sign(
+    { userId, email, role },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+}
+
+// Login endpoint - supports both JWT and session-based auth
 router.post('/login', async (req, res) => {
   const { password, role, userId, email } = req.body;
 
@@ -16,12 +30,12 @@ router.post('/login', async (req, res) => {
     // Support email-based login or role-based login
     let loginRole = role || 'admin';
     let loginUserId = userId || 'demo';
-    let loginEmail = email;
+    let loginEmail = email || 'demo@ridendine.com';
 
     // If email is provided, check if it's our admin
-    if (email === 'sean@seanfinlay.ca') {
+    if (email === 'admin@ridendine.com' || email === 'sean@seanfinlay.ca') {
       loginRole = 'admin';
-      loginUserId = 'admin_sean';
+      loginUserId = 'admin_demo';
       loginEmail = email;
     } else if (email) {
       // Try to find user by email in database
@@ -36,9 +50,16 @@ router.post('/login', async (req, res) => {
     // Validate role
     const validRoles = ['admin', 'chef', 'driver', 'customer'];
     if (!validRoles.includes(loginRole)) {
-      return res.status(400).json({ error: 'Invalid role' });
+      return res.status(400).json({ 
+        success: false,
+        error: { code: 'INVALID_ROLE', message: 'Invalid role' } 
+      });
     }
 
+    // Generate JWT token
+    const token = generateToken(loginUserId, loginEmail, loginRole);
+
+    // Also create session for backward compatibility
     const sessionId = createSession(loginUserId, loginRole, loginEmail);
 
     // Set cookie
@@ -51,93 +72,106 @@ router.post('/login', async (req, res) => {
 
     return res.json({ 
       success: true, 
-      role: loginRole,
-      userId: loginUserId,
-      email: loginEmail,
-      demoMode: true,
-      redirect: loginRole === 'admin' ? '/admin' : 
-                loginRole === 'chef' ? '/chef-portal/dashboard' : 
-                loginRole === 'driver' ? '/driver/jobs' : 
-                '/customer'
+      data: {
+        token,
+        user: {
+          userId: loginUserId,
+          email: loginEmail,
+          role: loginRole
+        },
+        demoMode: true,
+        redirect: loginRole === 'admin' ? '/admin' : 
+                  loginRole === 'chef' ? '/chef-portal/dashboard' : 
+                  loginRole === 'driver' ? '/driver/jobs' : 
+                  '/customer'
+      }
     });
   }
 
-  // PRODUCTION MODE - Require email and password
-  if (!email) {
-    // Fallback to role-based auth for backwards compatibility
-    if (!role || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+  // PRODUCTION MODE - Require email and password with bcrypt verification
+  if (!email || !password) {
+    return res.status(400).json({ 
+      success: false,
+      error: { code: 'MISSING_CREDENTIALS', message: 'Email and password are required' } 
+    });
+  }
+
+  try {
+    // Check for admin credentials using environment variables
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@ridendine.com';
+    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+
+    if (email === ADMIN_EMAIL && ADMIN_PASSWORD_HASH) {
+      // Verify password with bcrypt
+      const isValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+      
+      if (!isValid) {
+        return res.status(401).json({ 
+          success: false,
+          error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } 
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken('admin_1', email, 'admin');
+
+      // Also create session for backward compatibility
+      const sessionId = createSession('admin_1', 'admin', email);
+
+      res.cookie('sessionId', sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      return res.json({
+        success: true,
+        data: {
+          token,
+          user: {
+            userId: 'admin_1',
+            email,
+            role: 'admin'
+          },
+          redirect: '/admin'
+        }
+      });
     }
 
-    // Check password against environment variables (using timing-safe comparison)
-    let expectedPassword;
-    let authenticatedUserId;
+    // Fallback: Check database for user (if database is available)
+    const user = await dataService.findUserByEmail(email);
     
-    const validRoles = ['admin', 'chef', 'driver', 'customer'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({ error: 'Invalid role' });
-    }
-    
-    switch (role) {
-      case 'admin':
-        expectedPassword = process.env.ADMIN_PASSWORD || 'Admin0123';
-        authenticatedUserId = 'admin';
-        break;
-      case 'chef':
-        expectedPassword = process.env.CHEF_PASSWORD;
-        authenticatedUserId = 'chef';
-        break;
-      case 'driver':
-        expectedPassword = process.env.DRIVER_PASSWORD;
-        authenticatedUserId = 'driver';
-        break;
-      case 'customer':
-        return res.status(400).json({ error: 'Customer login requires email' });
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } 
+      });
     }
 
-    // Use timing-safe comparison to prevent timing attacks
-    const crypto = require('crypto');
-    const passwordBuffer = Buffer.from(password);
-    const expectedBuffer = Buffer.from(expectedPassword || '');
-    
-    if (passwordBuffer.length !== expectedBuffer.length) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // Verify password with bcrypt if hash exists
+    if (user.hashed_password) {
+      const isValid = await bcrypt.compare(password, user.hashed_password);
+      
+      if (!isValid) {
+        return res.status(401).json({ 
+          success: false,
+          error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } 
+        });
+      }
+    } else {
+      // No hashed password in database - reject
+      return res.status(401).json({ 
+        success: false,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } 
+      });
     }
-    
-    if (!crypto.timingSafeEqual(passwordBuffer, expectedBuffer)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+
+    // Generate JWT token
+    const token = generateToken(user.id.toString(), user.email, user.role);
 
     // Create session
-    const sessionId = createSession(authenticatedUserId, role);
-
-    // Set cookie
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    return res.json({ 
-      success: true, 
-      role,
-      userId: authenticatedUserId,
-      demoMode: false,
-      redirect: role === 'admin' ? '/admin' : 
-                role === 'chef' ? '/chef-portal/dashboard' : 
-                '/driver/jobs'
-    });
-  }
-
-  // Email-based authentication
-  if (!password) {
-    return res.status(400).json({ error: 'Password is required' });
-  }
-
-  // Check for master admin credentials
-  if (email === 'sean@seanfinlay.ca' && password === 'Admin0123') {
-    const sessionId = createSession('admin_sean', 'admin', email);
+    const sessionId = createSession(user.id.toString(), user.role, user.email);
 
     res.cookie('sessionId', sessionId, {
       httpOnly: true,
@@ -146,50 +180,28 @@ router.post('/login', async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    return res.json({
+    res.json({
       success: true,
-      role: 'admin',
-      userId: 'admin_sean',
-      email: email,
-      demoMode: false,
-      redirect: '/admin'
+      data: {
+        token,
+        user: {
+          userId: user.id.toString(),
+          email: user.email,
+          role: user.role
+        },
+        redirect: user.role === 'admin' ? '/admin' : 
+                  user.role === 'chef' ? '/chef-portal/dashboard' : 
+                  user.role === 'driver' ? '/driver/jobs' :
+                  '/customer'
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Login failed. Please try again.' } 
     });
   }
-
-  // Check database for user
-  const user = await dataService.findUserByEmail(email);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-
-  // In demo mode or without hashed password, skip password check
-  // In production, you would verify against hashed_password
-  if (user.hashed_password) {
-    // TODO: Implement proper password hashing with bcrypt
-    return res.status(401).json({ error: 'Password authentication not yet implemented' });
-  }
-
-  // Create session for database user
-  const sessionId = createSession(user.id.toString(), user.role, user.email);
-
-  res.cookie('sessionId', sessionId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000
-  });
-
-  res.json({
-    success: true,
-    role: user.role,
-    userId: user.id.toString(),
-    email: user.email,
-    demoMode: false,
-    redirect: user.role === 'admin' ? '/admin' : 
-              user.role === 'chef' ? '/chef-portal/dashboard' : 
-              user.role === 'driver' ? '/driver/jobs' :
-              '/customer'
-  });
 });
 
 // Logout endpoint
@@ -201,7 +213,10 @@ router.post('/logout', (req, res) => {
   }
 
   res.clearCookie('sessionId');
-  res.json({ success: true, redirect: '/' });
+  res.json({ 
+    success: true, 
+    data: { redirect: '/' } 
+  });
 });
 
 // Check session endpoint
@@ -212,40 +227,60 @@ router.get('/session', (req, res) => {
     const sessionId = req.cookies.sessionId;
     let role = DEFAULT_DEMO_ROLE;
     let userId = DEFAULT_DEMO_USER_ID;
+    let email = 'demo@ridendine.com';
     
     if (sessionId) {
       const session = getSession(sessionId);
       if (session && session.role) {
         role = session.role;
         userId = session.userId;
+        email = session.email || 'demo@ridendine.com';
       }
     }
     
     return res.json({ 
-      authenticated: true, 
-      demoMode: true,
-      role: role,
-      userId: userId
+      success: true,
+      data: {
+        authenticated: true, 
+        demoMode: true,
+        user: {
+          userId,
+          email,
+          role
+        }
+      }
     });
   }
 
   const sessionId = req.cookies.sessionId;
   
   if (!sessionId) {
-    return res.json({ authenticated: false });
+    return res.json({ 
+      success: true,
+      data: { authenticated: false } 
+    });
   }
 
   const session = getSession(sessionId);
   
   if (!session) {
-    return res.json({ authenticated: false });
+    return res.json({ 
+      success: true,
+      data: { authenticated: false } 
+    });
   }
 
   res.json({ 
-    authenticated: true, 
-    demoMode: false,
-    role: session.role,
-    userId: session.userId
+    success: true,
+    data: {
+      authenticated: true, 
+      demoMode: false,
+      user: {
+        userId: session.userId,
+        email: session.email,
+        role: session.role
+      }
+    }
   });
 });
 
