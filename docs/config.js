@@ -10,14 +10,13 @@
   let apiBaseUrl = '';
   
   if (isGitHubPages) {
-    // For GitHub Pages, use local demo mode (no backend required)
-    // This allows the app to work standalone on GitHub Pages
-    apiBaseUrl = '';
-    window.__RIDENDINE_DEMO_MODE__ = true;
-    console.log("[RideNDine] Running in standalone demo mode on GitHub Pages");
+    // For GitHub Pages, use Render backend
+    apiBaseUrl = 'https://ridendine-demo.onrender.com';
+    console.log("[RideNDine] Running on GitHub Pages, using Render backend");
   } else if (isLocalhost) {
-    // For localhost, assume backend is running on same origin
-    apiBaseUrl = '';
+    // For localhost, check if backend is running on different port
+    // Default to localhost:3000 for development
+    apiBaseUrl = ''; // Same origin for now
     console.log("[RideNDine] Running on localhost, using same-origin backend");
   } else {
     // For custom domain deployment, configure backend URL here if needed

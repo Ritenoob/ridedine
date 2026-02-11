@@ -1,29 +1,115 @@
 const express = require('express');
 const router = express.Router();
 const { createSession, deleteSession, getSession } = require('../services/session');
+const dataService = require('../services/dataService');
 
 // Demo mode constants
 const DEFAULT_DEMO_ROLE = 'admin';
 const DEFAULT_DEMO_USER_ID = 'demo';
 
 // Login endpoint
-router.post('/login', (req, res) => {
-  const { password, role, userId } = req.body;
+router.post('/login', async (req, res) => {
+  const { password, role, userId, email } = req.body;
 
-  if (!role) {
-    return res.status(400).json({ error: 'Role is required' });
-  }
-
-  // Validate role
-  const validRoles = ['admin', 'chef', 'driver', 'customer'];
-  if (!validRoles.includes(role)) {
-    return res.status(400).json({ error: 'Invalid role' });
-  }
-
-  // DEMO MODE BYPASS - Allow login without password
+  // DEMO MODE BYPASS - Allow login without password or with simple role selection
   if (process.env.DEMO_MODE === 'true') {
-    const demoUserId = userId || `demo_${role}`;
-    const sessionId = createSession(demoUserId, role);
+    // Support email-based login or role-based login
+    let loginRole = role || 'admin';
+    let loginUserId = userId || 'demo';
+    let loginEmail = email;
+
+    // If email is provided, check if it's our admin
+    if (email === 'sean@seanfinlay.ca') {
+      loginRole = 'admin';
+      loginUserId = 'admin_sean';
+      loginEmail = email;
+    } else if (email) {
+      // Try to find user by email in database
+      const user = await dataService.findUserByEmail(email);
+      if (user) {
+        loginRole = user.role;
+        loginUserId = user.id.toString();
+        loginEmail = user.email;
+      }
+    }
+
+    // Validate role
+    const validRoles = ['admin', 'chef', 'driver', 'customer'];
+    if (!validRoles.includes(loginRole)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    const sessionId = createSession(loginUserId, loginRole, loginEmail);
+
+    // Set cookie
+    res.cookie('sessionId', sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    return res.json({ 
+      success: true, 
+      role: loginRole,
+      userId: loginUserId,
+      email: loginEmail,
+      demoMode: true,
+      redirect: loginRole === 'admin' ? '/admin' : 
+                loginRole === 'chef' ? '/chef-portal/dashboard' : 
+                loginRole === 'driver' ? '/driver/jobs' : 
+                '/customer'
+    });
+  }
+
+  // PRODUCTION MODE - Require email and password
+  if (!email) {
+    // Fallback to role-based auth for backwards compatibility
+    if (!role || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Check password against environment variables (using timing-safe comparison)
+    let expectedPassword;
+    let authenticatedUserId;
+    
+    const validRoles = ['admin', 'chef', 'driver', 'customer'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+    
+    switch (role) {
+      case 'admin':
+        expectedPassword = process.env.ADMIN_PASSWORD || 'Admin0123';
+        authenticatedUserId = 'admin';
+        break;
+      case 'chef':
+        expectedPassword = process.env.CHEF_PASSWORD;
+        authenticatedUserId = 'chef';
+        break;
+      case 'driver':
+        expectedPassword = process.env.DRIVER_PASSWORD;
+        authenticatedUserId = 'driver';
+        break;
+      case 'customer':
+        return res.status(400).json({ error: 'Customer login requires email' });
+    }
+
+    // Use timing-safe comparison to prevent timing attacks
+    const crypto = require('crypto');
+    const passwordBuffer = Buffer.from(password);
+    const expectedBuffer = Buffer.from(expectedPassword || '');
+    
+    if (passwordBuffer.length !== expectedBuffer.length) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    if (!crypto.timingSafeEqual(passwordBuffer, expectedBuffer)) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Create session
+    const sessionId = createSession(authenticatedUserId, role);
 
     // Set cookie
     res.cookie('sessionId', sessionId, {
@@ -36,75 +122,73 @@ router.post('/login', (req, res) => {
     return res.json({ 
       success: true, 
       role,
-      userId: demoUserId,
-      demoMode: true,
+      userId: authenticatedUserId,
+      demoMode: false,
       redirect: role === 'admin' ? '/admin' : 
                 role === 'chef' ? '/chef-portal/dashboard' : 
-                role === 'driver' ? '/driver/jobs' : 
-                '/customer'
+                '/driver/jobs'
     });
   }
 
-  // PRODUCTION MODE - Require password
+  // Email-based authentication
   if (!password) {
     return res.status(400).json({ error: 'Password is required' });
   }
 
-  // Check password against environment variables (using timing-safe comparison)
-  let expectedPassword;
-  let authenticatedUserId;
-  
-  switch (role) {
-    case 'admin':
-      expectedPassword = process.env.ADMIN_PASSWORD;
-      authenticatedUserId = 'admin';
-      break;
-    case 'chef':
-      expectedPassword = process.env.CHEF_PASSWORD;
-      authenticatedUserId = 'chef';
-      break;
-    case 'driver':
-      expectedPassword = process.env.DRIVER_PASSWORD;
-      authenticatedUserId = 'driver';
-      break;
-    case 'customer':
-      // Customer auth would be handled differently in production
-      return res.status(400).json({ error: 'Customer login not implemented' });
+  // Check for master admin credentials
+  if (email === 'sean@seanfinlay.ca' && password === 'Admin0123') {
+    const sessionId = createSession('admin_sean', 'admin', email);
+
+    res.cookie('sessionId', sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    return res.json({
+      success: true,
+      role: 'admin',
+      userId: 'admin_sean',
+      email: email,
+      demoMode: false,
+      redirect: '/admin'
+    });
   }
 
-  // Use timing-safe comparison to prevent timing attacks
-  const crypto = require('crypto');
-  const passwordBuffer = Buffer.from(password);
-  const expectedBuffer = Buffer.from(expectedPassword || '');
-  
-  // Ensure buffers are same length for timing-safe comparison
-  if (passwordBuffer.length !== expectedBuffer.length) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-  
-  if (!crypto.timingSafeEqual(passwordBuffer, expectedBuffer)) {
+  // Check database for user
+  const user = await dataService.findUserByEmail(email);
+  if (!user) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  // Create session
-  const sessionId = createSession(authenticatedUserId, role);
+  // In demo mode or without hashed password, skip password check
+  // In production, you would verify against hashed_password
+  if (user.hashed_password) {
+    // TODO: Implement proper password hashing with bcrypt
+    return res.status(401).json({ error: 'Password authentication not yet implemented' });
+  }
 
-  // Set cookie
+  // Create session for database user
+  const sessionId = createSession(user.id.toString(), user.role, user.email);
+
   res.cookie('sessionId', sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000
   });
 
-  res.json({ 
-    success: true, 
-    role,
-    userId: authenticatedUserId,
+  res.json({
+    success: true,
+    role: user.role,
+    userId: user.id.toString(),
+    email: user.email,
     demoMode: false,
-    redirect: role === 'admin' ? '/admin' : 
-              role === 'chef' ? '/chef-portal/dashboard' : 
-              '/driver/jobs'
+    redirect: user.role === 'admin' ? '/admin' : 
+              user.role === 'chef' ? '/chef-portal/dashboard' : 
+              user.role === 'driver' ? '/driver/jobs' :
+              '/customer'
   });
 });
 

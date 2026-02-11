@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - RIDENDINE</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <style>
+    .dashboard-header {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-6);
+    }
+
+    .dashboard-logo {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .metric-card {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--color-primary);
+    }
+
+    .metric-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .metric-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .simulation-panel {
+      background: var(--color-surface);
+      padding: var(--space-6);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--space-6);
+    }
+
+    .simulation-controls {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+    }
+
+    .status-pending { background: var(--color-warning-bg); color: var(--color-warning); }
+    .status-preparing { background: var(--color-info-bg); color: var(--color-info); }
+    .status-on_route { background: var(--color-primary); color: var(--color-white); }
+    .status-delivered { background: var(--color-success-bg); color: var(--color-success); }
+  </style>
+</head>
+<body>
+  <div class="dashboard-header flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="dashboard-logo">🍜 RIDENDINE</div>
+      <div class="badge badge-primary">Demo Mode</div>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="text-sm text-muted">Logged in as: <strong id="userEmail">sean@seanfinlay.ca</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <p class="text-muted mb-6">Manage operations, view metrics, and run simulations</p>
+
+    <!-- Simulation Panel -->
+    <div class="simulation-panel">
+      <h2 class="card-title">Simulation Controls</h2>
+      <p class="text-muted mb-4">Generate test orders to demonstrate system capabilities</p>
+      
+      <div class="simulation-controls">
+        <button class="btn btn-primary" onclick="runSimulation(10, 60)">
+          Generate 10 Orders (1 hour)
+        </button>
+        <button class="btn btn-primary" onclick="runSimulation(50, 180)">
+          Generate 50 Orders (3 hours)
+        </button>
+        <button class="btn btn-secondary" onclick="runSimulation(100, 360)">
+          Generate 100 Orders (6 hours)
+        </button>
+        <button class="btn btn-outline" onclick="loadMetrics()">
+          Refresh Metrics
+        </button>
+      </div>
+
+      <div id="simulationStatus" class="mt-6" style="display: none;">
+        <div class="flex items-center gap-3">
+          <div class="spinner"></div>
+          <span class="text-sm font-medium">Running simulation...</span>
+        </div>
+      </div>
+
+      <div id="simulationResult" class="mt-6" style="display: none;">
+        <!-- Results will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <h2 class="mb-4">Key Performance Indicators</h2>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value" id="totalOrders">0</div>
+        <div class="metric-label">Total Orders</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="activeOrders">0</div>
+        <div class="metric-label">Active Orders</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="totalRevenue">$0</div>
+        <div class="metric-label">Total Revenue</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="avgDeliveryTime">0 min</div>
+        <div class="metric-label">Avg Delivery Time</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="activeDrivers">0</div>
+        <div class="metric-label">Active Drivers</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="onTimePercent">0%</div>
+        <div class="metric-label">On-Time Delivery</div>
+      </div>
+    </div>
+
+    <!-- Order Status Breakdown -->
+    <div class="card">
+      <h3 class="card-title">Order Status Breakdown</h3>
+      <div id="orderStatusGrid" class="grid grid-cols-auto gap-4 mt-4">
+        <!-- Will be populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Batch Metrics -->
+    <div class="card mt-6">
+      <h3 class="card-title">Routing & Batch Metrics</h3>
+      <div class="grid grid-cols-auto gap-4 mt-4">
+        <div>
+          <div class="text-muted text-sm">Orders per Route</div>
+          <div class="text-2xl font-bold" id="ordersPerRoute">0</div>
+        </div>
+        <div>
+          <div class="text-muted text-sm">Avg Route Duration</div>
+          <div class="text-2xl font-bold" id="avgRouteDuration">0 min</div>
+        </div>
+        <div>
+          <div class="text-muted text-sm">Avg Distance</div>
+          <div class="text-2xl font-bold" id="avgDistance">0 km</div>
+        </div>
+        <div>
+          <div class="text-muted text-sm">Utilization</div>
+          <div class="text-2xl font-bold" id="utilization">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Get API base URL from config
+    const apiConfig = window.__RIDENDINE_CONFIG__ || {};
+    const API_BASE = apiConfig.apiBaseUrl || 
+                     localStorage.getItem('API_BASE_URL') || 
+                     'https://ridendine-demo.onrender.com';
+
+    console.log('Using API base:', API_BASE);
+
+    // Load initial metrics
+    loadMetrics();
+
+    async function loadMetrics() {
+      try {
+        const response = await fetch(`${API_BASE}/api/dashboard/metrics`, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to load metrics');
+        }
+
+        const data = await response.json();
+        updateDashboard(data);
+      } catch (error) {
+        console.error('Error loading metrics:', error);
+        // Show demo data on error
+        updateDashboard(getDemoMetrics());
+      }
+    }
+
+    function updateDashboard(data) {
+      // Update main metrics
+      document.getElementById('totalOrders').textContent = data.orders?.total || 0;
+      document.getElementById('activeOrders').textContent = 
+        (data.orders?.pending || 0) + (data.orders?.preparing || 0) + (data.orders?.on_route || 0);
+      document.getElementById('totalRevenue').textContent = 
+        '$' + (data.financial?.totalRevenue || 0).toFixed(2);
+      document.getElementById('avgDeliveryTime').textContent = 
+        (data.timeMetrics?.avgDeliveryTimeMin || 0) + ' min';
+      document.getElementById('activeDrivers').textContent = data.drivers?.active || 0;
+      document.getElementById('onTimePercent').textContent = 
+        (data.timeMetrics?.onTimePercent || 0) + '%';
+
+      // Update order status breakdown
+      const statusGrid = document.getElementById('orderStatusGrid');
+      statusGrid.innerHTML = '';
+      
+      const statuses = ['pending', 'preparing', 'ready', 'on_route', 'delivered'];
+      statuses.forEach(status => {
+        const count = data.orders?.[status] || 0;
+        const statusDiv = document.createElement('div');
+        statusDiv.innerHTML = `
+          <div class="text-muted text-sm">${formatStatus(status)}</div>
+          <div class="text-2xl font-bold">${count}</div>
+        `;
+        statusGrid.appendChild(statusDiv);
+      });
+
+      // Update batch metrics
+      document.getElementById('ordersPerRoute').textContent = 
+        data.batchMetrics?.ordersPerRoute || 0;
+      document.getElementById('avgRouteDuration').textContent = 
+        (data.batchMetrics?.avgRouteDurationMin || 0) + ' min';
+      document.getElementById('avgDistance').textContent = 
+        (data.batchMetrics?.avgDistanceKm || 0) + ' km';
+      document.getElementById('utilization').textContent = 
+        (data.batchMetrics?.utilizationPercent || 0) + '%';
+    }
+
+    async function runSimulation(count, windowMinutes) {
+      const statusDiv = document.getElementById('simulationStatus');
+      const resultDiv = document.getElementById('simulationResult');
+      
+      statusDiv.style.display = 'block';
+      resultDiv.style.display = 'none';
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/simulate?count=${count}&windowMinutes=${windowMinutes}`,
+          {
+            method: 'POST',
+            credentials: 'include'
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Simulation failed');
+        }
+
+        const result = await response.json();
+        
+        statusDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+          <div class="card" style="background: var(--color-success-bg); border-color: var(--color-success);">
+            <h4 style="color: var(--color-success); margin-bottom: var(--space-4);">
+              ✅ Simulation Complete
+            </h4>
+            <div class="grid grid-cols-auto gap-4">
+              <div>
+                <div class="text-sm text-muted">Orders Created</div>
+                <div class="text-2xl font-bold">${result.ordersCreated || 0}</div>
+              </div>
+              <div>
+                <div class="text-sm text-muted">Routes Created</div>
+                <div class="text-2xl font-bold">${result.routesCreated || 0}</div>
+              </div>
+              <div>
+                <div class="text-sm text-muted">Drivers Assigned</div>
+                <div class="text-2xl font-bold">${result.driversAssigned || 0}</div>
+              </div>
+              <div>
+                <div class="text-sm text-muted">Total Revenue</div>
+                <div class="text-2xl font-bold">$${(result.totalRevenue || 0).toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Reload metrics after simulation
+        setTimeout(loadMetrics, 1000);
+      } catch (error) {
+        console.error('Simulation error:', error);
+        statusDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+          <div class="card" style="background: var(--color-error-bg); border-color: var(--color-error);">
+            <p style="color: var(--color-error);">❌ Simulation failed: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function formatStatus(status) {
+      return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function getDemoMetrics() {
+      return {
+        orders: { total: 0, pending: 0, preparing: 0, ready: 0, on_route: 0, delivered: 0 },
+        timeMetrics: { avgPrepTimeMin: 0, avgDispatchTimeMin: 0, avgDeliveryTimeMin: 0, onTimePercent: 0 },
+        batchMetrics: { ordersPerRoute: 0, avgRouteDurationMin: 0, avgDistanceKm: 0, utilizationPercent: 0 },
+        financial: { grossSales: 0, fees: 0, tax: 0, totalRevenue: 0 },
+        drivers: { active: 0, idlePercent: 0, deliveriesPerHour: 0 }
+      };
+    }
+
+    function logout() {
+      fetch(`${API_BASE}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      }).then(() => {
+        window.location.href = '/';
+      });
+    }
+
+    // Make functions global
+    window.loadMetrics = loadMetrics;
+    window.runSimulation = runSimulation;
+    window.logout = logout;
+  </script>
+</body>
+</html>

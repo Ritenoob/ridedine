@@ -83,6 +83,10 @@ const authLimiter = DISABLE_RATE_LIMIT
       validate: { xForwardedForHeader: false }
     });
 
+// Import services
+const dataService = require('./services/dataService');
+const simulationService = require('./services/simulationService');
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payments');
@@ -103,15 +107,58 @@ app.get('/api/config', (req, res) => {
 });
 
 // Health check (shows raw env so you can confirm Railway vars are injected)
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const dbConnected = dataService.isDbAvailable();
   res.json({
     status: 'ok',
     demoMode: DEMO_MODE,
     demoModeRaw: process.env.DEMO_MODE ?? null,
     disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT ?? null,
     portRaw: process.env.PORT ?? null,
+    database: dbConnected ? 'connected' : 'fallback-to-memory',
+    databaseUrl: process.env.DATABASE_URL ? 'configured' : 'not-configured',
     timestamp: new Date().toISOString()
   });
+});
+
+// New simulation and dashboard endpoints
+app.post('/api/simulate', async (req, res) => {
+  try {
+    const count = parseInt(req.query.count) || 100;
+    const windowMinutes = parseInt(req.query.windowMinutes) || 360;
+    const results = await simulationService.generateSimulation(count, windowMinutes);
+    res.json(results);
+  } catch (error) {
+    console.error('Simulation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/dashboard/metrics', async (req, res) => {
+  try {
+    const metrics = await simulationService.getDashboardMetrics();
+    res.json(metrics);
+  } catch (error) {
+    console.error('Metrics error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/routes/:id', async (req, res) => {
+  try {
+    if (!dataService.isDbAvailable()) {
+      return res.status(503).json({ error: 'Database not available' });
+    }
+    const db = require('./db');
+    const result = await db.query('SELECT * FROM routes WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Route not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Route fetch error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // API routes
@@ -143,11 +190,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 RideNDine server running on port ${PORT}`);
   console.log(`📦 Demo Mode: ${DEMO_MODE ? 'ENABLED' : 'DISABLED'} (raw=${process.env.DEMO_MODE})`);
   console.log(`🔒 Authentication: ${DEMO_MODE ? 'BYPASSED' : 'REQUIRED'}`);
   console.log(`🧯 Rate limiting: ${DISABLE_RATE_LIMIT ? 'DISABLED' : 'ENABLED'}`);
+  
+  // Check database connectivity
+  await dataService.checkDatabase();
 });
 
 module.exports = app;

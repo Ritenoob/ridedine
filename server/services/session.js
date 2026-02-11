@@ -6,13 +6,14 @@ const sessions = new Map();
 // Session duration: 24 hours
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 
-function createSession(userId, role) {
+function createSession(userId, role, email = null) {
   const sessionId = crypto.randomBytes(32).toString('hex');
   const expiresAt = Date.now() + SESSION_DURATION;
   
   sessions.set(sessionId, {
     userId,
     role,
+    email,
     createdAt: Date.now(),
     expiresAt
   });
