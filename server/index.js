@@ -90,6 +90,7 @@ const simulationService = require('./services/simulationService');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const publicRoutes = require('./routes/public');
 const paymentRoutes = require('./routes/payments');
 const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
@@ -168,6 +169,7 @@ app.get('/api/routes/:id', async (req, res) => {
 
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/public', publicRoutes); // Public endpoints (no auth required)
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
