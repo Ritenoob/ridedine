@@ -25,170 +25,170 @@
 
     // Landing page
     router.addRoute('/', async () => {
-      await loadPage('/pages/landing.html', 'RideNDine | Home Chef Delivery');
-    }, { title: 'RideNDine | Home Chef Delivery' });
+      await loadPage('/pages/landing.html', 'RIDENDINE | Delivery Sales Tracking Dashboard');
+    }, { title: 'RIDENDINE | Delivery Sales Tracking Dashboard' });
 
     // Customer routes
     router.addRoute('/customer', async () => {
-      await loadPage('/pages/customer/index.html', 'Customer | RideNDine');
-    }, { title: 'Customer | RideNDine' });
+      await loadPage('/pages/customer/index.html', 'Customer Portal | RIDENDINE');
+    }, { title: 'Customer Portal | RIDENDINE' });
 
     // Marketplace - new home cooks browse page
     router.addRoute('/marketplace', async () => {
-      await loadPage('/pages/marketplace.html', 'Home Cooks Marketplace | RideNDine');
-    }, { title: 'Home Cooks Marketplace | RideNDine' });
+      await loadPage('/pages/marketplace.html', 'Home Cooks Marketplace | RIDENDINE');
+    }, { title: 'Home Cooks Marketplace | RIDENDINE' });
 
     // Cook profile detail page
     router.addRoute('/cook/:cookSlug', async (params) => {
-      await loadPage('/pages/cook-detail.html', 'Cook Profile | RideNDine', params);
-    }, { title: 'Cook Profile | RideNDine' });
+      await loadPage('/pages/cook-detail.html', 'Cook Profile | RIDENDINE', params);
+    }, { title: 'Cook Profile | RIDENDINE' });
 
     router.addRoute('/chefs', async () => {
-      await loadPage('/pages/customer/chefs.html', 'Browse Chefs | RideNDine');
-    }, { title: 'Browse Chefs | RideNDine' });
+      await loadPage('/pages/customer/chefs.html', 'Browse Chefs | RIDENDINE');
+    }, { title: 'Browse Chefs | RIDENDINE' });
 
     router.addRoute('/chefs/:chefSlug', async (params) => {
-      await loadPage('/pages/customer/chef-detail.html', `${params.chefSlug} | RideNDine`, params);
-    }, { title: 'Chef Menu | RideNDine' });
+      await loadPage('/pages/customer/chef-detail.html', `${params.chefSlug} | RIDENDINE`, params);
+    }, { title: 'Chef Menu | RIDENDINE' });
 
     router.addRoute('/cart', async () => {
-      await loadPage('/pages/customer/cart.html', 'Cart | RideNDine');
-    }, { title: 'Cart | RideNDine' });
+      await loadPage('/pages/customer/cart.html', 'Cart | RIDENDINE');
+    }, { title: 'Cart | RIDENDINE' });
 
     router.addRoute('/checkout', async () => {
-      await loadPage('/pages/customer/checkout.html', 'Checkout | RideNDine');
-    }, { title: 'Checkout | RideNDine' });
+      await loadPage('/pages/customer/checkout.html', 'Checkout | RIDENDINE');
+    }, { title: 'Checkout | RIDENDINE' });
 
     router.addRoute('/checkout/success', async () => {
-      await loadPage('/pages/customer/checkout-success.html', 'Order Confirmed | RideNDine');
-    }, { title: 'Order Confirmed | RideNDine' });
+      await loadPage('/pages/customer/checkout-success.html', 'Order Confirmed | RIDENDINE');
+    }, { title: 'Order Confirmed | RIDENDINE' });
 
     router.addRoute('/checkout/cancel', async () => {
-      await loadPage('/pages/customer/checkout-cancel.html', 'Checkout Cancelled | RideNDine');
-    }, { title: 'Checkout Cancelled | RideNDine' });
+      await loadPage('/pages/customer/checkout-cancel.html', 'Checkout Cancelled | RIDENDINE');
+    }, { title: 'Checkout Cancelled | RIDENDINE' });
 
     // Customer order tracking - general search page
     router.addRoute('/order-tracking', async () => {
-      await loadPage('/pages/customer/order-tracking.html', 'Track Order | RideNDine');
-    }, { title: 'Track Order | RideNDine' });
+      await loadPage('/pages/customer/order-tracking.html', 'Track Order | RIDENDINE');
+    }, { title: 'Track Order | RIDENDINE' });
 
     // Customer order tracking (redacted, public) - specific order
     router.addRoute('/order/:orderId', async (params) => {
-      await loadPage('/pages/customer/order-tracking.html', 'Track Order | RideNDine', params);
-    }, { title: 'Track Order | RideNDine' });
+      await loadPage('/pages/customer/order-tracking.html', 'Track Order | RIDENDINE', params);
+    }, { title: 'Track Order | RIDENDINE' });
 
     // Legal pages
     router.addRoute('/legal/terms', async () => {
-      await loadPage('/legal/terms.html', 'Terms of Service | RideNDine');
-    }, { title: 'Terms of Service | RideNDine' });
+      await loadPage('/legal/terms.html', 'Terms of Service | RIDENDINE');
+    }, { title: 'Terms of Service | RIDENDINE' });
 
     router.addRoute('/legal/privacy', async () => {
-      await loadPage('/legal/privacy.html', 'Privacy Policy | RideNDine');
-    }, { title: 'Privacy Policy | RideNDine' });
+      await loadPage('/legal/privacy.html', 'Privacy Policy | RIDENDINE');
+    }, { title: 'Privacy Policy | RIDENDINE' });
 
     // =========================================================================
     // ADMIN ROUTES (Require Admin Authentication)
     // =========================================================================
 
     router.addRoute('/admin/login', async () => {
-      await loadPage('/pages/admin/login.html', 'Admin Login | RideNDine');
-    }, { title: 'Admin Login | RideNDine' });
+      await loadPage('/pages/admin/login.html', 'Admin Login | RIDENDINE');
+    }, { title: 'Admin Login | RIDENDINE' });
 
     router.addRoute('/admin', async () => {
-      await loadPage('/pages/admin/dashboard.html', 'Admin Dashboard | RideNDine');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Admin Dashboard | RideNDine' });
+      await loadPage('/pages/admin/dashboard.html', 'Admin Dashboard | RIDENDINE');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Admin Dashboard | RIDENDINE' });
 
     router.addRoute('/admin/customers', async () => {
-      await loadPage('/pages/admin/customers.html', 'Customers | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Customers | Admin' });
+      await loadPage('/pages/admin/customers.html', 'Customers | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Customers | RIDENDINE Admin' });
 
     router.addRoute('/admin/drivers', async () => {
-      await loadPage('/pages/admin/drivers.html', 'Drivers | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Drivers | Admin' });
+      await loadPage('/pages/admin/drivers.html', 'Drivers | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Drivers | RIDENDINE Admin' });
 
     router.addRoute('/admin/operations', async () => {
-      await loadPage('/pages/admin/operations.html', 'Operations | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Operations | Admin' });
+      await loadPage('/pages/admin/operations.html', 'Operations | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Operations | RIDENDINE Admin' });
 
     router.addRoute('/admin/payouts', async () => {
-      await loadPage('/pages/admin/payouts.html', 'Payouts | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Payouts | Admin' });
+      await loadPage('/pages/admin/payouts.html', 'Payouts | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Payouts | RIDENDINE Admin' });
 
     router.addRoute('/admin/disputes', async () => {
-      await loadPage('/pages/admin/disputes.html', 'Disputes | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Disputes | Admin' });
+      await loadPage('/pages/admin/disputes.html', 'Disputes | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Disputes | RIDENDINE Admin' });
 
     router.addRoute('/admin/legal/terms', async () => {
-      await loadPage('/pages/admin/legal/terms.html', 'Terms of Service | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Terms of Service | Admin' });
+      await loadPage('/pages/admin/legal/terms.html', 'Terms of Service | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Terms of Service | RIDENDINE Admin' });
 
     router.addRoute('/admin/legal/privacy', async () => {
-      await loadPage('/pages/admin/legal/privacy.html', 'Privacy Policy | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Privacy Policy | Admin' });
+      await loadPage('/pages/admin/legal/privacy.html', 'Privacy Policy | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Privacy Policy | RIDENDINE Admin' });
 
     router.addRoute('/admin/live-map', async () => {
-      await loadPage('/pages/admin/live-map.html', 'Live Map | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Live Map | Admin' });
+      await loadPage('/pages/admin/live-map.html', 'Live Map | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Live Map | RIDENDINE Admin' });
 
     router.addRoute('/admin/driver-simulator', async () => {
-      await loadPage('/pages/admin/driver-simulator.html', 'Driver Simulator | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Driver Simulator | Admin' });
+      await loadPage('/pages/admin/driver-simulator.html', 'Driver Simulator | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Driver Simulator | RIDENDINE Admin' });
 
     router.addRoute('/admin/integrations', async () => {
-      await loadPage('/pages/admin/integrations.html', 'Integrations | Admin');
-    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Integrations | Admin' });
+      await loadPage('/pages/admin/integrations.html', 'Integrations | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Integrations | RIDENDINE Admin' });
 
     // =========================================================================
     // CHEF PORTAL ROUTES (Require Chef Authentication)
     // =========================================================================
 
     router.addRoute('/chef-portal/login', async () => {
-      await loadPage('/pages/chef-portal/login.html', 'Chef Login | RideNDine');
-    }, { title: 'Chef Login | RideNDine' });
+      await loadPage('/pages/chef-portal/login.html', 'Chef Login | RIDENDINE');
+    }, { title: 'Chef Login | RIDENDINE' });
 
     router.addRoute('/chef-portal/dashboard', async () => {
-      await loadPage('/pages/chef-portal/dashboard.html', 'Chef Dashboard | RideNDine');
-    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Chef Dashboard | RideNDine' });
+      await loadPage('/pages/chef-portal/dashboard.html', 'Chef Dashboard | RIDENDINE');
+    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Chef Dashboard | RIDENDINE' });
 
     router.addRoute('/chef-portal/orders', async () => {
-      await loadPage('/pages/chef-portal/orders.html', 'Orders | Chef Portal');
-    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Orders | Chef Portal' });
+      await loadPage('/pages/chef-portal/orders.html', 'Orders | RIDENDINE Chef Portal');
+    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Orders | RIDENDINE Chef Portal' });
 
     router.addRoute('/chef-portal/menu', async () => {
-      await loadPage('/pages/chef-portal/menu.html', 'Menu | Chef Portal');
-    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Menu | Chef Portal' });
+      await loadPage('/pages/chef-portal/menu.html', 'Menu | RIDENDINE Chef Portal');
+    }, { requiresAuth: true, allowedRoles: ['chef'], title: 'Menu | RIDENDINE Chef Portal' });
 
     // =========================================================================
     // DRIVER APP ROUTES (Require Driver Authentication)
     // =========================================================================
 
     router.addRoute('/driver/login', async () => {
-      await loadPage('/pages/driver/login.html', 'Driver Login | RideNDine');
-    }, { title: 'Driver Login | RideNDine' });
+      await loadPage('/pages/driver/login.html', 'Driver Login | RIDENDINE');
+    }, { title: 'Driver Login | RIDENDINE' });
 
     router.addRoute('/driver', async () => {
-      await loadPage('/pages/driver/dashboard.html', 'Driver Dashboard | RideNDine');
-    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Driver Dashboard | RideNDine' });
+      await loadPage('/pages/driver/dashboard.html', 'Driver Dashboard | RIDENDINE');
+    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Driver Dashboard | RIDENDINE' });
 
     router.addRoute('/driver/jobs', async () => {
-      await loadPage('/pages/driver/jobs.html', 'Available Jobs | Driver');
-    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Available Jobs | Driver' });
+      await loadPage('/pages/driver/jobs.html', 'Available Jobs | RIDENDINE Driver');
+    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Available Jobs | RIDENDINE Driver' });
 
     router.addRoute('/driver/navigation/:jobId', async (params) => {
-      await loadPage('/pages/driver/navigation.html', 'Navigation | Driver', params);
-    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Navigation | Driver' });
+      await loadPage('/pages/driver/navigation.html', 'Navigation | RIDENDINE Driver', params);
+    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Navigation | RIDENDINE Driver' });
 
     router.addRoute('/driver/pod/:jobId', async (params) => {
-      await loadPage('/pages/driver/proof-of-delivery.html', 'Proof of Delivery | Driver', params);
-    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Proof of Delivery | Driver' });
+      await loadPage('/pages/driver/proof-of-delivery.html', 'Proof of Delivery | RIDENDINE Driver', params);
+    }, { requiresAuth: true, allowedRoles: ['driver'], title: 'Proof of Delivery | RIDENDINE Driver' });
 
     // =========================================================================
     // 404 FALLBACK
     // =========================================================================
 
     router.addRoute('*', async () => {
-      await loadPage('/pages/404.html', '404 Not Found | RideNDine');
-    }, { title: '404 Not Found | RideNDine' });
+      await loadPage('/pages/404.html', '404 Not Found | RIDENDINE');
+    }, { title: '404 Not Found | RIDENDINE' });
 
     // Start the router
     router.start();
