@@ -6,6 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RIDENDINE | Delivery Sales Tracking Dashboard</title>
   
+  <!-- Dynamic Base Path Detection for GitHub Pages -->
+  <script>
+    // Detect and set base href for proper asset loading on GitHub Pages
+    (function() {
+      const hostname = window.location.hostname;
+      const pathname = window.location.pathname;
+      
+      // Check if this is GitHub Pages deployment
+      if (hostname.endsWith('.github.io')) {
+        // Extract repo name from pathname (first segment)
+        const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+        
+        // If we have a path segment that's not a file, use it as base path
+        if (pathSegments.length > 0 && !pathSegments[0].includes('.')) {
+          const basePath = '/' + pathSegments[0] + '/';
+          
+          // Create and insert base tag
+          const base = document.createElement('base');
+          base.href = basePath;
+          document.head.appendChild(base);
+          
+          console.log('[RideNDine] GitHub Pages detected, base path set to:', basePath);
+        }
+      }
+    })();
+  </script>
+  
   <!-- Icons & Manifest -->
   <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/assets/logo.svg" />
