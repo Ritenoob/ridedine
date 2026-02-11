@@ -13,6 +13,8 @@
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
       
+      let basePath = '/'; // Default to root for all deployments
+      
       // Check if this is GitHub Pages deployment
       if (hostname.endsWith('.github.io')) {
         // Extract repo name from pathname (first segment)
@@ -27,17 +29,17 @@
           const isFile = fileExtensions.some(ext => firstSegment.endsWith(ext));
           
           if (!isFile) {
-            const basePath = '/' + firstSegment + '/';
-            
-            // Create and insert base tag
-            const base = document.createElement('base');
-            base.href = basePath;
-            document.head.appendChild(base);
-            
-            console.log('[RideNDine] GitHub Pages detected, base path set to:', basePath);
+            basePath = '/' + firstSegment + '/';
           }
         }
       }
+      
+      // Always create and insert base tag
+      const base = document.createElement('base');
+      base.href = basePath;
+      document.head.appendChild(base);
+      
+      console.log('[RideNDine] Base path set to:', basePath);
     })();
   </script>
   
