@@ -67,6 +67,11 @@
       await loadPage('/pages/customer/checkout-cancel.html', 'Checkout Cancelled | RIDENDINE');
     }, { title: 'Checkout Cancelled | RIDENDINE' });
 
+    // Public order tracking page
+    router.addRoute('/track', async () => {
+      await loadPage('/pages/track.html', 'Track Order | RIDENDINE');
+    }, { title: 'Track Order | RIDENDINE' });
+
     // Customer order tracking - general search page
     router.addRoute('/order-tracking', async () => {
       await loadPage('/pages/customer/order-tracking.html', 'Track Order | RIDENDINE');
