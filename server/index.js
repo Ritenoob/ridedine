@@ -22,8 +22,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS: allow GitHub Pages and localhost to call this API
+// Use environment variable for GitHub Pages origin (makes it portable)
+const githubPagesOrigin = process.env.GITHUB_PAGES_ORIGIN || "https://seancfafinlay.github.io";
 const allowedOrigins = [
-  "https://seancfafinlay.github.io",
+  githubPagesOrigin,
   "http://localhost:8080",
   "http://localhost:3000",
   "http://127.0.0.1:8080",

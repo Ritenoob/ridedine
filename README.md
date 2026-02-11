@@ -1,10 +1,10 @@
-# RideNDine Demo
+# RIDENDINE
 
-Home chef delivery platform with integrated routing, payments, and delivery management.
+Delivery sales tracking dashboard for home cooks and local chefs in Hamilton, Ontario.
 
 ## Overview
 
-RideNDine connects local chefs with customers in Hamilton, Ontario. This platform includes:
+RIDENDINE connects local chefs with customers through a comprehensive delivery platform that includes:
 - **Customer-facing**: Browse chefs, order meals, track deliveries
 - **Chef Portal**: Manage menus, orders, and prep status
 - **Driver App**: View jobs, navigate routes, complete deliveries
@@ -63,6 +63,7 @@ cp .env.example .env
 | `MEALBRIDGE_BASE_URL` | Mealbridge API base URL | No |
 | `SESSION_SECRET` | Secret for session encryption | Yes |
 | `PORT` | Server port (default: 3000) | No |
+| `GITHUB_PAGES_ORIGIN` | GitHub Pages URL for CORS (backend deployment) | No |
 
 ### Running Locally
 
