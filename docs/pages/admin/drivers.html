@@ -1,22 +1,22 @@
-<!-- Driver Management -->
+﻿<!-- Driver Management -->
 <div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="admin-brand">
-      <h2>🔐 Admin Portal</h2>
+      <h2>ðŸ” Admin Portal</h2>
     </div>
     <nav class="admin-nav">
-      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
-      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
-      <a href="#" onclick="navigateTo('/admin/drivers'); return false;" class="active">🚗 Drivers</a>
-      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
-      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
-      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
-      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
-      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
-      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <a href="#" onclick="navigateTo('/admin'); return false;">ðŸ“Š Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">ðŸ‘¥ Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;" class="active">ðŸš— Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">ðŸ“¦ Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">ðŸ’° Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">âš ï¸ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">ðŸ”Œ Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">ðŸ—ºï¸ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">ðŸŽ® Simulator</a>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
-      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
-      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">ðŸ“„ Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">ðŸ”’ Privacy</a>
     </nav>
   </aside>
 
@@ -137,7 +137,7 @@
           <td><span class="status-badge ${statusClass}">${statusText}</span></td>
           <td>${driver.vehicle}</td>
           <td>${driver.deliveries}</td>
-          <td>⭐ ${driver.rating.toFixed(1)}</td>
+          <td>â­ ${driver.rating.toFixed(1)}</td>
           <td>$${driver.earnings.toFixed(2)}</td>
           <td>${formatTime(driver.lastActive)}</td>
           <td>
@@ -177,3 +177,4 @@
   renderDrivers();
 })();
 </script>
+

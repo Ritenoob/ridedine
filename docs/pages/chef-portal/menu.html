@@ -1,4 +1,4 @@
-<!-- Chef Menu Editor -->
+﻿<!-- Chef Menu Editor -->
 <style>
   .chef-layout {
     display: flex;
@@ -265,14 +265,14 @@
 <div class="chef-layout">
   <aside class="chef-sidebar">
     <div class="chef-brand">
-      <h2>👨‍🍳 Chef Portal</h2>
+      <h2>ðŸ‘¨â€ðŸ³ Chef Portal</h2>
     </div>
     <nav class="chef-nav">
-      <a href="#" onclick="navigateTo('/chef-portal/dashboard'); return false;">📊 Dashboard</a>
-      <a href="#" onclick="navigateTo('/chef-portal/orders'); return false;">📋 Orders</a>
-      <a href="#" onclick="navigateTo('/chef-portal/menu'); return false;" class="active">🍽️ Menu</a>
+      <a href="#" onclick="navigateTo('/chef-portal/dashboard'); return false;">ðŸ“Š Dashboard</a>
+      <a href="#" onclick="navigateTo('/chef-portal/orders'); return false;">ðŸ“‹ Orders</a>
+      <a href="#" onclick="navigateTo('/chef-portal/menu'); return false;" class="active">ðŸ½ï¸ Menu</a>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
-      <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+      <a href="#" onclick="handleLogout(); return false;">ðŸšª Logout</a>
     </nav>
   </aside>
 
@@ -295,7 +295,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="modalTitle">Add Menu Item</h2>
-      <button class="close-modal" onclick="closeModal()">×</button>
+      <button class="close-modal" onclick="closeModal()">Ã—</button>
     </div>
     <form id="itemForm">
       <input type="hidden" id="itemId">
@@ -406,7 +406,7 @@ function renderMenu() {
   if (menuItems.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted);">
-        <div style="font-size: 3rem;">🍽️</div>
+        <div style="font-size: 3rem;">ðŸ½ï¸</div>
         <h3>No menu items yet</h3>
         <p>Add your first menu item to get started</p>
       </div>
@@ -523,3 +523,4 @@ async function handleLogout() {
   navigateTo('/');
 }
 </script>
+

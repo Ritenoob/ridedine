@@ -1,4 +1,4 @@
-<!-- Driver Dashboard -->
+﻿<!-- Driver Dashboard -->
 <style>
   body {
     margin: 0;
@@ -182,7 +182,7 @@
 
 <div class="driver-app">
   <header class="driver-header">
-    <h1>🚗 Driver Dashboard</h1>
+    <h1>ðŸš— Driver Dashboard</h1>
     <button class="button button-secondary" onclick="handleLogout()" style="padding: 8px 16px; width: auto;">
       Logout
     </button>
@@ -190,7 +190,7 @@
 
   <div class="driver-content" style="padding-bottom: 80px;">
     <div class="status-card">
-      <div id="statusBadge" class="status-badge">🟢 Online</div>
+      <div id="statusBadge" class="status-badge">ðŸŸ¢ Online</div>
       <h2 style="margin: 8px 0;">Welcome, Driver!</h2>
       <p style="color: var(--muted);">Ready to deliver</p>
       
@@ -217,19 +217,19 @@
     <h3 style="margin: 0 0 12px 0;">Quick Actions</h3>
     
     <div class="action-card" onclick="navigateTo('/driver/jobs')">
-      <div class="action-icon">📦</div>
+      <div class="action-icon">ðŸ“¦</div>
       <h3>Available Jobs</h3>
       <p>View and accept delivery jobs</p>
     </div>
 
     <div class="action-card" onclick="navigateTo('/driver/jobs')">
-      <div class="action-icon">📍</div>
+      <div class="action-icon">ðŸ“</div>
       <h3>Active Deliveries</h3>
       <p>Manage your ongoing deliveries</p>
     </div>
 
     <div class="action-card" onclick="alert('Coming soon: View your delivery history')">
-      <div class="action-icon">📊</div>
+      <div class="action-icon">ðŸ“Š</div>
       <h3>Earnings History</h3>
       <p>Track your performance and earnings</p>
     </div>
@@ -237,19 +237,19 @@
 
   <nav class="nav-menu">
     <div class="nav-item active" onclick="navigateTo('/driver')">
-      <div class="nav-icon">🏠</div>
+      <div class="nav-icon">ðŸ </div>
       <div class="nav-label">Home</div>
     </div>
     <div class="nav-item" onclick="navigateTo('/driver/jobs')">
-      <div class="nav-icon">📦</div>
+      <div class="nav-icon">ðŸ“¦</div>
       <div class="nav-label">Jobs</div>
     </div>
     <div class="nav-item" onclick="alert('Coming soon: Earnings section')">
-      <div class="nav-icon">💰</div>
+      <div class="nav-icon">ðŸ’°</div>
       <div class="nav-label">Earnings</div>
     </div>
     <div class="nav-item" onclick="alert('Coming soon: Profile section')">
-      <div class="nav-icon">👤</div>
+      <div class="nav-icon">ðŸ‘¤</div>
       <div class="nav-label">Profile</div>
     </div>
   </nav>
@@ -305,16 +305,16 @@ function showActiveDelivery(delivery) {
   container.style.display = 'block';
   container.innerHTML = `
     <div class="current-delivery">
-      <h3>🚗 Active Delivery</h3>
+      <h3>ðŸš— Active Delivery</h3>
       <div class="delivery-details">
         <div style="margin-bottom: 8px;">
           <strong>Order #${delivery.orderId}</strong>
         </div>
         <div style="font-size: 0.875rem; opacity: 0.9;">
-          📍 ${delivery.dropoffAddress || 'Delivery address'}
+          ðŸ“ ${delivery.dropoffAddress || 'Delivery address'}
         </div>
         <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 4px;">
-          ⏱️ ETA: ${delivery.eta || '15 mins'}
+          â±ï¸ ETA: ${delivery.eta || '15 mins'}
         </div>
       </div>
       <button class="button" onclick="navigateTo('/driver/navigation?jobId=${delivery.jobId}')" style="margin-top: 16px;">
@@ -333,3 +333,4 @@ async function handleLogout() {
   navigateTo('/');
 }
 </script>
+

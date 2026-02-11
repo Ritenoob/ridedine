@@ -1,7 +1,7 @@
-<!-- Checkout Page -->
+﻿<!-- Checkout Page -->
 <header class="header">
   <div class="header__brand">
-    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <img src="./assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
     <h1>RideNDine</h1>
   </div>
   <nav class="header__nav">
@@ -13,7 +13,7 @@
 <div style="padding: 40px 6vw; max-width: 900px; margin: 0 auto;">
   <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);">
     <button class="button button--ghost" onclick="navigateTo('/cart')" style="margin-bottom: 20px;">
-      ← Back to Cart
+      â† Back to Cart
     </button>
 
     <h1 style="margin: 0 0 24px 0;">Checkout</h1>
@@ -77,12 +77,12 @@
         Proceed to Payment
       </button>
       <p style="color: var(--muted); text-align: center; margin-top: 12px; font-size: 0.9rem;">
-        🔒 Secure payment powered by Stripe
+        ðŸ”’ Secure payment powered by Stripe
       </p>
     </div>
 
     <div id="checkout-loading" style="display: none; text-align: center; padding: 40px;">
-      <div style="font-size: 3rem; margin-bottom: 16px;">⏳</div>
+      <div style="font-size: 3rem; margin-bottom: 16px;">â³</div>
       <p style="color: var(--muted);">Creating secure checkout session...</p>
     </div>
 
@@ -258,7 +258,7 @@
 
   function showError(message) {
     const errorEl = document.getElementById('checkout-error');
-    errorEl.textContent = '⚠️ ' + message;
+    errorEl.textContent = 'âš ï¸ ' + message;
     errorEl.style.display = 'block';
     setTimeout(() => {
       errorEl.style.display = 'none';
@@ -268,3 +268,5 @@
   // Initial render
   renderOrderSummary();
 </script>
+
+

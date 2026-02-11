@@ -1,4 +1,4 @@
-<!-- Proof of Delivery -->
+﻿<!-- Proof of Delivery -->
 <style>
   body {
     margin: 0;
@@ -157,7 +157,7 @@
 
 <div class="driver-app">
   <header class="pod-header">
-    <h1>📋 Proof of Delivery</h1>
+    <h1>ðŸ“‹ Proof of Delivery</h1>
     <p style="margin: 0; opacity: 0.9; font-size: 0.875rem;">Complete delivery confirmation</p>
   </header>
 
@@ -178,18 +178,18 @@
     </div>
 
     <div id="successMessage" class="success-message">
-      <div style="font-size: 2rem; margin-bottom: 8px;">✅</div>
+      <div style="font-size: 2rem; margin-bottom: 8px;">âœ…</div>
       <div style="font-weight: 600;">Delivery Confirmed!</div>
       <div style="font-size: 0.875rem; margin-top: 4px;">Great job! Your earnings have been updated.</div>
     </div>
 
     <div id="podForm">
       <div class="pod-card">
-        <h3>📸 Photo Verification</h3>
+        <h3>ðŸ“¸ Photo Verification</h3>
         <div class="form-group">
           <label class="file-upload" for="photoUpload">
             <input type="file" id="photoUpload" accept="image/*" onchange="handlePhotoUpload(event)">
-            <div class="upload-icon">📷</div>
+            <div class="upload-icon">ðŸ“·</div>
             <div class="upload-text">
               <strong>Click to take photo</strong><br>
               Or tap to select from gallery
@@ -200,7 +200,7 @@
       </div>
 
       <div class="pod-card">
-        <h3>✍️ Customer Signature</h3>
+        <h3>âœï¸ Customer Signature</h3>
         <div class="form-group">
           <canvas id="signatureCanvas" class="signature-canvas" width="500" height="200"></canvas>
           <div class="signature-controls">
@@ -213,7 +213,7 @@
       </div>
 
       <div class="pod-card">
-        <h3>📝 Delivery Notes (Optional)</h3>
+        <h3>ðŸ“ Delivery Notes (Optional)</h3>
         <div class="form-group">
           <textarea id="notesTextarea" class="notes-textarea" placeholder="Add any delivery notes here...
 Examples:
@@ -227,7 +227,7 @@ Examples:
         Complete Delivery
       </button>
       <button class="button button-secondary" onclick="navigateTo('/driver/jobs')" style="margin-top: 12px; width: 100%;">
-        ← Cancel
+        â† Cancel
       </button>
     </div>
 
@@ -368,7 +368,7 @@ function draw(e) {
   ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
   ctx.stroke();
   
-  document.getElementById('signatureStatus').textContent = '✓ Signed';
+  document.getElementById('signatureStatus').textContent = 'âœ“ Signed';
   document.getElementById('signatureStatus').style.color = 'var(--teal)';
   signatureData = true;
 }
@@ -445,3 +445,4 @@ async function submitProofOfDelivery() {
   }
 }
 </script>
+

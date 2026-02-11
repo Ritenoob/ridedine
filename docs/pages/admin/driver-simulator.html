@@ -1,28 +1,28 @@
-<!-- Driver Simulator -->
+﻿<!-- Driver Simulator -->
 <div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="admin-brand">
-      <h2>🔐 Admin Portal</h2>
+      <h2>ðŸ” Admin Portal</h2>
     </div>
     <nav class="admin-nav">
-      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
-      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
-      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
-      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
-      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
-      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
-      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
-      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
-      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;" class="active">🎮 Simulator</a>
+      <a href="#" onclick="navigateTo('/admin'); return false;">ðŸ“Š Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">ðŸ‘¥ Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">ðŸš— Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">ðŸ“¦ Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">ðŸ’° Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">âš ï¸ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;">ðŸ”Œ Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">ðŸ—ºï¸ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;" class="active">ðŸŽ® Simulator</a>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
-      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
-      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">ðŸ“„ Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">ðŸ”’ Privacy</a>
     </nav>
   </aside>
 
   <main class="admin-main">
     <header class="admin-header">
-      <h1>🎮 Driver Simulator</h1>
+      <h1>ðŸŽ® Driver Simulator</h1>
       <button id="logoutBtn" class="button">Logout</button>
     </header>
 
@@ -58,32 +58,32 @@
               <option value="point-4">Delivery Point 4</option>
             </select>
             <button class="button button--primary" onclick="moveDriver()" style="width: 100%; margin-top: 8px;">
-              📍 Move Driver
+              ðŸ“ Move Driver
             </button>
           </div>
 
           <div class="control-group">
             <label>Order Status Actions</label>
             <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button class="sim-btn" onclick="updateStatus('picked_up')">📦 Mark as Picked Up</button>
-              <button class="sim-btn" onclick="updateStatus('en_route')">🚗 Mark as En Route</button>
-              <button class="sim-btn" onclick="updateStatus('arrived')">📍 Mark as Arrived</button>
-              <button class="sim-btn" onclick="updateStatus('delivered')">✅ Mark as Delivered</button>
+              <button class="sim-btn" onclick="updateStatus('picked_up')">ðŸ“¦ Mark as Picked Up</button>
+              <button class="sim-btn" onclick="updateStatus('en_route')">ðŸš— Mark as En Route</button>
+              <button class="sim-btn" onclick="updateStatus('arrived')">ðŸ“ Mark as Arrived</button>
+              <button class="sim-btn" onclick="updateStatus('delivered')">âœ… Mark as Delivered</button>
             </div>
           </div>
 
           <div class="control-group">
             <label>Driver Actions</label>
             <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button class="sim-btn" onclick="goOnline()">🟢 Go Online</button>
-              <button class="sim-btn" onclick="goOffline()">🔴 Go Offline</button>
-              <button class="sim-btn" onclick="requestBreak()">☕ Request Break</button>
+              <button class="sim-btn" onclick="goOnline()">ðŸŸ¢ Go Online</button>
+              <button class="sim-btn" onclick="goOffline()">ðŸ”´ Go Offline</button>
+              <button class="sim-btn" onclick="requestBreak()">â˜• Request Break</button>
             </div>
           </div>
         </div>
 
         <div class="sim-panel">
-          <h3>🗺️ Live Map View</h3>
+          <h3>ðŸ—ºï¸ Live Map View</h3>
           <div id="miniMap" style="height: 400px; border-radius: 8px; overflow: hidden;"></div>
           
           <div style="margin-top: 16px;">
@@ -95,7 +95,7 @@
       </div>
 
       <div class="sim-panel" style="margin-top: 24px;">
-        <h3>📊 Simulation Log</h3>
+        <h3>ðŸ“Š Simulation Log</h3>
         <div id="simLog" style="background: #1a202c; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 0.875rem; max-height: 200px; overflow-y: auto;">
           <div>[System] Driver simulator ready</div>
         </div>
@@ -257,3 +257,4 @@
   setTimeout(() => miniMap.invalidateSize(), 100);
 })();
 </script>
+

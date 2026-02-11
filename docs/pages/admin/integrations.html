@@ -1,22 +1,22 @@
-<!-- Integrations Management -->
+﻿<!-- Integrations Management -->
 <div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="admin-brand">
-      <img src="/assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
+      <img src="./assets/logo.svg" alt="RideNDine" style="width: 100%; height: auto; padding: 1rem;" />
     </div>
     <nav class="admin-nav">
-      <a href="#" onclick="navigateTo('/admin'); return false;">📊 Dashboard</a>
-      <a href="#" onclick="navigateTo('/admin/customers'); return false;">👥 Customers</a>
-      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
-      <a href="#" onclick="navigateTo('/admin/operations'); return false;">📦 Operations</a>
-      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
-      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
-      <a href="#" onclick="navigateTo('/admin/integrations'); return false;" class="active">🔌 Integrations</a>
-      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
-      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      <a href="#" onclick="navigateTo('/admin'); return false;">ðŸ“Š Dashboard</a>
+      <a href="#" onclick="navigateTo('/admin/customers'); return false;">ðŸ‘¥ Customers</a>
+      <a href="#" onclick="navigateTo('/admin/drivers'); return false;">ðŸš— Drivers</a>
+      <a href="#" onclick="navigateTo('/admin/operations'); return false;">ðŸ“¦ Operations</a>
+      <a href="#" onclick="navigateTo('/admin/payouts'); return false;">ðŸ’° Payouts</a>
+      <a href="#" onclick="navigateTo('/admin/disputes'); return false;">âš ï¸ Disputes</a>
+      <a href="#" onclick="navigateTo('/admin/integrations'); return false;" class="active">ðŸ”Œ Integrations</a>
+      <a href="#" onclick="navigateTo('/admin/live-map'); return false;">ðŸ—ºï¸ Live Map</a>
+      <a href="#" onclick="navigateTo('/admin/driver-simulator'); return false;">ðŸŽ® Simulator</a>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
-      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">📄 Terms</a>
-      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">🔒 Privacy</a>
+      <a href="#" onclick="navigateTo('/admin/legal/terms'); return false;">ðŸ“„ Terms</a>
+      <a href="#" onclick="navigateTo('/admin/legal/privacy'); return false;">ðŸ”’ Privacy</a>
     </nav>
   </aside>
 
@@ -31,7 +31,7 @@
       <div class="integrations-grid">
         <!-- Cooco Integration -->
         <div class="integration-card">
-          <div class="integration-icon">🍱</div>
+          <div class="integration-icon">ðŸ±</div>
           <h3>Cooco Meal Plan</h3>
           <p class="integration-description">
             Connect to Cooco meal planning app to import menus and sync store data.
@@ -41,10 +41,10 @@
           </div>
           <div class="integration-actions">
             <button class="button button--primary" onclick="openCooco()">
-              🔗 Open Cooco
+              ðŸ”— Open Cooco
             </button>
             <button class="button button--outline" onclick="showCoocoImport()">
-              📥 Import Menu
+              ðŸ“¥ Import Menu
             </button>
           </div>
           <div class="integration-config">
@@ -65,7 +65,7 @@
 
         <!-- Hoang Gia Pho Integration -->
         <div class="integration-card">
-          <div class="integration-icon">🍜</div>
+          <div class="integration-icon">ðŸœ</div>
           <h3>Hoang Gia Pho</h3>
           <p class="integration-description">
             Connect to Hoang Gia Pho restaurant storefront for menu sync and order management.
@@ -75,10 +75,10 @@
           </div>
           <div class="integration-actions">
             <button class="button button--primary" onclick="openChefSite()">
-              🔗 Open Storefront
+              ðŸ”— Open Storefront
             </button>
             <button class="button button--outline" onclick="showChefImport()">
-              📥 Sync Menu
+              ðŸ“¥ Sync Menu
             </button>
           </div>
           <div class="integration-config">
@@ -102,7 +102,7 @@
 
         <!-- Stripe Integration -->
         <div class="integration-card">
-          <div class="integration-icon">💳</div>
+          <div class="integration-icon">ðŸ’³</div>
           <h3>Stripe Payments</h3>
           <p class="integration-description">
             Payment processing for customer orders. Currently in <strong id="stripeMode">demo mode</strong>.
@@ -112,14 +112,14 @@
           </div>
           <div class="integration-actions">
             <button class="button button--outline" onclick="testStripe()">
-              🧪 Test Payment
+              ðŸ§ª Test Payment
             </button>
           </div>
         </div>
 
         <!-- Mealbridge Integration -->
         <div class="integration-card">
-          <div class="integration-icon">🚚</div>
+          <div class="integration-icon">ðŸšš</div>
           <h3>Mealbridge Dispatch</h3>
           <p class="integration-description">
             Order routing and driver dispatch system. Integrated with simulator.
@@ -129,7 +129,7 @@
           </div>
           <div class="integration-actions">
             <button class="button button--outline" onclick="navigateTo('/admin/driver-simulator')">
-              🎮 Open Simulator
+              ðŸŽ® Open Simulator
             </button>
           </div>
         </div>
@@ -140,7 +140,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h2 id="importModalTitle">Import Menu Items</h2>
-            <button onclick="closeImportModal()" class="button button--sm">✕</button>
+            <button onclick="closeImportModal()" class="button button--sm">âœ•</button>
           </div>
           <div class="modal-body">
             <p>Paste menu items in CSV format: <code>name,price,category</code></p>
@@ -254,14 +254,14 @@
   // Open Cooco
   window.openCooco = function() {
     window.open('https://cooco.app/mealplan', '_blank');
-    window.showToast('✅ Opened Cooco in new tab', 'success');
+    window.showToast('âœ… Opened Cooco in new tab', 'success');
   };
 
   // Open Chef Site
   window.openChefSite = function() {
     const url = document.getElementById('chefWebsite').value;
     window.open(url, '_blank');
-    window.showToast('✅ Opened chef storefront in new tab', 'success');
+    window.showToast('âœ… Opened chef storefront in new tab', 'success');
   };
 
   // Show import modal
@@ -328,8 +328,8 @@
       });
 
       if (response.ok) {
-        document.getElementById('importResult').innerHTML = `<p style="color: green;">✅ Successfully imported ${items.length} menu items!</p>`;
-        window.showToast(`✅ Imported ${items.length} items`, 'success');
+        document.getElementById('importResult').innerHTML = `<p style="color: green;">âœ… Successfully imported ${items.length} menu items!</p>`;
+        window.showToast(`âœ… Imported ${items.length} items`, 'success');
         
         // Auto-close after 2 seconds
         setTimeout(() => closeImportModal(), 2000);
@@ -349,7 +349,7 @@
     const importMode = document.getElementById('coocoImportMode').value;
 
     if (!storeName) {
-      window.showToast('⚠️ Please enter a store name', 'warning');
+      window.showToast('âš ï¸ Please enter a store name', 'warning');
       return;
     }
 
@@ -360,19 +360,19 @@
       });
 
       if (response.ok) {
-        window.showToast('✅ Cooco configuration saved', 'success');
+        window.showToast('âœ… Cooco configuration saved', 'success');
       } else {
-        window.showToast('⚠️ Failed to save configuration', 'error');
+        window.showToast('âš ï¸ Failed to save configuration', 'error');
       }
     } catch (error) {
       console.error('Save config error:', error);
-      window.showToast('⚠️ Failed to save configuration', 'error');
+      window.showToast('âš ï¸ Failed to save configuration', 'error');
     }
   };
 
   // Test Stripe
   window.testStripe = async function() {
-    window.showToast('🧪 Testing payment...', 'info');
+    window.showToast('ðŸ§ª Testing payment...', 'info');
     
     try {
       const response = await window.apiFetch('/api/payments/create-intent', {
@@ -386,12 +386,12 @@
       const data = await response.json();
       
       if (data.demoMode) {
-        window.showToast('✅ Demo payment successful!', 'success');
+        window.showToast('âœ… Demo payment successful!', 'success');
       } else if (data.clientSecret) {
-        window.showToast('✅ Stripe payment intent created', 'success');
+        window.showToast('âœ… Stripe payment intent created', 'success');
       }
     } catch (error) {
-      window.showToast('⚠️ Payment test failed', 'error');
+      window.showToast('âš ï¸ Payment test failed', 'error');
     }
   };
 
@@ -468,3 +468,5 @@
   checkStripeStatus();
 })();
 </script>
+
+

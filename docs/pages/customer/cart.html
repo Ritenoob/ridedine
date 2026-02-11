@@ -1,7 +1,7 @@
-<!-- Shopping Cart -->
+﻿<!-- Shopping Cart -->
 <header class="header">
   <div class="header__brand">
-    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <img src="./assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
     <h1>RideNDine</h1>
   </div>
   <nav class="header__nav">
@@ -20,7 +20,7 @@
     </div>
 
     <div id="empty-cart" style="display: none; text-align: center; padding: 60px 20px;">
-      <div style="font-size: 5rem; margin-bottom: 16px;">🛒</div>
+      <div style="font-size: 5rem; margin-bottom: 16px;">ðŸ›’</div>
       <h2 style="color: var(--muted);">Your cart is empty</h2>
       <p style="color: var(--muted); margin-bottom: 24px;">Start adding delicious items from our talented chefs!</p>
       <button class="button button--primary" onclick="navigateTo('/chefs')">
@@ -81,7 +81,7 @@
       <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f0efed;">
         <h3 style="margin: 0 0 16px 0; color: var(--teal);">
           ${data.chefName}
-          <a onclick="navigateTo('/chefs/${data.chefSlug || chefId}')" style="font-size: 0.9rem; font-weight: normal; color: var(--orange); cursor: pointer; margin-left: 12px;">View Menu →</a>
+          <a onclick="navigateTo('/chefs/${data.chefSlug || chefId}')" style="font-size: 0.9rem; font-weight: normal; color: var(--orange); cursor: pointer; margin-left: 12px;">View Menu â†’</a>
         </h3>
         ${data.items.map((item) => `
           <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 12px; background: #f7fbfa; border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap;">
@@ -94,7 +94,7 @@
                 <button 
                   onclick="handleQuantityChange('${chefId}', '${item.itemId}', ${item.quantity - 1})"
                   style="border: none; background: #f0efed; color: var(--ink); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold;"
-                >−</button>
+                >âˆ’</button>
                 <span style="min-width: 30px; text-align: center; font-weight: 600;">${item.quantity}</span>
                 <button 
                   onclick="handleQuantityChange('${chefId}', '${item.itemId}', ${item.quantity + 1})"
@@ -144,3 +144,5 @@
   // Initial render
   renderCart();
 </script>
+
+

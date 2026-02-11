@@ -1,7 +1,7 @@
-<!-- Chef Detail & Menu Page -->
+﻿<!-- Chef Detail & Menu Page -->
 <header class="header">
   <div class="header__brand">
-    <img src="/assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
+    <img src="./assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
     <h1>RideNDine</h1>
   </div>
   <nav class="header__nav">
@@ -15,10 +15,10 @@
   <!-- Chef Header -->
   <div style="background: #ffffff; border-radius: 24px; padding: 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); margin-bottom: 32px;">
     <button class="button button--ghost" onclick="navigateTo('/chefs')" style="margin-bottom: 20px;">
-      ← Back to Chefs
+      â† Back to Chefs
     </button>
     <div style="display: flex; gap: 24px; align-items: start; flex-wrap: wrap;">
-      <div style="font-size: 5rem;">🍜</div>
+      <div style="font-size: 5rem;">ðŸœ</div>
       <div style="flex: 1; min-width: 250px;">
         <h1 id="chef-name" style="margin: 0 0 8px 0;">Chef Name</h1>
         <p id="chef-description" style="color: var(--muted); line-height: 1.6; margin: 0;">
@@ -26,7 +26,7 @@
         </p>
         <div style="margin-top: 16px;">
           <span style="background: #f3f9f8; padding: 8px 14px; border-radius: 999px; font-weight: 600; color: var(--teal-dark);">
-            ⭐ <span id="chef-rating">4.9</span> (<span id="chef-reviews">0</span> reviews)
+            â­ <span id="chef-rating">4.9</span> (<span id="chef-reviews">0</span> reviews)
           </span>
         </div>
       </div>
@@ -46,7 +46,7 @@
 
   <!-- Cart Preview -->
   <div id="cart-preview" style="position: fixed; bottom: 20px; right: 20px; background: var(--orange); color: white; padding: 16px 24px; border-radius: 999px; box-shadow: 0 10px 30px rgba(255, 122, 24, 0.4); cursor: pointer; display: none; font-weight: 600; z-index: 100;" onclick="navigateTo('/cart')">
-    🛒 View Cart (<span id="cart-preview-count">0</span> items) - $<span id="cart-preview-total">0.00</span>
+    ðŸ›’ View Cart (<span id="cart-preview-count">0</span> items) - $<span id="cart-preview-total">0.00</span>
   </div>
 </div>
 
@@ -64,7 +64,7 @@
       if (!chef) {
         document.getElementById('menu-loading').innerHTML = `
           <div style="text-align: center; padding: 60px 20px;">
-            <div style="font-size: 5rem; margin-bottom: 16px;">😕</div>
+            <div style="font-size: 5rem; margin-bottom: 16px;">ðŸ˜•</div>
             <h2>Chef Not Found</h2>
             <p style="color: var(--muted);">We couldn't find this chef. Please try another one.</p>
             <button class="button button--primary" onclick="navigateTo('/chefs')">Browse Chefs</button>
@@ -197,7 +197,7 @@
         z-index: 10000;
         animation: slideIn 0.3s ease-out;
       `;
-      toast.textContent = `✓ ${message}`;
+      toast.textContent = `âœ“ ${message}`;
       
       document.body.appendChild(toast);
       
@@ -226,3 +226,5 @@
     to { transform: translateX(400px); opacity: 0; }
   }
 </style>
+
+

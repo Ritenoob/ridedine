@@ -1,4 +1,4 @@
-<!-- Chef Orders -->
+﻿<!-- Chef Orders -->
 <style>
   .chef-layout {
     display: flex;
@@ -204,21 +204,21 @@
 <div class="chef-layout">
   <aside class="chef-sidebar">
     <div class="chef-brand">
-      <h2>👨‍🍳 Chef Portal</h2>
+      <h2>ðŸ‘¨â€ðŸ³ Chef Portal</h2>
     </div>
     <nav class="chef-nav">
-      <a href="#" onclick="navigateTo('/chef-portal/dashboard'); return false;">📊 Dashboard</a>
-      <a href="#" onclick="navigateTo('/chef-portal/orders'); return false;" class="active">📋 Orders</a>
-      <a href="#" onclick="navigateTo('/chef-portal/menu'); return false;">🍽️ Menu</a>
+      <a href="#" onclick="navigateTo('/chef-portal/dashboard'); return false;">ðŸ“Š Dashboard</a>
+      <a href="#" onclick="navigateTo('/chef-portal/orders'); return false;" class="active">ðŸ“‹ Orders</a>
+      <a href="#" onclick="navigateTo('/chef-portal/menu'); return false;">ðŸ½ï¸ Menu</a>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 12px 0;">
-      <a href="#" onclick="handleLogout(); return false;">🚪 Logout</a>
+      <a href="#" onclick="handleLogout(); return false;">ðŸšª Logout</a>
     </nav>
   </aside>
 
   <main class="chef-main">
     <header class="chef-header">
       <h1>Orders</h1>
-      <button class="button button-primary" onclick="loadOrders()">🔄 Refresh</button>
+      <button class="button button-primary" onclick="loadOrders()">ðŸ”„ Refresh</button>
     </header>
 
     <div class="chef-content">
@@ -231,7 +231,7 @@
 
       <div id="ordersList" class="orders-list">
         <div class="empty-state">
-          <div style="font-size: 3rem;">⏳</div>
+          <div style="font-size: 3rem;">â³</div>
           <h3>Loading orders...</h3>
         </div>
       </div>
@@ -290,7 +290,7 @@ async function loadOrders() {
     console.error('Failed to load orders:', error);
     document.getElementById('ordersList').innerHTML = `
       <div class="empty-state">
-        <div style="font-size: 3rem;">⚠️</div>
+        <div style="font-size: 3rem;">âš ï¸</div>
         <h3>Failed to load orders</h3>
         <p>${error.message}</p>
       </div>
@@ -327,7 +327,7 @@ function renderOrders() {
   if (filteredOrders.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <div style="font-size: 3rem;">📭</div>
+        <div style="font-size: 3rem;">ðŸ“­</div>
         <h3>No ${currentFilter === 'all' ? '' : currentFilter} orders</h3>
         <p>Orders will appear here when customers place them</p>
       </div>
@@ -373,8 +373,8 @@ function renderOrders() {
         </div>
 
         <div class="order-meta">
-          <div>⏰ Pickup: ${pickupTime}</div>
-          <div>📅 ${new Date(order.createdAt || Date.now()).toLocaleString()}</div>
+          <div>â° Pickup: ${pickupTime}</div>
+          <div>ðŸ“… ${new Date(order.createdAt || Date.now()).toLocaleString()}</div>
         </div>
 
         <div class="order-actions">
@@ -389,7 +389,7 @@ function renderOrders() {
             </button>
           ` : ''}
           ${status === 'ready' ? `
-            <span style="color: var(--teal); font-weight: 600;">✓ Ready for pickup</span>
+            <span style="color: var(--teal); font-weight: 600;">âœ“ Ready for pickup</span>
           ` : ''}
         </div>
       </div>
@@ -429,3 +429,4 @@ async function handleLogout() {
   navigateTo('/');
 }
 </script>
+

@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Track Order | RideNDine</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
     <style>
       body {
         padding: 32px;
@@ -146,7 +146,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 20px;">
-      <a href="/" class="button button--ghost">← Back to Home</a>
+      <a href="./" class="button button--ghost">â† Back to Home</a>
     </div>
 
     <script>
@@ -218,7 +218,7 @@
 
           ${order.driverStatus ? `
             <div style="margin-top: 30px; padding: 20px; background: #edf2f7; border-radius: 12px;">
-              <h3 style="margin: 0 0 8px;">🚗 Driver Status</h3>
+              <h3 style="margin: 0 0 8px;">ðŸš— Driver Status</h3>
               <p style="margin: 0; color: #4a5568;">${order.driverStatus}</p>
             </div>
           ` : ''}
@@ -251,7 +251,7 @@
           const isCompleted = index < currentIndex;
           const isActive = index === currentIndex;
           const dotClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
-          const icon = isCompleted ? '✓' : (isActive ? '●' : '○');
+          const icon = isCompleted ? 'âœ“' : (isActive ? 'â—' : 'â—‹');
 
           return `
             <div class="timeline-item">
@@ -284,3 +284,5 @@
     </script>
   </body>
 </html>
+
+

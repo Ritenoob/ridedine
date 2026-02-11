@@ -1,4 +1,4 @@
-<!-- Order Tracking Page -->
+﻿<!-- Order Tracking Page -->
 <header class="header">
   <div class="header__brand">
     <img src="./assets/logo.png" alt="RideNDine" onerror="this.style.display='none'">
@@ -34,13 +34,13 @@
 
   <!-- Tracking Results -->
   <div id="tracking-loading" style="display: none; background: #ffffff; border-radius: 24px; padding: 60px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
-    <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+    <div style="font-size: 4rem; margin-bottom: 16px;">ðŸ”</div>
     <h3>Loading order information...</h3>
     <p style="color: var(--muted);">Please wait</p>
   </div>
 
   <div id="tracking-error" style="display: none; background: #ffffff; border-radius: 24px; padding: 40px 28px; box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08); text-align: center;">
-    <div style="font-size: 5rem; margin-bottom: 16px;">❌</div>
+    <div style="font-size: 5rem; margin-bottom: 16px;">âŒ</div>
     <h3>Order Not Found</h3>
     <p style="color: var(--muted); margin-bottom: 24px;" id="error-message">
       We couldn't find an order with that ID. Please check and try again.
@@ -73,27 +73,27 @@
           </div>
           
           <div class="progress-step" data-step="placed" style="flex: 1; text-align: center; position: relative; z-index: 1;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">📝</div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">ðŸ“</div>
             <div style="font-size: 0.85rem; font-weight: 600;">Placed</div>
           </div>
           
           <div class="progress-step" data-step="preparing" style="flex: 1; text-align: center; position: relative; z-index: 1;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👨‍🍳</div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">ðŸ‘¨â€ðŸ³</div>
             <div style="font-size: 0.85rem; font-weight: 600;">Preparing</div>
           </div>
           
           <div class="progress-step" data-step="ready" style="flex: 1; text-align: center; position: relative; z-index: 1;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✅</div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">âœ…</div>
             <div style="font-size: 0.85rem; font-weight: 600;">Ready</div>
           </div>
           
           <div class="progress-step" data-step="picked-up" style="flex: 1; text-align: center; position: relative; z-index: 1;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🚗</div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">ðŸš—</div>
             <div style="font-size: 0.85rem; font-weight: 600;">En Route</div>
           </div>
           
           <div class="progress-step" data-step="delivered" style="flex: 1; text-align: center; position: relative; z-index: 1;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🎉</div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2f1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">ðŸŽ‰</div>
             <div style="font-size: 0.85rem; font-weight: 600;">Delivered</div>
           </div>
         </div>
@@ -291,3 +291,4 @@
     document.getElementById('order-id-input').focus();
   }
 </script>
+
