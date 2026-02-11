@@ -8,6 +8,7 @@ class Router {
     this.routes = new Map();
     this.currentRoute = null;
     this.beforeEachHooks = [];
+    this.afterEachHooks = [];
     
     // Detect base path for GitHub Pages deployment
     // Empty for local dev, '/ridendine-demo' for GitHub Pages
@@ -96,6 +97,11 @@ class Router {
   // Add before navigation hook
   beforeEach(hook) {
     this.beforeEachHooks.push(hook);
+  }
+
+  // Add after navigation hook
+  afterEach(hook) {
+    this.afterEachHooks.push(hook);
   }
 
   // Navigate to a path
