@@ -18,10 +18,10 @@ class AuthClient {
       return data;
     } catch (error) {
       console.error('Session check failed:', error);
-      // Return demo mode session on error
+      // On error, return not authenticated and not in demo mode for security
       this.session = {
         authenticated: false,
-        demoMode: true,
+        demoMode: false,
         role: null
       };
       return this.session;

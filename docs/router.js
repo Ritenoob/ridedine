@@ -157,18 +157,24 @@ class Router {
         ]);
       } catch (error) {
         console.warn('Session check failed or timed out:', error);
-        session = { authenticated: false };
+        // On error, default to not authenticated and not in demo mode
+        // This ensures security in production environments
+        session = { authenticated: false, demoMode: false };
       }
       
-      if (!session.authenticated) {
-        // Redirect to login based on role
-        const loginPath = this.getLoginPath(cleanPath);
-        window.location.href = this.addBasePath(loginPath);
-        return;
-      }
+      // In demo mode, bypass authentication entirely - allow access to all roles
+      if (session.demoMode) {
+        // Demo mode: skip authentication and role checks
+        console.log('Demo mode active: bypassing authentication for', cleanPath);
+      } else {
+        // Production mode: enforce authentication
+        if (!session.authenticated) {
+          // Redirect to login based on role
+          const loginPath = this.getLoginPath(cleanPath);
+          window.location.href = this.addBasePath(loginPath);
+          return;
+        }
 
-      // In demo mode, bypass role checks - allow access to all roles
-      if (!session.demoMode) {
         // Check role only in production mode
         if (matchedRoute.allowedRoles.length > 0) {
           if (!matchedRoute.allowedRoles.includes(session.role)) {
