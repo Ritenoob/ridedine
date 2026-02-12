@@ -320,6 +320,8 @@
   </div>
 
   <script>
+    const AUTO_REFRESH_INTERVAL = 15000; // 15 seconds
+    
     const trackForm = document.getElementById('trackForm');
     const orderIdInput = document.getElementById('orderId');
     const trackingTokenInput = document.getElementById('trackingToken');
@@ -369,11 +371,11 @@
         loadingSpinner.classList.add('hidden');
         trackingResult.classList.add('visible');
         
-        // Start auto-refresh every 15 seconds if order not delivered
+        // Start auto-refresh if order not delivered
         if (data.data.status !== 'DELIVERED' && !autoRefreshInterval) {
           autoRefreshInterval = setInterval(() => {
             trackOrder(orderId, token);
-          }, 15000); // 15 seconds
+          }, AUTO_REFRESH_INTERVAL);
         }
       } catch (error) {
         console.error('Tracking error:', error);

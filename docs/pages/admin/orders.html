@@ -180,6 +180,8 @@
   let currentOrderId = null;
   let currentOrderStatus = null;
 
+  const ADMIN_REFRESH_INTERVAL = 30000; // 30 seconds
+
   async function loadOrders() {
     const statusFilter = document.getElementById('statusFilter').value;
     const spinner = document.getElementById('loadingSpinner');
@@ -253,7 +255,7 @@
               class="button button--sm button--outline"
               data-order-id="${order.id}"
               data-order-status="${escapeHtml(order.status)}"
-              onclick="openStatusModal(this.getAttribute('data-order-id'), this.getAttribute('data-order-status'))"
+              onclick="openStatusModal(this.dataset.orderId, this.dataset.orderStatus)"
             >
               Update
             </button>
@@ -359,6 +361,6 @@
   // Load orders on page load
   loadOrders();
   
-  // Refresh every 30 seconds
-  setInterval(loadOrders, 30000);
+  // Refresh at regular intervals
+  setInterval(loadOrders, ADMIN_REFRESH_INTERVAL);
 </script>
