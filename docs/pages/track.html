@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Order | RIDENDINE</title>
+  <link rel="stylesheet" href="/ui.css">
+  <link rel="stylesheet" href="/layout.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .track-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .track-form {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 32px;
+    }
+
+    .track-form h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: var(--gray-900, #1a1a1a);
+    }
+
+    .track-form p {
+      margin: 0 0 24px 0;
+      color: var(--gray-600, #666);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--gray-700, #444);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--gray-300, #ddd);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary, #ff7a18);
+    }
+
+    .btn-track {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary, #ff7a18);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-track:hover {
+      background: var(--primary-dark, #e66910);
+    }
+
+    .btn-track:disabled {
+      background: var(--gray-400, #ccc);
+      cursor: not-allowed;
+    }
+
+    .tracking-result {
+      display: none;
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tracking-result.visible {
+      display: block;
+    }
+
+    .order-header {
+      border-bottom: 2px solid var(--gray-200, #eee);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .order-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--gray-900, #1a1a1a);
+    }
+
+    .order-status {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--success-bg, #d4edda);
+      color: var(--success, #155724);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .timeline {
+      position: relative;
+      padding: 24px 0;
+    }
+
+    .timeline-step {
+      position: relative;
+      padding-left: 48px;
+      margin-bottom: 24px;
+    }
+
+    .timeline-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      background: var(--gray-300, #ddd);
+      color: var(--gray-600, #666);
+    }
+
+    .timeline-step.complete .timeline-dot {
+      background: var(--success, #28a745);
+      color: white;
+    }
+
+    .timeline-step.active .timeline-dot {
+      background: var(--primary, #ff7a18);
+      color: white;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: -24px;
+      width: 2px;
+      background: var(--gray-300, #ddd);
+    }
+
+    .timeline-step:last-child .timeline-line {
+      display: none;
+    }
+
+    .timeline-step.complete .timeline-line {
+      background: var(--success, #28a745);
+    }
+
+    .timeline-content h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      color: var(--gray-900, #1a1a1a);
+    }
+
+    .timeline-content p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--gray-600, #666);
+    }
+
+    .order-details {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 2px solid var(--gray-200, #eee);
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: var(--gray-700, #444);
+    }
+
+    .detail-value {
+      color: var(--gray-900, #1a1a1a);
+    }
+
+    .support-info {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--gray-50, #f9f9f9);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .support-info strong {
+      color: var(--gray-900, #1a1a1a);
+    }
+
+    .error-message {
+      display: none;
+      padding: 16px;
+      background: var(--danger-bg, #f8d7da);
+      color: var(--danger, #721c24);
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray-600, #666);
+    }
+
+    .loading.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="track-container">
+    <div class="track-form">
+      <h1>Track Your Order</h1>
+      <p>Enter your order ID to see real-time delivery status</p>
+      
+      <form id="trackForm">
+        <div class="form-group">
+          <label for="orderId">Order ID</label>
+          <input 
+            type="text" 
+            id="orderId" 
+            name="orderId" 
+            placeholder="e.g., ORD-10000" 
+            required
+          >
+        </div>
+        
+        <button type="submit" class="btn-track">Track Order</button>
+      </form>
+
+      <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <div id="loadingSpinner" class="loading hidden">
+      <p>Loading order information...</p>
+    </div>
+
+    <div id="trackingResult" class="tracking-result">
+      <div class="order-header">
+        <h2>Order <span id="orderIdDisplay"></span></h2>
+        <span id="orderStatus" class="order-status"></span>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="detail-label">Estimated Delivery:</span>
+          <span class="detail-value" id="estimatedDelivery"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">ETA:</span>
+          <span class="detail-value" id="etaMinutes"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Order Total:</span>
+          <span class="detail-value" id="orderTotal"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Order Placed:</span>
+          <span class="detail-value" id="orderCreated"></span>
+        </div>
+      </div>
+
+      <div class="support-info">
+        <strong>Need help?</strong><br>
+        Contact us at <span id="supportContact"></span> or call <span id="supportPhone"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const trackForm = document.getElementById('trackForm');
+    const orderIdInput = document.getElementById('orderId');
+    const errorMessage = document.getElementById('errorMessage');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const trackingResult = document.getElementById('trackingResult');
+
+    // Check URL params for orderId
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = urlParams.get('orderId');
+    if (orderIdFromUrl) {
+      orderIdInput.value = orderIdFromUrl;
+      trackOrder(orderIdFromUrl);
+    }
+
+    trackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orderId = orderIdInput.value.trim();
+      if (orderId) {
+        await trackOrder(orderId);
+      }
+    });
+
+    async function trackOrder(orderId) {
+      // Hide previous results and errors
+      errorMessage.classList.remove('visible');
+      trackingResult.classList.remove('visible');
+      loadingSpinner.classList.remove('hidden');
+
+      try {
+        const response = await window.apiFetch(`/api/public/track?orderId=${encodeURIComponent(orderId)}`);
+        
+        if (!response.ok || !response.data.success) {
+          throw new Error(response.data?.error?.message || 'Order not found');
+        }
+
+        const data = response.data.data;
+        displayTrackingInfo(data);
+        
+        loadingSpinner.classList.add('hidden');
+        trackingResult.classList.add('visible');
+      } catch (error) {
+        console.error('Tracking error:', error);
+        errorMessage.textContent = error.message || 'Unable to track order. Please check your order ID and try again.';
+        errorMessage.classList.add('visible');
+        loadingSpinner.classList.add('hidden');
+      }
+    }
+
+    function displayTrackingInfo(data) {
+      document.getElementById('orderIdDisplay').textContent = data.orderId;
+      document.getElementById('orderStatus').textContent = data.customerStatus;
+      document.getElementById('estimatedDelivery').textContent = formatDate(data.estimatedDelivery);
+      document.getElementById('etaMinutes').textContent = data.etaMinutes === '0' ? 'Delivered' : `${data.etaMinutes} minutes`;
+      document.getElementById('orderTotal').textContent = `$${data.total}`;
+      document.getElementById('orderCreated').textContent = formatDate(data.createdAt);
+      document.getElementById('supportContact').textContent = data.supportContact;
+      document.getElementById('supportPhone').textContent = data.supportPhone;
+
+      // Build timeline
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = data.timeline.map((step, index) => `
+        <div class="timeline-step ${step.status}">
+          <div class="timeline-dot">${step.status === 'complete' ? '✓' : step.step}</div>
+          ${index < data.timeline.length - 1 ? '<div class="timeline-line"></div>' : ''}
+          <div class="timeline-content">
+            <h3>${step.label}</h3>
+            <p>${step.timestamp ? formatDate(step.timestamp) : 'Pending'}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      
+      // Check if it's already a formatted string (e.g., "Today, 5:00-6:00 PM")
+      if (typeof dateString === 'string' && dateString.includes(',') && dateString.match(/\d{1,2}:\d{2}/)) {
+        return dateString;
+      }
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          return dateString; // Return as-is if not a valid date
+        }
+        return date.toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (e) {
+        return dateString; // Return as-is on error
+      }
+    }
+  </script>
+</body>
+</html>

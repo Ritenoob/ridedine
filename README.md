@@ -93,37 +93,67 @@ cp .env.example .env
 
 ### Environment Configuration
 
-#### Required Variables
+**Core Settings:**
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DEMO_MODE` | Enable ONLY for development (bypasses auth) | `false` (production) |
-| `ADMIN_EMAIL` | Admin login email | `admin@ridendine.com` |
-| `ADMIN_PASSWORD` | Admin password (dev only) | `YourSecurePassword` |
-| `ADMIN_PASSWORD_HASH` | Bcrypt hash (production) | See below |
-| `SESSION_SECRET` | Session encryption key | Random string |
-| `PORT` | Server port | `8080` |
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `DEMO_MODE` | Enable development mode (bypasses auth) | No | `false` |
+| `PORT` | Server port | No | `3000` |
+| `NODE_ENV` | Environment (development/production) | No | `development` |
+| `FRONTEND_URL` | Frontend URL for CORS | Yes (production) | `http://localhost:3000` |
 
-#### Optional Variables
+**Authentication (JWT-based):**
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | In-memory fallback |
-| `STRIPE_SECRET_KEY` | Stripe API secret key | Not required |
-| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Not required |
-| `GITHUB_PAGES_ORIGIN` | Frontend URL for CORS | Localhost |
-| `DISABLE_RATE_LIMIT` | Disable rate limiting | `false` |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `JWT_SECRET` | Secret key for JWT signing (64+ chars recommended) | Yes |
+| `JWT_EXPIRES_IN` | JWT token expiration | No (default: `24h`) |
+| `ADMIN_EMAIL` | Admin email for login | Yes |
+| `ADMIN_PASSWORD_HASH` | Bcrypt hash of admin password | Yes |
 
-### Generate Admin Password Hash
+**Legacy Auth (Deprecated):**
 
-For production, use bcrypt to hash your password:
+| Variable | Description | Notes |
+|----------|-------------|-------|
+| `ADMIN_PASSWORD` | Plain text admin password | ⚠️ Use `ADMIN_PASSWORD_HASH` instead |
+| `CHEF_PASSWORD` | Plain text chef password | ⚠️ Deprecated |
+| `DRIVER_PASSWORD` | Plain text driver password | ⚠️ Deprecated |
+
+**Payment Integration:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `STRIPE_SECRET_KEY` | Stripe secret key | Yes |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | Yes |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret | Yes |
+
+**Database:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | No (uses in-memory fallback) |
+
+**Other:**
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `APP_BASE_URL` | Application base URL | Yes |
+| `SESSION_SECRET` | Session encryption key | Yes |
+| `DISABLE_RATE_LIMIT` | Disable rate limiting | No (default: `false`) |
+
+### Generating Secure Passwords
+
+To generate a secure bcrypt password hash for admin login:
 
 ```bash
-# Generate a secure password hash
-node -e "const bcrypt = require('bcrypt'); bcrypt.hash('YOUR_PASSWORD', 10, (err, hash) => console.log(hash));"
+# Generate hash for a password
+node scripts/generate-password-hash.js YourSecurePassword123
+
+# Copy the output to your .env file:
+# ADMIN_PASSWORD_HASH=$2b$10$...generated_hash...
 ```
 
-Copy the output and set it as `ADMIN_PASSWORD_HASH` in your `.env` file.
+**Important:** Never commit password hashes to version control!
 
 ### Running Locally
 
@@ -459,3 +489,107 @@ For issues, questions, or feature requests, please [open an issue](https://githu
 ---
 
 **Made with ❤️ for the Hamilton food community**
+
+## 📡 API Documentation
+
+### Authentication Endpoints
+
+**POST /api/auth/login**
+- Authenticate user and receive JWT token
+- Body: `{ email: string, password: string, role?: string }`
+- Response: `{ success: true, data: { token, user, redirect } }`
+
+**POST /api/auth/logout**
+- Clear session and logout
+- Response: `{ success: true, data: { redirect } }`
+
+**GET /api/auth/session**
+- Check current session status
+- Response: `{ success: true, data: { authenticated, user, demoMode } }`
+
+### Public Endpoints (No Auth Required)
+
+**GET /api/public/track?orderId=XXX**
+- Track order status publicly
+- Query params: `orderId` (required)
+- Response: `{ success: true, data: { orderId, status, timeline, ... } }`
+
+**GET /api/config**
+- Get public app configuration
+- Response: `{ demoMode, stripePublishableKey, appName, version }`
+
+**GET /api/health**
+- Server health check
+- Response: `{ status, demoMode, database, timestamp }`
+
+**GET /api/chefs**
+- List all chefs
+- Response: Array of chef objects
+
+**GET /api/chefs/:chefId**
+- Get chef details
+- Response: Chef object with menu items
+
+### Protected Endpoints (Require Auth)
+
+**GET /api/orders**
+- List all orders (admin only)
+- Headers: `Cookie: sessionId=...` or `Authorization: Bearer <token>`
+- Response: `{ orders: [...] }`
+
+**GET /api/orders/:orderId**
+- Get order details (admin only)
+- Response: Order object
+
+**PATCH /api/orders/:orderId/status**
+- Update order status (admin/chef only)
+- Body: `{ status: string }`
+- Response: `{ success: true, order: {...} }`
+
+**POST /api/payments/create-checkout-session**
+- Create Stripe checkout session
+- Body: `{ items, customerId, chefId }`
+- Response: `{ sessionId, url }`
+
+### Response Format
+
+All endpoints follow a consistent response envelope:
+
+**Success:**
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+**Error:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "details": { ... }  // Optional
+  }
+}
+```
+
+### Authentication
+
+The API supports two authentication methods:
+
+1. **JWT Tokens (Recommended):**
+   - Include in Authorization header: `Authorization: Bearer <token>`
+   - Tokens expire after 24 hours (configurable via `JWT_EXPIRES_IN`)
+
+2. **Session Cookies (Legacy):**
+   - Automatically sent with requests when using `credentials: 'include'`
+
+### Rate Limiting
+
+API endpoints are rate-limited to prevent abuse:
+- General endpoints: 100 requests per 15 minutes per IP
+- Auth endpoints: 5 requests per 15 minutes per IP
+- Can be disabled with `DISABLE_RATE_LIMIT=true` (dev only)
+
