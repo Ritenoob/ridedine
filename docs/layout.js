@@ -139,50 +139,10 @@
             </a>
           </div>
           
-          ${isDemoMode ? this.renderDemoBanner() : ''}
-          
           <div class="app-header__actions">
-            ${isDemoMode ? this.renderRoleSwitcher(role) : ''}
             ${role !== 'public' ? this.renderLogoutButton() : ''}
           </div>
         </header>
-      `;
-    },
-    
-    /**
-     * Render Demo Mode Banner
-     */
-    renderDemoBanner() {
-      return `
-        <div class="demo-banner">
-          <span class="demo-banner__icon">🔧</span>
-          <span class="demo-banner__text">DEVELOPMENT MODE</span>
-        </div>
-      `;
-    },
-    
-    /**
-     * Render Role Switcher (Demo Mode only)
-     */
-    renderRoleSwitcher(currentRole) {
-      const roles = [
-        { id: 'customer', label: 'Customer', icon: '👤' },
-        { id: 'admin', label: 'Admin', icon: '🔐' },
-        { id: 'chef', label: 'Chef', icon: '👨‍🍳' },
-        { id: 'driver', label: 'Driver', icon: '🚗' }
-      ];
-      
-      return `
-        <div class="role-switcher">
-          <label class="role-switcher__label">Switch Role:</label>
-          <select id="roleSwitcher" class="role-switcher__select">
-            ${roles.map(role => `
-              <option value="${role.id}" ${role.id === currentRole ? 'selected' : ''}>
-                ${role.icon} ${role.label}
-              </option>
-            `).join('')}
-          </select>
-        </div>
       `;
     },
     
@@ -294,54 +254,12 @@
      * Attach event listeners to layout elements
      */
     attachEventListeners() {
-      // Role switcher
-      const roleSwitcher = document.getElementById('roleSwitcher');
-      if (roleSwitcher) {
-        roleSwitcher.addEventListener('change', async (e) => {
-          const newRole = e.target.value;
-          await this.switchRole(newRole);
-        });
-      }
-      
       // Logout button
       const logoutBtn = document.getElementById('logoutBtn');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
           await this.logout();
         });
-      }
-    },
-    
-    /**
-     * Switch user role (Demo Mode only)
-     */
-    async switchRole(role) {
-      try {
-        const response = await window.apiFetch('/api/auth/login', {
-          method: 'POST',
-          body: { role, userId: `demo_${role}` }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          window.AppConfig.currentRole = role;
-          
-          // Navigate to appropriate dashboard
-          const dashboards = {
-            'admin': '/admin',
-            'chef': '/chef-portal/dashboard',
-            'driver': '/driver',
-            'customer': '/customer'
-          };
-          
-          navigateTo(dashboards[role] || '/');
-        } else {
-          alert('Failed to switch role: ' + (data.error || 'Unknown error'));
-        }
-      } catch (error) {
-        console.error('Role switch error:', error);
-        alert('Failed to switch role. Please try again.');
       }
     },
     
