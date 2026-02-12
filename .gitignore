@@ -1,6 +1,7 @@
 node_modules/
 .env
 .env.local
+.env*.local
 *.log
 .DS_Store
 dist/
@@ -10,3 +11,15 @@ coverage/
 *.tmp
 .vscode/
 .idea/
+
+# Expo
+.expo/
+.expo-shared/
+
+# Next.js
+.next/
+out/
+
+# Supabase
+**/supabase/.temp/
+**/supabase/.branches/
