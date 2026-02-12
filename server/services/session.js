@@ -51,7 +51,12 @@ function cleanupExpiredSessions() {
 }
 
 // Cleanup expired sessions every hour
-setInterval(cleanupExpiredSessions, 60 * 60 * 1000);
+const cleanupTimer = setInterval(cleanupExpiredSessions, 60 * 60 * 1000);
+
+// Avoid keeping Node.js process alive during test runs
+if (typeof cleanupTimer.unref === 'function') {
+  cleanupTimer.unref();
+}
 
 module.exports = {
   createSession,

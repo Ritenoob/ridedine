@@ -165,7 +165,7 @@ npm run dev
 npm start
 ```
 
-The application will be available at `http://localhost:8080`
+The application will be available at `http://localhost:3000`
 
 ## 🔐 Authentication
 
@@ -396,25 +396,25 @@ npm run dev
 2. **Test authentication:**
 ```bash
 # Login as admin
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@ridendine.com", "password": "Admin0123"}' \
   -c cookies.txt
 
 # Check session
-curl http://localhost:8080/api/auth/session -b cookies.txt
+curl http://localhost:3000/api/auth/session -b cookies.txt
 
 # Access protected route
-curl http://localhost:8080/api/orders -b cookies.txt
+curl http://localhost:3000/api/orders -b cookies.txt
 ```
 
 3. **Test public endpoints:**
 ```bash
 # Health check
-curl http://localhost:8080/api/health
+curl http://localhost:3000/api/health
 
 # Order tracking (no auth required)
-curl http://localhost:8080/api/orders/ORDER123/tracking
+curl http://localhost:3000/api/orders/ORDER123/tracking
 ```
 
 ### Automated Tests
