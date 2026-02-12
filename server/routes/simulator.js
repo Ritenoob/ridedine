@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const simulator = require('../services/simulator');
+const revenue = require('../services/revenue');
 
 // Initialize simulator
 router.post('/initialize', (req, res) => {
@@ -132,6 +133,68 @@ router.get('/stores', (req, res) => {
   } catch (error) {
     console.error('Get stores error:', error);
     res.status(500).json({ error: 'Failed to get stores' });
+  }
+});
+
+// Revenue Simulator Endpoints
+
+// Get revenue overview
+router.get('/revenue/overview', (req, res) => {
+  try {
+    const overview = revenue.getRevenueOverview();
+    res.json(overview);
+  } catch (error) {
+    console.error('Revenue overview error:', error);
+    res.status(500).json({ error: 'Failed to get revenue overview' });
+  }
+});
+
+// Get daily revenue
+router.get('/revenue/daily', (req, res) => {
+  try {
+    const date = req.query.date ? new Date(req.query.date) : new Date();
+    const daily = revenue.calculateDailyRevenue(date);
+    res.json(daily);
+  } catch (error) {
+    console.error('Daily revenue error:', error);
+    res.status(500).json({ error: 'Failed to calculate daily revenue' });
+  }
+});
+
+// Get weekly revenue
+router.get('/revenue/weekly', (req, res) => {
+  try {
+    const weekStart = req.query.weekStart ? new Date(req.query.weekStart) : null;
+    const weekly = revenue.calculateWeeklyRevenue(weekStart);
+    res.json(weekly);
+  } catch (error) {
+    console.error('Weekly revenue error:', error);
+    res.status(500).json({ error: 'Failed to calculate weekly revenue' });
+  }
+});
+
+// Get monthly revenue
+router.get('/revenue/monthly', (req, res) => {
+  try {
+    const year = req.query.year ? parseInt(req.query.year) : null;
+    const month = req.query.month ? parseInt(req.query.month) - 1 : null; // Convert to 0-indexed
+    const monthly = revenue.calculateMonthlyRevenue(year, month);
+    res.json(monthly);
+  } catch (error) {
+    console.error('Monthly revenue error:', error);
+    res.status(500).json({ error: 'Failed to calculate monthly revenue' });
+  }
+});
+
+// Get revenue projection
+router.get('/revenue/projection', (req, res) => {
+  try {
+    const days = req.query.days ? parseInt(req.query.days) : 30;
+    const projection = revenue.projectRevenue(days);
+    res.json(projection);
+  } catch (error) {
+    console.error('Revenue projection error:', error);
+    res.status(500).json({ error: 'Failed to calculate revenue projection' });
   }
 });
 
