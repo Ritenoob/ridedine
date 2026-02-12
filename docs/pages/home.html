@@ -72,6 +72,68 @@
       color: white;
     }
 
+    .hero__cta-group {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero__cta--secondary {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: none;
+    }
+
+    .hero__cta--secondary:hover {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.7);
+      color: #fff;
+    }
+
+    .portal-strip {
+      max-width: 1200px;
+      margin: -1.25rem auto 2.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .portal-strip__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .portal-tab {
+      background: #fff;
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-xl);
+      padding: 0.875rem;
+      text-decoration: none;
+      color: var(--color-text);
+      display: block;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+    }
+
+    .portal-tab:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-primary);
+      color: var(--color-text);
+    }
+
+    .portal-tab__title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+      margin-bottom: 0.2rem;
+    }
+
+    .portal-tab__desc {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      line-height: 1.4;
+    }
+
     /* Section Container */
     .section {
       max-width: 1200px;
@@ -450,9 +512,36 @@
   <section class="hero">
     <div class="hero__content">
       <h1 class="hero__title">Delicious Meals from Local Chefs</h1>
-      <p class="hero__subtitle">Discover authentic home-cooked dishes from talented chefs in your neighborhood. Fresh, flavorful, and delivered to your door.</p>
-      <a href="/track" class="hero__cta">
-        📦 Track Your Order
+      <p class="hero__subtitle">Your customer-facing marketplace for premium home-chef meals. Fast checkout, reliable delivery, and real-time order tracking from kitchen to doorstep.</p>
+      <div class="hero__cta-group">
+        <a href="/browse" class="hero__cta">🍽️ Start Ordering</a>
+        <a href="/track" class="hero__cta hero__cta--secondary">📦 Track Order</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Business Access Tabs -->
+  <section class="portal-strip" aria-label="Business operations portals">
+    <div class="portal-strip__grid">
+      <a class="portal-tab" href="/">
+        <div class="portal-tab__title">🛍️ Customer</div>
+        <div class="portal-tab__desc">Browse chefs, order food, and manage checkout.</div>
+      </a>
+      <a class="portal-tab" href="/chef-portal/login">
+        <div class="portal-tab__title">👨‍🍳 Chef</div>
+        <div class="portal-tab__desc">Update menus, offerings, and active orders.</div>
+      </a>
+      <a class="portal-tab" href="/driver/login">
+        <div class="portal-tab__title">🚗 Driver</div>
+        <div class="portal-tab__desc">Accept routes and complete delivery tasks.</div>
+      </a>
+      <a class="portal-tab" href="/admin/payouts">
+        <div class="portal-tab__title">💳 Payments</div>
+        <div class="portal-tab__desc">Review payouts, disputes, and transaction flow.</div>
+      </a>
+      <a class="portal-tab" href="/admin/login">
+        <div class="portal-tab__title">🛡️ Admin</div>
+        <div class="portal-tab__desc">Operate the full backend business dashboard.</div>
       </a>
     </div>
   </section>
@@ -518,7 +607,7 @@
     (function() {
       'use strict';
 
-      // Featured chefs data (hardcoded for demo)
+      // Featured chefs data for sales landing page
       const featuredChefs = [
         {
           name: "Hoàng Gia Phở",
@@ -565,7 +654,7 @@
         }
       ];
 
-      // Featured dishes data (hardcoded for demo)
+      // Featured dishes data for sales landing page
       const featuredDishes = [
         {
           name: "Classic Phở Bò",

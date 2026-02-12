@@ -55,14 +55,14 @@
     demoRow.style.cssText = 'display: none; align-items: center; gap: 6px;';
     
     const demoLabel = document.createElement('span');
-    demoLabel.textContent = '🔧 Dev Mode:';
+    demoLabel.textContent = '🔧 System Mode:';
     demoLabel.style.opacity = '0.7';
     
     const demoValue = document.createElement('span');
     demoValue.id = 'env-banner-demo';
     demoValue.style.fontWeight = 'bold';
     demoValue.style.color = '#ffd700';
-    demoValue.textContent = 'ON';
+    demoValue.textContent = 'ACTIVE';
     
     demoRow.appendChild(demoLabel);
     demoRow.appendChild(demoValue);

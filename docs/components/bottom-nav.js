@@ -11,7 +11,8 @@
     { path: '/', icon: '🏠', label: 'Home' },
     { path: '/browse', icon: '🍽️', label: 'Browse' },
     { path: '/orders', icon: '📦', label: 'Orders' },
-    { path: '/account', icon: '👤', label: 'Account' }
+    { path: '/account', icon: '👤', label: 'Account' },
+    { path: '/admin/login', icon: '🛡️', label: 'Admin' }
   ];
 
   /**
