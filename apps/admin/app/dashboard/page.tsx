@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default async function Dashboard() {
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const { data: { session } } = await supabase.auth.getSession()
   
