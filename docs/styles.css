@@ -1,12 +1,13 @@
 :root {
   color-scheme: light;
-  --teal: #19b7b1;
-  --teal-dark: #0e8f8b;
-  --orange: #ff7a18;
-  --orange-dark: #d85c0f;
-  --sand: #f8f6f2;
-  --ink: #1e1f24;
-  --muted: #5f6671;
+  /* Legacy color variables - now mapped to new design tokens */
+  --teal: #065f46;      /* Deep Emerald (primary) */
+  --teal-dark: #064e3b; /* Darker Emerald */
+  --orange: #fb923c;    /* Warm Orange (accent) */
+  --orange-dark: #ea580c; /* Darker Orange */
+  --sand: #f3f4f6;      /* Soft neutral gray */
+  --ink: #111827;       /* Deep charcoal */
+  --muted: #6b7280;     /* Muted gray */
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 

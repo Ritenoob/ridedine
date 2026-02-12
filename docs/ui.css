@@ -11,22 +11,22 @@
    ========================================================================= */
 
 :root {
-  /* Brand Colors */
-  --color-primary: #ff7a18;
-  --color-primary-dark: #d85c0f;
-  --color-primary-light: #fff2e8;
+  /* Brand Colors - Production Professional Scheme */
+  --color-primary: #065f46;        /* Deep Emerald - primary brand color */
+  --color-primary-dark: #064e3b;   /* Darker emerald for hover states */
+  --color-primary-light: #d1fae5;  /* Light emerald for backgrounds */
   
-  --color-secondary: #19b7b1;
-  --color-secondary-dark: #0e8f8b;
-  --color-secondary-light: #f7fbfa;
+  --color-secondary: #fb923c;      /* Warm Orange - accent color */
+  --color-secondary-dark: #ea580c; /* Darker orange for hover states */
+  --color-secondary-light: #ffedd5; /* Light orange for backgrounds */
   
   /* Neutral Colors */
-  --color-background: #f8f6f2;
+  --color-background: #f3f4f6;     /* Soft neutral gray */
   --color-surface: #ffffff;
-  --color-text: #1e1f24;
-  --color-text-muted: #5f6671;
-  --color-border: #e4e4e4;
-  --color-border-light: #f0efed;
+  --color-text: #111827;           /* Deep charcoal for text */
+  --color-text-muted: #6b7280;     /* Muted gray for secondary text */
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
   
   /* Semantic Colors */
   --color-success: #10b981;
@@ -78,11 +78,12 @@
   --radius-2xl: 1.25rem;   /* 20px */
   --radius-full: 9999px;
   
-  /* Shadows */
+  /* Shadows - Enhanced for depth */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
