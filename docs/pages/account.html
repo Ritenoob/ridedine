@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - RidenDine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f9fafb;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .profile-hero {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #065f46 0%, #fb923c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #fb923c;
+            color: white;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #065f46;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #065f46;
+        }
+
+        .form-input:disabled {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #065f46;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #047857;
+        }
+
+        .btn-secondary {
+            background: #fb923c;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #f97316;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #065f46;
+            border: 2px solid #065f46;
+        }
+
+        .btn-outline:hover {
+            background: #f0fdf4;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .list-item {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-item-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .preference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .preference-item {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preference-item.selected {
+            border-color: #065f46;
+            background: #f0fdf4;
+        }
+
+        .preference-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .preference-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .toggle-group {
+            margin-bottom: 1rem;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            flex: 1;
+        }
+
+        .toggle-title {
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .toggle-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #065f46;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            text-decoration: none;
+            color: #1f2937;
+            transition: all 0.2s;
+        }
+
+        .link-item:hover {
+            border-color: #065f46;
+            background: #f0fdf4;
+        }
+
+        .link-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .preference-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>My Account</h1>
+    </div>
+
+    <div class="container">
+        <!-- Profile Hero -->
+        <div class="profile-hero">
+            <div class="avatar-container">
+                <div class="avatar" id="userAvatar">JD</div>
+                <div class="edit-avatar-btn">✏️</div>
+            </div>
+            <h2 id="userNameDisplay" style="margin-bottom: 0.25rem; color: #1f2937;">John Doe</h2>
+            <p id="userEmailDisplay" style="color: #6b7280; font-size: 0.875rem;">john.doe@example.com</p>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalOrders">12</div>
+                    <div class="stat-label">Orders</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="favoriteChefs">5</div>
+                    <div class="stat-label">Fave Chefs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalSpent">$248</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Information -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Profile Information</h2>
+                <button class="btn btn-sm btn-outline" id="editProfileBtn">Edit</button>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="userName" value="John Doe" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="userEmail" value="john.doe@example.com" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="userPhone" value="+1 (555) 123-4567" disabled>
+                </div>
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn" style="display: none;">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+
+        <!-- Saved Addresses -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Saved Addresses</h2>
+                <button class="btn btn-sm btn-secondary" onclick="openAddressModal()">+ Add</button>
+            </div>
+            <div id="addressList"></div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Payment Methods</h2>
+                <button class="btn btn-sm btn-secondary" onclick="openPaymentModal()">+ Add</button>
+            </div>
+            <div id="paymentList"></div>
+        </div>
+
+        <!-- Dietary Preferences -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Dietary Preferences</h2>
+            </div>
+            <div class="preference-grid" id="dietaryPreferences"></div>
+        </div>
+
+        <!-- Cuisine Preferences -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Cuisine Preferences</h2>
+            </div>
+            <div class="preference-grid" id="cuisinePreferences"></div>
+        </div>
+
+        <!-- Settings -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Settings</h2>
+            </div>
+            <div class="toggle-group">
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <div class="toggle-title">Push Notifications</div>
+                        <div class="toggle-description">Get updates about your orders</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="pushNotifications" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <div class="toggle-title">Order Updates</div>
+                        <div class="toggle-description">Real-time order status notifications</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="orderUpdates" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <div class="toggle-title">Marketing Emails</div>
+                        <div class="toggle-description">Receive promotional offers</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="marketingEmails">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-item">
+                    <div class="toggle-label">
+                        <div class="toggle-title">Chef Recommendations</div>
+                        <div class="toggle-description">Get personalized chef suggestions</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="chefRecommendations" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Quick Links</h2>
+            </div>
+            <a href="orders.html" class="link-item">
+                <span class="link-icon">📦</span>
+                <div class="link-content">
+                    <div class="link-title">Order History</div>
+                    <div class="link-subtitle">View all your past orders</div>
+                </div>
+                <span>→</span>
+            </a>
+        </div>
+
+        <!-- Help & Support -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Help & Support</h2>
+            </div>
+            <a href="#" class="link-item">
+                <span class="link-icon">💬</span>
+                <div class="link-content">
+                    <div class="link-title">Contact Support</div>
+                    <div class="link-subtitle">Get help with your account</div>
+                </div>
+                <span>→</span>
+            </a>
+            <a href="#" class="link-item">
+                <span class="link-icon">❓</span>
+                <div class="link-content">
+                    <div class="link-title">FAQ</div>
+                    <div class="link-subtitle">Find answers to common questions</div>
+                </div>
+                <span>→</span>
+            </a>
+            <a href="#" class="link-item">
+                <span class="link-icon">📋</span>
+                <div class="link-content">
+                    <div class="link-title">Terms & Privacy</div>
+                    <div class="link-subtitle">Read our policies</div>
+                </div>
+                <span>→</span>
+            </a>
+        </div>
+
+        <!-- Logout -->
+        <div class="section">
+            <button class="btn btn-danger" style="width: 100%;" onclick="logout()">
+                🚪 Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Address Modal -->
+    <div class="modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Address</h3>
+                <button class="close-modal" onclick="closeAddressModal()">×</button>
+            </div>
+            <form id="addressForm">
+                <div class="form-group">
+                    <label class="form-label">Label</label>
+                    <input type="text" class="form-input" id="addressLabel" placeholder="Home, Work, etc." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Street Address</label>
+                    <input type="text" class="form-input" id="addressStreet" placeholder="123 Main St" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apartment/Suite</label>
+                    <input type="text" class="form-input" id="addressApt" placeholder="Apt 4B">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-input" id="addressCity" placeholder="New York" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-input" id="addressState" placeholder="NY" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ZIP Code</label>
+                    <input type="text" class="form-input" id="addressZip" placeholder="10001" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Address</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Payment Method</h3>
+                <button class="close-modal" onclick="closePaymentModal()">×</button>
+            </div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cardholder Name</label>
+                    <input type="text" class="form-input" id="cardName" placeholder="John Doe" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-input" id="cardCvv" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Payment Method</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bottomNav"></div>
+
+    <script src="../bottom-nav.js"></script>
+    <script>
+        // Initialize data from localStorage
+        const STORAGE_KEYS = {
+            profile: 'ridendine_profile',
+            addresses: 'ridendine_addresses',
+            payments: 'ridendine_payments',
+            dietaryPrefs: 'ridendine_dietary',
+            cuisinePrefs: 'ridendine_cuisine',
+            settings: 'ridendine_settings',
+            stats: 'ridendine_stats'
+        };
+
+        // Default data
+        const defaultProfile = {
+            name: 'John Doe',
+            email: 'john.doe@example.com',
+            phone: '+1 (555) 123-4567'
+        };
+
+        const defaultStats = {
+            totalOrders: 12,
+            favoriteChefs: 5,
+            totalSpent: 248
+        };
+
+        const dietaryOptions = [
+            { id: 'vegan', icon: '🌱', label: 'Vegan' },
+            { id: 'vegetarian', icon: '🥗', label: 'Vegetarian' },
+            { id: 'halal', icon: '☪️', label: 'Halal' },
+            { id: 'kosher', icon: '✡️', label: 'Kosher' },
+            { id: 'gluten-free', icon: '🌾', label: 'Gluten-Free' },
+            { id: 'dairy-free', icon: '🥛', label: 'Dairy-Free' },
+            { id: 'nut-free', icon: '🥜', label: 'Nut-Free' },
+            { id: 'keto', icon: '🥑', label: 'Keto' }
+        ];
+
+        const cuisineOptions = [
+            { id: 'italian', icon: '🍝', label: 'Italian' },
+            { id: 'chinese', icon: '🥡', label: 'Chinese' },
+            { id: 'mexican', icon: '🌮', label: 'Mexican' },
+            { id: 'japanese', icon: '🍣', label: 'Japanese' },
+            { id: 'indian', icon: '🍛', label: 'Indian' },
+            { id: 'thai', icon: '🍜', label: 'Thai' },
+            { id: 'american', icon: '🍔', label: 'American' },
+            { id: 'french', icon: '🥐', label: 'French' }
+        ];
+
+        // Load data
+        function loadData(key, defaultValue) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        // Initialize profile
+        let profile = loadData(STORAGE_KEYS.profile, defaultProfile);
+        let addresses = loadData(STORAGE_KEYS.addresses, []);
+        let payments = loadData(STORAGE_KEYS.payments, []);
+        let dietaryPrefs = loadData(STORAGE_KEYS.dietaryPrefs, []);
+        let cuisinePrefs = loadData(STORAGE_KEYS.cuisinePrefs, []);
+        let settings = loadData(STORAGE_KEYS.settings, {
+            pushNotifications: true,
+            orderUpdates: true,
+            marketingEmails: false,
+            chefRecommendations: true
+        });
+        let stats = loadData(STORAGE_KEYS.stats, defaultStats);
+
+        // Update UI
+        function updateProfile() {
+            document.getElementById('userName').value = profile.name;
+            document.getElementById('userEmail').value = profile.email;
+            document.getElementById('userPhone').value = profile.phone;
+            document.getElementById('userNameDisplay').textContent = profile.name;
+            document.getElementById('userEmailDisplay').textContent = profile.email;
+            
+            // Update avatar
+            const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+        }
+
+        function updateStats() {
+            document.getElementById('totalOrders').textContent = stats.totalOrders;
+            document.getElementById('favoriteChefs').textContent = stats.favoriteChefs;
+            document.getElementById('totalSpent').textContent = `$${stats.totalSpent}`;
+        }
+
+        function renderAddresses() {
+            const container = document.getElementById('addressList');
+            if (addresses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📍</div>
+                        <p>No saved addresses yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = addresses.map((addr, index) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-title">
+                            ${addr.label}
+                            ${index === 0 ? '<span class="badge badge-primary">Default</span>' : ''}
+                        </div>
+                        <div class="list-item-subtitle">
+                            ${addr.street}${addr.apt ? ', ' + addr.apt : ''}<br>
+                            ${addr.city}, ${addr.state} ${addr.zip}
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="deleteAddress(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPayments() {
+            const container = document.getElementById('paymentList');
+            if (payments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💳</div>
+                        <p>No saved payment methods yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = payments.map((payment, index) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-title">
+                            ${getCardIcon(payment.cardNumber)} •••• ${payment.last4}
+                            ${index === 0 ? '<span class="badge badge-primary">Default</span>' : ''}
+                        </div>
+                        <div class="list-item-subtitle">
+                            ${payment.name} • Expires ${payment.expiry}
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="deletePayment(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCardIcon(cardNumber) {
+            const firstDigit = cardNumber.charAt(0);
+            if (firstDigit === '4') return '💳 Visa';
+            if (firstDigit === '5') return '💳 Mastercard';
+            if (firstDigit === '3') return '💳 Amex';
+            return '💳';
+        }
+
+        function renderPreferences() {
+            const dietaryContainer = document.getElementById('dietaryPreferences');
+            dietaryContainer.innerHTML = dietaryOptions.map(option => `
+                <div class="preference-item ${dietaryPrefs.includes(option.id) ? 'selected' : ''}"
+                     onclick="togglePreference('dietary', '${option.id}')">
+                    <div class="preference-icon">${option.icon}</div>
+                    <div class="preference-label">${option.label}</div>
+                </div>
+            `).join('');
+
+            const cuisineContainer = document.getElementById('cuisinePreferences');
+            cuisineContainer.innerHTML = cuisineOptions.map(option => `
+                <div class="preference-item ${cuisinePrefs.includes(option.id) ? 'selected' : ''}"
+                     onclick="togglePreference('cuisine', '${option.id}')">
+                    <div class="preference-icon">${option.icon}</div>
+                    <div class="preference-label">${option.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateSettings() {
+            Object.keys(settings).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.checked = settings[key];
+                }
+            });
+        }
+
+        // Profile editing
+        document.getElementById('editProfileBtn').addEventListener('click', function() {
+            const inputs = document.querySelectorAll('#profileForm input');
+            inputs.forEach(input => input.disabled = false);
+            document.getElementById('saveProfileBtn').style.display = 'block';
+            this.style.display = 'none';
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            profile = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                phone: document.getElementById('userPhone').value
+            };
+            
+            saveData(STORAGE_KEYS.profile, profile);
+            updateProfile();
+            
+            const inputs = document.querySelectorAll('#profileForm input');
+            inputs.forEach(input => input.disabled = true);
+            document.getElementById('saveProfileBtn').style.display = 'none';
+            document.getElementById('editProfileBtn').style.display = 'inline-flex';
+            
+            alert('Profile updated successfully!');
+        });
+
+        // Address management
+        function openAddressModal() {
+            document.getElementById('addressModal').classList.add('active');
+        }
+
+        function closeAddressModal() {
+            document.getElementById('addressModal').classList.remove('active');
+            document.getElementById('addressForm').reset();
+        }
+
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newAddress = {
+                label: document.getElementById('addressLabel').value,
+                street: document.getElementById('addressStreet').value,
+                apt: document.getElementById('addressApt').value,
+                city: document.getElementById('addressCity').value,
+                state: document.getElementById('addressState').value,
+                zip: document.getElementById('addressZip').value
+            };
+            
+            addresses.push(newAddress);
+            saveData(STORAGE_KEYS.addresses, addresses);
+            renderAddresses();
+            closeAddressModal();
+        });
+
+        function deleteAddress(index) {
+            if (confirm('Are you sure you want to delete this address?')) {
+                addresses.splice(index, 1);
+                saveData(STORAGE_KEYS.addresses, addresses);
+                renderAddresses();
+            }
+        }
+
+        // Payment management
+        function openPaymentModal() {
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            document.getElementById('paymentForm').reset();
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        document.getElementById('cardExpiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        document.getElementById('cardCvv').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            
+            const newPayment = {
+                cardNumber: cardNumber,
+                last4: cardNumber.slice(-4),
+                name: document.getElementById('cardName').value,
+                expiry: document.getElementById('cardExpiry').value,
+                cvv: document.getElementById('cardCvv').value
+            };
+            
+            payments.push(newPayment);
+            saveData(STORAGE_KEYS.payments, payments);
+            renderPayments();
+            closePaymentModal();
+        });
+
+        function deletePayment(index) {
+            if (confirm('Are you sure you want to delete this payment method?')) {
+                payments.splice(index, 1);
+                saveData(STORAGE_KEYS.payments, payments);
+                renderPayments();
+            }
+        }
+
+        // Preferences
+        function togglePreference(type, id) {
+            const key = type === 'dietary' ? STORAGE_KEYS.dietaryPrefs : STORAGE_KEYS.cuisinePrefs;
+            const prefs = type === 'dietary' ? dietaryPrefs : cuisinePrefs;
+            
+            const index = prefs.indexOf(id);
+            if (index > -1) {
+                prefs.splice(index, 1);
+            } else {
+                prefs.push(id);
+            }
+            
+            if (type === 'dietary') {
+                dietaryPrefs = prefs;
+            } else {
+                cuisinePrefs = prefs;
+            }
+            
+            saveData(key, prefs);
+            renderPreferences();
+        }
+
+        // Settings
+        ['pushNotifications', 'orderUpdates', 'marketingEmails', 'chefRecommendations'].forEach(setting => {
+            document.getElementById(setting).addEventListener('change', function(e) {
+                settings[setting] = e.target.checked;
+                saveData(STORAGE_KEYS.settings, settings);
+            });
+        });
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logged out successfully!');
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Initialize
+        function init() {
+            updateProfile();
+            updateStats();
+            renderAddresses();
+            renderPayments();
+            renderPreferences();
+            updateSettings();
+            
+            // Initialize bottom navigation
+            if (typeof window.initBottomNav === 'function') {
+                window.initBottomNav();
+            }
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
