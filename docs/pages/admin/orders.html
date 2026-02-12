@@ -246,12 +246,14 @@
           <td>${escapeHtml(order.customer_name || 'N/A')}</td>
           <td>${escapeHtml(order.customer_email || 'N/A')}</td>
           <td><strong>$${parseFloat(order.total || 0).toFixed(2)}</strong></td>
-          <td><span class="badge ${statusClass}">${order.status}</span></td>
+          <td><span class="badge ${statusClass}">${escapeHtml(order.status)}</span></td>
           <td>${createdDate}</td>
           <td>
             <button 
               class="button button--sm button--outline"
-              onclick="openStatusModal(${order.id}, '${order.status}')"
+              data-order-id="${order.id}"
+              data-order-status="${escapeHtml(order.status)}"
+              onclick="openStatusModal(this.getAttribute('data-order-id'), this.getAttribute('data-order-status'))"
             >
               Update
             </button>

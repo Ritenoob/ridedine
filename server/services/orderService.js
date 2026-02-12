@@ -5,11 +5,37 @@ const dataService = require('./dataService');
 // In-memory order storage when database is not available
 const inMemoryOrders = new Map();
 
+// Valid order statuses
+const VALID_STATUSES = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE', 'DELIVERED'];
+
 /**
  * Generate a secure random tracking token
  */
 function generateTrackingToken() {
   return crypto.randomBytes(32).toString('hex');
+}
+
+/**
+ * Calculate ETA based on order status
+ */
+function calculateETA(status) {
+  switch (status) {
+    case 'CREATED':
+    case 'CONFIRMED':
+      return '45-60 minutes';
+    case 'PREPARING':
+      return '30-40 minutes';
+    case 'READY':
+      return '20-30 minutes';
+    case 'PICKED_UP':
+      return '15-25 minutes';
+    case 'EN_ROUTE':
+      return '5-15 minutes';
+    case 'DELIVERED':
+      return 'Delivered';
+    default:
+      return '45-60 minutes';
+  }
 }
 
 /**
@@ -194,38 +220,12 @@ async function getOrderTracking(orderId, token) {
       };
     }
     
-    // Calculate ETA based on status
-    let eta = null;
-    switch (order.status) {
-      case 'CREATED':
-      case 'CONFIRMED':
-        eta = '45-60 minutes';
-        break;
-      case 'PREPARING':
-        eta = '30-40 minutes';
-        break;
-      case 'READY':
-        eta = '20-30 minutes';
-        break;
-      case 'PICKED_UP':
-        eta = '15-25 minutes';
-        break;
-      case 'EN_ROUTE':
-        eta = '5-15 minutes';
-        break;
-      case 'DELIVERED':
-        eta = 'Delivered';
-        break;
-      default:
-        eta = '45-60 minutes';
-    }
-    
     return {
       success: true,
       data: {
         orderId: order.id,
         status: order.status,
-        eta,
+        eta: calculateETA(order.status),
         total: order.total,
         lastUpdated: order.updatedAt
       }
@@ -270,38 +270,12 @@ async function getOrderTracking(orderId, token) {
       };
     }
     
-    // Calculate ETA based on status
-    let eta = null;
-    switch (order.status) {
-      case 'CREATED':
-      case 'CONFIRMED':
-        eta = '45-60 minutes';
-        break;
-      case 'PREPARING':
-        eta = '30-40 minutes';
-        break;
-      case 'READY':
-        eta = '20-30 minutes';
-        break;
-      case 'PICKED_UP':
-        eta = '15-25 minutes';
-        break;
-      case 'EN_ROUTE':
-        eta = '5-15 minutes';
-        break;
-      case 'DELIVERED':
-        eta = 'Delivered';
-        break;
-      default:
-        eta = '45-60 minutes';
-    }
-    
     return {
       success: true,
       data: {
         orderId: order.id,
         status: order.status,
-        eta,
+        eta: calculateETA(order.status),
         lastUpdated: order.updated_at || order.created_at
       }
     };
@@ -332,12 +306,10 @@ async function updateOrderStatus(orderId, newStatus) {
       };
     }
     
-    const validStatuses = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE', 'DELIVERED'];
-    
-    if (!validStatuses.includes(newStatus)) {
+    if (!VALID_STATUSES.includes(newStatus)) {
       return {
         success: false,
-        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+        error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`
       };
     }
     
@@ -355,12 +327,10 @@ async function updateOrderStatus(orderId, newStatus) {
     };
   }
   
-  const validStatuses = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE', 'DELIVERED'];
-  
-  if (!validStatuses.includes(newStatus)) {
+  if (!VALID_STATUSES.includes(newStatus)) {
     return {
       success: false,
-      error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`
     };
   }
   
