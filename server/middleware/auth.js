@@ -75,22 +75,16 @@ function requireJWT(req, res, next) {
 
 // Session-based authentication middleware (backward compatibility)
 function requireAuth(req, res, next) {
-  // Check for demo mode bypass
-  if (process.env.DEMO_MODE === 'true') {
-    req.user = { userId: 'demo', role: 'admin', email: 'demo@ridendine.com' };
-    return next();
-  }
-
   const sessionId = req.cookies.sessionId;
   
   if (!sessionId) {
     return res.status(401).json({ 
       success: false,
-      error: { 
-        code: 'NO_SESSION', 
-        message: 'Authentication required',
-        redirect: '/admin/login'
-      } 
+      error: {
+        code: 'AUTH_REQUIRED',
+        message: 'Authentication required'
+      },
+      redirect: '/admin/login.html' 
     });
   }
 
@@ -99,11 +93,11 @@ function requireAuth(req, res, next) {
   if (!session) {
     return res.status(401).json({ 
       success: false,
-      error: { 
-        code: 'SESSION_EXPIRED', 
-        message: 'Session expired, please login again',
-        redirect: '/admin/login'
-      } 
+      error: {
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired'
+      },
+      redirect: '/admin/login.html' 
     });
   }
 
@@ -117,20 +111,20 @@ function requireRole(...roles) {
     if (!req.user) {
       return res.status(401).json({ 
         success: false,
-        error: { 
-          code: 'NO_AUTH', 
-          message: 'Authentication required' 
-        } 
+        error: {
+          code: 'AUTH_REQUIRED',
+          message: 'Authentication required'
+        }
       });
     }
 
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ 
         success: false,
-        error: { 
-          code: 'FORBIDDEN', 
-          message: 'Insufficient permissions' 
-        } 
+        error: {
+          code: 'INSUFFICIENT_PERMISSIONS',
+          message: 'Insufficient permissions'
+        }
       });
     }
 

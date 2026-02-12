@@ -13,6 +13,8 @@
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
       
+      let basePath = '/'; // Default to root for all deployments
+      
       // Check if this is GitHub Pages deployment
       if (hostname.endsWith('.github.io')) {
         // Extract repo name from pathname (first segment)
@@ -27,24 +29,24 @@
           const isFile = fileExtensions.some(ext => firstSegment.endsWith(ext));
           
           if (!isFile) {
-            const basePath = '/' + firstSegment + '/';
-            
-            // Create and insert base tag
-            const base = document.createElement('base');
-            base.href = basePath;
-            document.head.appendChild(base);
-            
-            console.log('[RideNDine] GitHub Pages detected, base path set to:', basePath);
+            basePath = '/' + firstSegment + '/';
           }
         }
       }
+      
+      // Always create and insert base tag
+      const base = document.createElement('base');
+      base.href = basePath;
+      document.head.appendChild(base);
+      
+      console.log('[RideNDine] Base path set to:', basePath);
     })();
   </script>
   
   <!-- Icons & Manifest -->
-  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/assets/logo.svg" />
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="./assets/logo.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/logo.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#ff7a18" />
   
   <!-- Preconnect for performance -->
@@ -59,9 +61,9 @@
   />
   
   <!-- Main Styles -->
-  <link rel="stylesheet" href="/ui.css" />
-  <link rel="stylesheet" href="/layout.css" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="./ui.css" />
+  <link rel="stylesheet" href="./layout.css" />
+  <link rel="stylesheet" href="./styles.css" />
   
   <!-- Meta Description -->
   <meta name="description" content="RIDENDINE is a professional delivery sales tracking dashboard connecting home chefs with customers across Hamilton. Order fresh, home-cooked meals for delivery." />

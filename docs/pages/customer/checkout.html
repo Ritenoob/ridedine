@@ -45,6 +45,25 @@
       </div>
     </div>
 
+    <!-- Customer Information -->
+    <div style="margin-bottom: 24px;">
+      <h3>Your Information</h3>
+      <input 
+        type="text" 
+        id="customer-name" 
+        placeholder="Your name"
+        style="width: 100%; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem; margin-bottom: 12px;"
+        required
+      >
+      <input 
+        type="email" 
+        id="customer-email" 
+        placeholder="Your email address"
+        style="width: 100%; border: 1px solid #e4e4e4; border-radius: 12px; padding: 12px 14px; font-size: 1rem; margin-bottom: 12px;"
+        required
+      >
+    </div>
+
     <!-- Delivery Address -->
     <div style="margin-bottom: 24px;">
       <h3>Delivery Address</h3>
@@ -129,6 +148,8 @@
     const address = document.getElementById('delivery-address').value.trim();
     const phone = document.getElementById('delivery-phone').value.trim();
     const notes = document.getElementById('delivery-notes').value.trim();
+    const customerName = document.getElementById('customer-name')?.value.trim() || 'Guest';
+    const customerEmail = document.getElementById('customer-email')?.value.trim();
 
     if (!address) {
       showError('Please enter a delivery address');
@@ -137,6 +158,11 @@
 
     if (!phone) {
       showError('Please enter a phone number');
+      return;
+    }
+
+    if (!customerEmail) {
+      showError('Please enter your email address');
       return;
     }
 
@@ -152,103 +178,55 @@
     document.getElementById('checkout-error').style.display = 'none';
 
     try {
-      // Check if in demo mode
-      const configResponse = await window.apiFetch('/api/config').catch(() => null);
-      const config = configResponse ? await configResponse.json().catch(() => null) : null;
-      const isDemoMode = config?.demoMode === true;
+      // Prepare order items
+      const orderItems = cart.map(item => ({
+        name: item.itemName,
+        price: item.price,
+        quantity: item.quantity,
+        prepTime: item.prepTime || 15
+      }));
 
-      if (isDemoMode) {
-        // DEMO MODE: Create order directly via API
-        const orderItems = cart.map(item => ({
-          name: item.itemName,
-          price: item.price,
-          quantity: item.quantity,
-          prepTime: item.prepTime || 15
-        }));
+      const subtotal = window.CartService.getTotal();
+      const totalAmount = subtotal.toFixed(2);
 
-        const subtotal = window.CartService.getTotal();
-        const deliveryFee = 4.99;
-        const serviceFee = 2.00;
-        const total = (subtotal + deliveryFee + serviceFee).toFixed(2);
-
-        // Create order
-        const orderResponse = await window.apiFetch('/api/orders', {
-          method: 'POST',
-          body: {
-            items: orderItems,
-            chefId: cart[0]?.chefId || 'chef_2000',
-            customerInfo: { address, phone, notes },
-            deliveryAddress: address,
-            total
-          }
-        });
-
-        if (!orderResponse.ok) {
-          throw new Error('Failed to create order');
+      // Create order using new public API
+      const orderResponse = await window.apiFetch('/api/public/orders', {
+        method: 'POST',
+        body: {
+          customerName,
+          customerEmail,
+          items: orderItems,
+          totalAmount
         }
+      });
 
-        const orderData = await orderResponse.json();
-        const orderId = orderData.orderId || orderData.order?.id;
-
-        // Simulate payment
-        if (orderId) {
-          await window.apiFetch('/api/demo/simulate-payment/' + orderId, {
-            method: 'POST'
-          });
-        }
-
-        // Clear cart
-        window.CartService.clearCart();
-
-        // Redirect to success page with order ID
-        navigateTo(`/checkout/success?order=${orderId}`);
-      } else {
-        // PRODUCTION MODE: Use Stripe
-        const items = cart.map(item => ({
-          name: `${item.chefName} - ${item.itemName}`,
-          price: Math.round(item.price * 100), // Convert to cents
-          quantity: item.quantity
-        }));
-
-        // Add delivery and service fees
-        items.push({ name: 'Delivery Fee', price: 499, quantity: 1 });
-        items.push({ name: 'Service Fee', price: 200, quantity: 1 });
-
-        const response = await window.apiFetch('/api/payments/create-checkout-session', {
-          method: 'POST',
-          body: {
-            items,
-            metadata: {
-              deliveryAddress: address,
-              deliveryPhone: phone,
-              deliveryNotes: notes,
-              cart: JSON.stringify(cart)
-            }
-          }
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Failed to create checkout session');
-        }
-
-        const data = await response.json();
-        
-        if (data.url) {
-          // Store delivery info for later
-          localStorage.setItem('pendingOrder', JSON.stringify({
-            address,
-            phone,
-            notes,
-            cart
-          }));
-          
-          // Redirect to Stripe
-          window.location.href = data.url;
-        } else {
-          throw new Error('No checkout URL received');
-        }
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Failed to create order');
       }
+
+      const orderData = await orderResponse.json();
+
+      if (!orderData.success) {
+        throw new Error('Failed to create order');
+      }
+
+      const { orderId, trackingToken } = orderData.data;
+
+      // Store order info in sessionStorage for tracking page
+      sessionStorage.setItem('currentOrder', JSON.stringify({
+        orderId,
+        trackingToken,
+        customerName,
+        customerEmail,
+        timestamp: new Date().toISOString()
+      }));
+
+      // Clear cart
+      window.CartService.clearCart();
+
+      // Redirect to success page with order info
+      navigateTo(`/checkout/success?orderId=${orderId}&token=${trackingToken}`);
     } catch (error) {
       console.error('Checkout error:', error);
       showError(error.message || 'Failed to complete checkout. Please try again.');

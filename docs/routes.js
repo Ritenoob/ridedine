@@ -123,6 +123,10 @@
       await loadPage('/pages/admin/dashboard.html', 'Admin Dashboard | RIDENDINE');
     }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Admin Dashboard | RIDENDINE' });
 
+    router.addRoute('/admin/orders', async () => {
+      await loadPage('/pages/admin/orders.html', 'Orders | RIDENDINE Admin');
+    }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Orders | RIDENDINE Admin' });
+
     router.addRoute('/admin/customers', async () => {
       await loadPage('/pages/admin/customers.html', 'Customers | RIDENDINE Admin');
     }, { requiresAuth: true, allowedRoles: ['admin'], title: 'Customers | RIDENDINE Admin' });

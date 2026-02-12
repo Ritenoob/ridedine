@@ -88,107 +88,73 @@
 
 <script>
   let orderId = null;
+  let trackingToken = null;
 
   async function verifyOrder() {
     // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session_id');
-    const demoOrderId = urlParams.get('order');
+    orderId = urlParams.get('orderId');
+    trackingToken = urlParams.get('token');
 
-    // Handle demo mode (direct order ID)
-    if (demoOrderId) {
-      try {
-        // Fetch order details from API
-        const orderResponse = await window.apiFetch(`/api/orders/${demoOrderId}/tracking`);
-        
-        if (orderResponse.ok) {
-          const orderData = await orderResponse.json();
-          
-          orderId = orderData.orderId || demoOrderId;
-          document.getElementById('order-number').textContent = orderId;
-          document.getElementById('order-status').textContent = orderData.customerStatus || 'Confirmed';
-          document.getElementById('order-total').textContent = orderData.total || '0.00';
-
-          // Display items
-          if (orderData.items && orderData.items.length > 0) {
-            const itemsHtml = orderData.items.map(item => 
-              `<div style="padding: 4px 0;">${item.quantity}x ${item.name} - $${(parseFloat(item.price) * item.quantity).toFixed(2)}</div>`
-            ).join('');
-            document.getElementById('order-items').innerHTML = itemsHtml;
-          }
-        }
-
-        // Clear cart
-        if (window.CartService) {
-          window.CartService.clearCart();
-        }
-        
-        // Show success
-        document.getElementById('success-loading').style.display = 'none';
-        document.getElementById('success-content').style.display = 'block';
-        
-      } catch (error) {
-        console.error('Error loading order:', error);
-        showError('Order created successfully! Order #' + demoOrderId);
+    // Also check sessionStorage
+    if (!orderId || !trackingToken) {
+      const storedOrder = sessionStorage.getItem('currentOrder');
+      if (storedOrder) {
+        const orderData = JSON.parse(storedOrder);
+        orderId = orderData.orderId;
+        trackingToken = orderData.trackingToken;
       }
-      return;
     }
 
-    // Handle production mode (Stripe session)
-    if (!sessionId) {
-      showError('No session ID found. Please contact support if you were charged.');
+    if (!orderId || !trackingToken) {
+      showError('No order information found. Please contact support if you placed an order.');
       return;
     }
 
     try {
-      const response = await window.apiFetch(`/api/payments/verify/${sessionId}`);
+      // Fetch order details using tracking API
+      const orderResponse = await window.apiFetch(`/api/public/track?orderId=${orderId}&token=${trackingToken}`);
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to verify order');
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error?.message || 'Failed to verify order');
       }
 
-      const data = await response.json();
+      const result = await orderResponse.json();
       
-      // Display order details
-      orderId = data.orderId || data.orderNumber || 'N/A';
-      document.getElementById('order-number').textContent = orderId;
-      document.getElementById('order-status').textContent = data.status || 'Confirmed';
-      
-      const total = data.amount ? (data.amount / 100).toFixed(2) : '0.00';
-      document.getElementById('order-total').textContent = total;
-
-      // Display items if available
-      if (data.items && data.items.length > 0) {
-        const itemsHtml = data.items.map(item => 
-          `<div style="padding: 4px 0;">${item.quantity}x ${item.name} - $${((item.price * item.quantity) / 100).toFixed(2)}</div>`
-        ).join('');
-        document.getElementById('order-items').innerHTML = itemsHtml;
-      } else {
-        // Try to get from localStorage
-        const pendingOrder = localStorage.getItem('pendingOrder');
-        if (pendingOrder) {
-          const orderData = JSON.parse(pendingOrder);
-          const itemsHtml = orderData.cart.map(item => 
-            `<div style="padding: 4px 0;">${item.quantity}x ${item.itemName} - $${(item.price * item.quantity).toFixed(2)}</div>`
-          ).join('');
-          document.getElementById('order-items').innerHTML = itemsHtml;
-        }
+      if (!result.success) {
+        throw new Error('Failed to verify order');
       }
 
-      // Clear cart and pending order
+      const orderData = result.data;
+      
+      document.getElementById('order-number').textContent = orderData.orderId;
+      document.getElementById('order-status').textContent = orderData.status || 'CREATED';
+      document.getElementById('order-total').textContent = orderData.total || '0.00';
+
+      // Display ETA
+      if (orderData.eta) {
+        document.getElementById('order-status').innerHTML = `${orderData.status}<br><small style="font-weight: normal; color: var(--muted);">ETA: ${orderData.eta}</small>`;
+      }
+
+      // Clear cart
       if (window.CartService) {
         window.CartService.clearCart();
       }
-      localStorage.removeItem('pendingOrder');
-
+      
       // Show success
       document.getElementById('success-loading').style.display = 'none';
       document.getElementById('success-content').style.display = 'block';
-
+      
     } catch (error) {
-      console.error('Verification error:', error);
-      showError(error.message || 'Failed to verify order. Please contact support if you were charged.');
+      console.error('Error loading order:', error);
+      showError(error.message || 'Order created successfully! Order #' + orderId);
+      // Still show as success if we have an order ID
+      if (orderId) {
+        document.getElementById('success-loading').style.display = 'none';
+        document.getElementById('success-content').style.display = 'block';
+        document.getElementById('order-number').textContent = orderId;
+      }
     }
   }
 
@@ -199,10 +165,10 @@
   }
 
   function trackOrder() {
-    if (orderId && orderId !== 'N/A') {
-      navigateTo(`/order/${orderId}`);
+    if (orderId && trackingToken) {
+      navigateTo(`/track?orderId=${orderId}&token=${trackingToken}`);
     } else {
-      navigateTo('/order-tracking');
+      navigateTo('/track');
     }
   }
 
