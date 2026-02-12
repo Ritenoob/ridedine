@@ -638,7 +638,7 @@
             <div class="section-header">
                 <h2 class="section-title">Quick Links</h2>
             </div>
-            <a href="orders.html" class="link-item">
+            <a href="/orders" class="link-item" onclick="event.preventDefault(); if (window.Router) { window.Router.navigate('/orders'); } else { window.location.href = '/orders'; }">
                 <span class="link-icon">📦</span>
                 <div class="link-content">
                     <div class="link-title">Order History</div>
@@ -757,7 +757,7 @@
 
     <div id="bottomNav"></div>
 
-    <script src="../bottom-nav.js"></script>
+    <script src="../components/bottom-nav.js"></script>
     <script>
         // Initialize data from localStorage
         const STORAGE_KEYS = {

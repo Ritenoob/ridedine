@@ -227,60 +227,6 @@ router.post('/:orderId/advance', requireAuth, (req, res) => {
   }
   
   res.json({ success: true, order });
-}); (admin/chef only)
-router.patch('/:orderId/status', requireAuth, (req, res) => {
-  const { status } = req.body;
-  
-  if (!status) {
-    return res.status(400).json({ 
-      success: false,
-      error: {
-        code: 'INVALID_INPUT',
-        message: 'Status is required'
-      }
-    });
-  }
-
-  if (isDemoMode()) {
-    // Use demo data advance function
-    try {
-      const result = demoData.advanceOrder(req.params.orderId);
-      res.json({ 
-        success: true,
-        data: {
-          order: result.order
-        }
-      });
-    } catch (error) {
-      res.status(400).json({ 
-        success: false,
-        error: {
-          code: 'UPDATE_ORDER_ERROR',
-          message: error.message
-        }
-      });
-    }
-  } else {
-    const order = orderService.getOrder(req.params.orderId);
-    
-    if (!order) {
-      return res.status(404).json({ 
-        success: false,
-        error: {
-          code: 'ORDER_NOT_FOUND',
-          message: 'Order not found'
-        }
-      });
-    }
-
-    const updatedOrder = orderService.updateOrder(req.params.orderId, { status });
-    res.json({ 
-      success: true,
-      data: {
-        order: updatedOrder
-      }
-    });
-  }
 });
 
 // List all orders (admin only)

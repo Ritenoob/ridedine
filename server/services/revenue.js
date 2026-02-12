@@ -107,7 +107,7 @@ function calculateMonthlyRevenue(year = null, month = null) {
   const targetMonth = month !== null ? month : date.getMonth();
   
   const startOfMonth = new Date(targetYear, targetMonth, 1);
-  const endOfMonth = new Date(targetYear, targetMonth + 1, 0);
+  const endOfMonth = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
   
   const orders = orderService.listOrders();
   const monthlyOrders = orders.filter(order => {

@@ -4,7 +4,7 @@
  */
 
 const orderService = require('../services/orders');
-const { sendSuccess, sendError } = require('../middleware/responseEnvelope');
+const { sendSuccess } = require('../middleware/responseEnvelope');
 const { AppError } = require('../middleware/errorHandler');
 
 /**

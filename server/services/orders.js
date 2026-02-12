@@ -46,7 +46,7 @@ function getOrder(orderId) {
 
 // Get order by tracking token
 function getOrderByTrackingToken(trackingToken) {
-  for (const [orderId, order] of orders.entries()) {
+  for (const [, order] of orders.entries()) {
     if (order.trackingToken === trackingToken) {
       return order;
     }
@@ -70,11 +70,12 @@ function createOrder(orderData) {
   const trackingToken = generateTrackingToken();
   const now = new Date().toISOString();
   
+  // Spread orderData first, then override reserved fields to prevent tampering
   const order = {
+    ...orderData,
     orderId,
     trackingToken,
     status: ORDER_STATUS.CREATED,
-    ...orderData,
     createdAt: orderData.createdAt || now,
     updatedAt: now,
     statusHistory: [

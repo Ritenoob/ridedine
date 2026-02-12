@@ -234,10 +234,6 @@
     </main>
   </div>
 
-  <script src="../../api-client.js"></script>
-  <script src="../../auth-client.js"></script>
-  <script src="../../router.js"></script>
-  <script src="../../routes.js"></script>
   <script src="../../auth-guard.js" data-required-role="admin"></script>
   <script>
     (async function() {
@@ -251,18 +247,36 @@
       
       async function loadDashboard() {
         try {
-          const res = await window.apiFetch('/api/demo/data');
-          const data = await res.json();
-          if (data.success || data.orders) {
-            const orders = data.orders || [];
-            const drivers = data.drivers || [];
-            const chefs = data.chefs || [];
-            updateMetrics(orders, drivers, chefs);
-            updateRevenue(orders);
-            updatePipeline(orders);
-            updateActiveOrders(orders);
-            updateActiveDrivers(drivers);
+          let orders = [];
+          let drivers = [];
+          let chefs = [];
+
+          if (isDemoMode) {
+            const res = await window.apiFetch('/api/demo/data');
+            const data = await res.json();
+            if (data.success || data.orders) {
+              orders = data.orders || [];
+              drivers = data.drivers || [];
+              chefs = data.chefs || [];
+            }
+          } else {
+            // Production mode: fetch from real endpoints
+            const res = await window.apiFetch('/api/orders');
+            const data = await res.json();
+            // Handle different response shapes: { orders: [...] } or just [...]
+            orders = data.orders || data || [];
           }
+
+          if (!orders || orders.length === 0) {
+            // No orders to display
+            return;
+          }
+
+          updateMetrics(orders, drivers, chefs);
+          updateRevenue(orders);
+          updatePipeline(orders);
+          updateActiveOrders(orders);
+          updateActiveDrivers(drivers);
         } catch (error) { console.error('Load failed:', error); }
       }
       
