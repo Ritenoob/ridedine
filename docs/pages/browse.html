@@ -262,6 +262,30 @@
       font-size: var(--font-size-base);
     }
 
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 6rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-primary);
+      color: white;
+      padding: var(--space-4) var(--space-6);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-xl);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      z-index: var(--z-tooltip);
+      opacity: 0;
+      transition: all var(--transition-base);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .browse-header {
@@ -357,6 +381,9 @@
     </div>
   </div>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
   <script src="../components/bottom-nav.js"></script>
   <script>
     // Dish data
@@ -390,8 +417,8 @@
     function init() {
       setupFilterListeners();
       renderDishes();
-      if (window.refreshBottomNav) {
-        window.refreshBottomNav();
+      if (window.initBottomNav) {
+        window.initBottomNav();
       }
     }
 
@@ -528,11 +555,22 @@
       // Save cart
       localStorage.setItem('cart', JSON.stringify(cart));
       
-      // Show feedback
-      alert(`✅ ${dish.name} added to cart!`);
+      // Show feedback with toast
+      showToast(`✅ ${dish.name} added to cart!`);
       
       // Update cart count if available
       updateCartCount();
+    }
+
+    // Show toast notification
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
     }
 
     // Update cart count
