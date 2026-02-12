@@ -13,7 +13,11 @@ class AuthClient {
   async checkSession() {
     try {
       const response = await window.apiFetch('/api/auth/session');
-      const data = await response.json();
+      const result = await response.json();
+      
+      // Handle new response envelope format
+      const data = result.success ? result.data : result;
+      
       this.session = data;
       return data;
     } catch (error) {
@@ -28,22 +32,25 @@ class AuthClient {
     }
   }
 
-  // Login
-  async login(password, role) {
+  // Login - now requires email and password
+  async login(email, password) {
     try {
       const response = await window.apiFetch('/api/auth/login', {
         method: 'POST',
-        body: { password, role }
+        body: { email, password }
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        const errorMsg = result.error?.message || result.error || 'Login failed';
+        throw new Error(errorMsg);
       }
 
-      this.session = data;
-      return data;
+      // Handle new response envelope format
+      const data = result.success ? result.data : result;
+      this.session = { authenticated: true, ...data };
+      return this.session;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -57,9 +64,11 @@ class AuthClient {
         method: 'POST'
       });
 
-      const data = await response.json();
+      const result = await response.json();
       this.session = null;
-      return data;
+      
+      // Return data from response envelope
+      return result.success ? result.data : result;
     } catch (error) {
       console.error('Logout failed:', error);
       throw error;

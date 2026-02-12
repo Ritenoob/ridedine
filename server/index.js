@@ -12,8 +12,7 @@ app.set('trust proxy', 1);
 
 const PORT = Number(process.env.PORT || 3000);
 
-// IMPORTANT: DEMO_MODE is FALSE by default for production security
-// Only enable it explicitly for development/testing
+// Robust env parsing - DEMO_MODE is FALSE by default (production-first)
 const DEMO_MODE = process.env.DEMO_MODE === 'true';
 const DISABLE_RATE_LIMIT = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
 
@@ -55,8 +54,11 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Ensure OPTIONS requests are handled properly
+app.options('*', cors());
 // Rate limiting (can be disabled)
 if (!DISABLE_RATE_LIMIT) {
   const limiter = rateLimit({
@@ -101,10 +103,13 @@ const simulatorRoutes = require('./routes/simulator');
 // Config endpoint
 app.get('/api/config', (req, res) => {
   res.json({
-    demoMode: DEMO_MODE,
-    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
-    appName: 'RideNDine',
-    version: '1.0.0'
+    success: true,
+    data: {
+      demoMode: DEMO_MODE,
+      stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      appName: 'RideNDine',
+      version: '1.0.0'
+    }
   });
 });
 
@@ -112,19 +117,21 @@ app.get('/api/config', (req, res) => {
 app.get('/api/health', async (req, res) => {
   const dbConnected = dataService.isDbAvailable();
   res.json({
-    status: 'ok',
-    demoMode: DEMO_MODE,
-    demoModeRaw: process.env.DEMO_MODE ?? null,
-    disableRateLimitRaw: process.env.DISABLE_RATE_LIMIT ?? null,
-    portRaw: process.env.PORT ?? null,
-    database: dbConnected ? 'connected' : 'fallback-to-memory',
-    databaseUrl: process.env.DATABASE_URL ? 'configured' : 'not-configured',
-    timestamp: new Date().toISOString()
+    success: true,
+    data: {
+      status: 'ok',
+      demoMode: DEMO_MODE,
+      database: dbConnected ? 'connected' : 'fallback-to-memory',
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
 app.get('/api/version', (req, res) => {
-  res.json({ version: 'ed995bd' });
+  res.json({ 
+    success: true, 
+    data: { version: 'ed995bd' } 
+  });
 });
 
 // New simulation and dashboard endpoints
@@ -203,13 +210,21 @@ app.use((req, res, next) => {
   res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
 });
 
-// Error handler
+// Error handler - returns consistent response envelope
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+  
+  const statusCode = err.status || err.statusCode || 500;
+  const response = {
+    success: false,
+    error: {
+      code: err.code || 'INTERNAL_ERROR',
+      message: err.message || 'Internal server error',
+      ...(process.env.NODE_ENV === 'development' && err.stack && { stack: err.stack })
+    }
+  };
+  
+  res.status(statusCode).json(response);
 });
 
 app.listen(PORT, async () => {

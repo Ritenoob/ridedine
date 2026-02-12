@@ -74,7 +74,7 @@ RIDENDINE is a comprehensive delivery management platform connecting local chefs
 ### Prerequisites
 - Node.js >= 18.0.0
 - npm or yarn
-- Stripe account (for payment processing)
+- Stripe account (for payment processing - optional for testing)
 
 ### Installation
 
@@ -158,70 +158,45 @@ node scripts/generate-password-hash.js YourSecurePassword123
 ### Running Locally
 
 ```bash
-# Development mode with auto-reload
+# Development mode
 npm run dev
 
 # Production mode
 npm start
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:8080`
 
-## 🧪 Development & Production Modes
+## 🔐 Authentication
 
-### Development Mode
+### Production Mode (DEMO_MODE=false)
 
-For local development and testing, you can enable demo mode:
+**Admin Login:**
+- Navigate to the homepage
+- Click "Admin" link in the footer (discreet)
+- Login with email and password configured in `.env`
+
+**Security Features:**
+- ✅ Bcrypt password hashing
+- ✅ Session-based authentication with HTTP-only cookies
+- ✅ Rate limiting on login endpoints
+- ✅ Timing-safe password comparison
+- ✅ CORS protection
+- ✅ Role-based access control
+
+### Development Mode (DEMO_MODE=true)
+
+**⚠️ NEVER USE IN PRODUCTION!**
+
+When enabled for testing:
+- Authentication is bypassed
+- Any email/password combination accepted
+- Sample data automatically loaded
 
 ```bash
-# In .env
+# In .env (development only)
 DEMO_MODE=true
 ```
-
-**When enabled:**
-- ✅ Authentication is bypassed for all roles
-- ✅ Sample data is automatically loaded
-- ✅ Payment simulation is available
-- ⚠️ **NOT FOR PRODUCTION USE**
-
-### Production Mode (Recommended)
-
-For production deployment with secure authentication:
-
-```bash
-# In .env
-DEMO_MODE=false  # or omit this variable
-JWT_SECRET=<your-64-char-random-string>
-ADMIN_EMAIL=admin@yourdomain.com
-ADMIN_PASSWORD_HASH=<bcrypt-hash-from-generator>
-FRONTEND_URL=https://yourdomain.com
-```
-
-**Generate JWT Secret:**
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-**Generate Password Hash:**
-```bash
-node scripts/generate-password-hash.js YourSecurePassword
-```
-
-### Login Credentials
-
-**Production Mode:**
-- Email: (from `ADMIN_EMAIL` env var)
-- Password: (the password you used to generate `ADMIN_PASSWORD_HASH`)
-- Login URL: `/admin/login`
-
-**Development Mode (DEMO_MODE=true):**
-- Any email/password will work (authentication bypassed)
-
-**Note:** Chef and Driver authentication is not yet migrated to the new JWT system. They still use session-based auth with role and password from env vars.
-
-**Driver:**
-- Username: driver
-- Password: (from `DRIVER_PASSWORD` env var)
 
 ## 📦 Deployment
 
@@ -330,15 +305,40 @@ GITHUB_PAGES_ORIGIN=https://username.github.io
 
 ## 🔌 API Endpoints
 
+### Response Format
+
+All API endpoints return a consistent response envelope:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message"
+  }
+}
+```
+
 ### Authentication
-- `POST /api/auth/login` - User login
+- `POST /api/auth/login` - User login (requires email and password)
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/session` - Check session status
 
 ### Orders
-- `GET /api/orders/:orderId` - Get order details
-- `GET /api/orders/:orderId/tracking` - Public tracking info
+- `GET /api/orders` - List all orders (admin only)
+- `GET /api/orders/:orderId` - Get order details (admin only)
+- `GET /api/orders/:orderId/tracking` - Public tracking info (no auth required)
 - `POST /api/orders` - Create new order
+- `PATCH /api/orders/:orderId/status` - Update order status (admin only)
 
 ### Payments
 - `POST /api/payments/create-checkout-session` - Stripe checkout
@@ -383,6 +383,51 @@ Based on 4px grid (4px, 8px, 12px, 16px, 20px, 24px, 32px, 40px, 48px, 64px)
 - Tables and lists
 - Modals and toasts
 - Navigation (sidebar, header, bottom nav)
+
+## 🧪 Testing
+
+### Manual Testing
+
+1. **Start the server:**
+```bash
+npm run dev
+```
+
+2. **Test authentication:**
+```bash
+# Login as admin
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@ridendine.com", "password": "Admin0123"}' \
+  -c cookies.txt
+
+# Check session
+curl http://localhost:8080/api/auth/session -b cookies.txt
+
+# Access protected route
+curl http://localhost:8080/api/orders -b cookies.txt
+```
+
+3. **Test public endpoints:**
+```bash
+# Health check
+curl http://localhost:8080/api/health
+
+# Order tracking (no auth required)
+curl http://localhost:8080/api/orders/ORDER123/tracking
+```
+
+### Automated Tests
+
+Currently, this project uses manual testing. To add automated tests:
+
+```bash
+# Install test dependencies
+npm install --save-dev jest supertest
+
+# Run tests (when implemented)
+npm test
+```
 
 ## 🔒 Security
 
