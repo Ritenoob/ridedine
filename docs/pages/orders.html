@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - RideNDine</title>
+  <link rel="stylesheet" href="../ui.css">
+  <link rel="stylesheet" href="../layout.css">
+  <style>
+    /* Page Container */
+    .orders-page {
+      min-height: 100vh;
+      background: var(--color-background);
+      padding-bottom: 5rem;
+    }
+
+    /* Hero Header */
+    .orders-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .orders-header__title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      margin: 0;
+    }
+
+    .orders-header__subtitle {
+      font-size: var(--font-size-base);
+      opacity: 0.9;
+      margin-top: var(--space-2);
+    }
+
+    /* Search Section */
+    .search-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-4);
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: var(--space-4) var(--space-4) var(--space-4) 3rem;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      font-size: var(--font-size-base);
+      transition: all var(--transition-base);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Orders Container */
+    .orders-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--space-4) var(--space-6);
+    }
+
+    /* Section Header */
+    .section-header {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin: var(--space-6) 0 var(--space-4);
+    }
+
+    .section-header:first-child {
+      margin-top: 0;
+    }
+
+    /* Order Card */
+    .order-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      border: 2px solid transparent;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-light);
+    }
+
+    .order-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: var(--space-3);
+    }
+
+    .order-card__info {
+      flex: 1;
+    }
+
+    .order-card__number {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+    }
+
+    .order-card__date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .order-card__status {
+      flex-shrink: 0;
+      margin-left: var(--space-3);
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .status-badge--created {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .status-badge--confirmed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-badge--preparing {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-badge--ready {
+      background: var(--color-secondary-light);
+      color: var(--color-secondary-dark);
+    }
+
+    .status-badge--picked_up {
+      background: #e9d5ff;
+      color: #7c3aed;
+    }
+
+    .status-badge--en_route {
+      background: var(--color-success-light);
+      color: #047857;
+    }
+
+    .status-badge--delivered,
+    .status-badge--completed {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+
+    /* Order Details */
+    .order-card__details {
+      margin-bottom: var(--space-4);
+    }
+
+    .order-card__items {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .order-card__amount {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
+
+    /* Track Button */
+    .track-button {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .track-button:hover {
+      background: var(--color-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .track-button:active {
+      transform: translateY(0);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12) var(--space-4);
+    }
+
+    .empty-state__icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+
+    .empty-state__title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-2);
+    }
+
+    .empty-state__description {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+    }
+
+    .empty-state__button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      background: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      transition: all var(--transition-base);
+    }
+
+    .empty-state__button:hover {
+      background: var(--color-primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* No Results */
+    .no-results {
+      text-align: center;
+      padding: var(--space-8) var(--space-4);
+      color: var(--color-text-muted);
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      .orders-header {
+        padding: 3rem 2rem;
+      }
+
+      .orders-header__title {
+        font-size: var(--font-size-4xl);
+      }
+
+      .search-section {
+        padding: var(--space-8) var(--space-6) var(--space-6);
+      }
+
+      .order-card {
+        padding: var(--space-6);
+      }
+
+      .order-card__header {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="orders-page">
+    <!-- Header -->
+    <header class="orders-header">
+      <h1 class="orders-header__title">My Orders</h1>
+      <p class="orders-header__subtitle">Track your current and past orders</p>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          id="orderSearch"
+          placeholder="Search by order ID or tracking number..."
+          aria-label="Search orders"
+        >
+      </div>
+    </section>
+
+    <!-- Orders Container -->
+    <div class="orders-container" id="ordersContainer">
+      <!-- Orders will be rendered here -->
+    </div>
+  </div>
+
+  <script src="../components/bottom-nav.js"></script>
+  <script>
+    'use strict';
+
+    // Demo order data
+    const DEMO_ORDERS = [
+      {
+        id: 'ORD-001',
+        trackingNumber: 'TRK-ABC123',
+        date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+        amount: 45.99,
+        status: 'EN_ROUTE',
+        items: 3,
+        chef: 'Chef Mario'
+      },
+      {
+        id: 'ORD-002',
+        trackingNumber: 'TRK-DEF456',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+        amount: 32.50,
+        status: 'PREPARING',
+        items: 2,
+        chef: 'Chef Maria'
+      },
+      {
+        id: 'ORD-003',
+        trackingNumber: 'TRK-GHI789',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+        amount: 58.75,
+        status: 'DELIVERED',
+        items: 5,
+        chef: 'Chef Giovanni'
+      },
+      {
+        id: 'ORD-004',
+        trackingNumber: 'TRK-JKL012',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+        amount: 27.99,
+        status: 'COMPLETED',
+        items: 2,
+        chef: 'Chef Sofia'
+      },
+      {
+        id: 'ORD-005',
+        trackingNumber: 'TRK-MNO345',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
+        amount: 41.25,
+        status: 'COMPLETED',
+        items: 4,
+        chef: 'Chef Marco'
+      },
+      {
+        id: 'ORD-006',
+        trackingNumber: 'TRK-PQR678',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
+        amount: 65.50,
+        status: 'COMPLETED',
+        items: 6,
+        chef: 'Chef Isabella'
+      }
+    ];
+
+    // Status configuration
+    const STATUS_CONFIG = {
+      CREATED: { label: 'Created', class: 'created' },
+      CONFIRMED: { label: 'Confirmed', class: 'confirmed' },
+      PREPARING: { label: 'Preparing', class: 'preparing' },
+      READY: { label: 'Ready', class: 'ready' },
+      PICKED_UP: { label: 'Picked Up', class: 'picked_up' },
+      EN_ROUTE: { label: 'En Route', class: 'en_route' },
+      DELIVERED: { label: 'Delivered', class: 'delivered' },
+      COMPLETED: { label: 'Completed', class: 'completed' }
+    };
+
+    const ACTIVE_STATUSES = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE'];
+    const PAST_STATUSES = ['DELIVERED', 'COMPLETED'];
+
+    // Get orders from localStorage or use demo data
+    function getOrders() {
+      try {
+        const stored = localStorage.getItem('ridendine_orders');
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error('Error loading orders from localStorage:', e);
+      }
+      return DEMO_ORDERS;
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffMins < 1) {
+        return 'Just now';
+      } else if (diffMins < 60) {
+        return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+      } else if (diffHours < 24) {
+        return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+      } else if (diffDays < 7) {
+        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+      } else {
+        return date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+        });
+      }
+    }
+
+    // Render status badge
+    function renderStatusBadge(status) {
+      const config = STATUS_CONFIG[status] || { label: status, class: 'created' };
+      return `<span class="status-badge status-badge--${config.class}">${config.label}</span>`;
+    }
+
+    // Render order card
+    function renderOrderCard(order) {
+      return `
+        <div class="order-card" data-order-id="${order.id}" onclick="navigateToTrack('${order.id}')">
+          <div class="order-card__header">
+            <div class="order-card__info">
+              <div class="order-card__number">${order.id}</div>
+              <div class="order-card__date">${formatDate(order.date)}</div>
+            </div>
+            <div class="order-card__status">
+              ${renderStatusBadge(order.status)}
+            </div>
+          </div>
+          <div class="order-card__details">
+            <div class="order-card__items">
+              ${order.items} item${order.items !== 1 ? 's' : ''} from ${order.chef}
+            </div>
+            <div class="order-card__amount">$${order.amount.toFixed(2)}</div>
+          </div>
+          <button class="track-button" onclick="event.stopPropagation(); navigateToTrack('${order.id}')">
+            <span>📍</span>
+            <span>Track Order</span>
+          </button>
+        </div>
+      `;
+    }
+
+    // Render empty state
+    function renderEmptyState() {
+      return `
+        <div class="empty-state">
+          <div class="empty-state__icon">📦</div>
+          <h2 class="empty-state__title">No Orders Yet</h2>
+          <p class="empty-state__description">
+            Start exploring delicious homemade dishes from local chefs in your area.
+          </p>
+          <a href="/browse" class="empty-state__button">
+            <span>🍽️</span>
+            <span>Browse Dishes</span>
+          </a>
+        </div>
+      `;
+    }
+
+    // Render no results
+    function renderNoResults() {
+      return `
+        <div class="no-results">
+          <p>No orders match your search.</p>
+        </div>
+      `;
+    }
+
+    // Render orders list
+    function renderOrders(orders) {
+      const container = document.getElementById('ordersContainer');
+      
+      if (!orders || orders.length === 0) {
+        container.innerHTML = renderEmptyState();
+        return;
+      }
+
+      // Group orders by status
+      const activeOrders = orders.filter(o => ACTIVE_STATUSES.includes(o.status));
+      const pastOrders = orders.filter(o => PAST_STATUSES.includes(o.status));
+
+      let html = '';
+
+      // Render active orders
+      if (activeOrders.length > 0) {
+        html += '<h2 class="section-header">Active Orders</h2>';
+        activeOrders.forEach(order => {
+          html += renderOrderCard(order);
+        });
+      }
+
+      // Render past orders
+      if (pastOrders.length > 0) {
+        html += '<h2 class="section-header">Past Orders</h2>';
+        pastOrders.forEach(order => {
+          html += renderOrderCard(order);
+        });
+      }
+
+      container.innerHTML = html;
+    }
+
+    // Navigate to track page
+    function navigateToTrack(orderId) {
+      window.location.href = `/track?orderId=${orderId}`;
+    }
+
+    // Search orders
+    function searchOrders(query) {
+      const orders = getOrders();
+      
+      if (!query || query.trim() === '') {
+        renderOrders(orders);
+        return;
+      }
+
+      const searchTerm = query.toLowerCase().trim();
+      const filtered = orders.filter(order => 
+        order.id.toLowerCase().includes(searchTerm) ||
+        order.trackingNumber.toLowerCase().includes(searchTerm) ||
+        order.chef.toLowerCase().includes(searchTerm)
+      );
+
+      if (filtered.length === 0) {
+        document.getElementById('ordersContainer').innerHTML = renderNoResults();
+      } else {
+        renderOrders(filtered);
+      }
+    }
+
+    // Initialize page
+    function init() {
+      // Render orders
+      const orders = getOrders();
+      renderOrders(orders);
+
+      // Setup search
+      const searchInput = document.getElementById('orderSearch');
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          searchOrders(e.target.value);
+        }, 300);
+      });
+
+      // Initialize bottom navigation
+      if (window.initBottomNav) {
+        window.initBottomNav();
+      }
+    }
+
+    // Make navigateToTrack available globally
+    window.navigateToTrack = navigateToTrack;
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

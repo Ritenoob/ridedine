@@ -23,10 +23,30 @@
     // PUBLIC ROUTES (No Authentication Required)
     // =========================================================================
 
-    // Landing page
+    // Home page - Food-first landing
     router.addRoute('/', async () => {
-      await loadPage('/pages/landing.html', 'RIDENDINE | Delivery Sales Tracking Dashboard');
-    }, { title: 'RIDENDINE | Delivery Sales Tracking Dashboard' });
+      await loadPage('/pages/home.html', 'RIDENDINE | Fresh Meals from Local Chefs');
+    }, { title: 'RIDENDINE | Fresh Meals from Local Chefs' });
+
+    // Browse dishes
+    router.addRoute('/browse', async () => {
+      await loadPage('/pages/browse.html', 'Browse Dishes | RIDENDINE');
+    }, { title: 'Browse Dishes | RIDENDINE' });
+
+    // My orders
+    router.addRoute('/orders', async () => {
+      await loadPage('/pages/orders.html', 'My Orders | RIDENDINE');
+    }, { title: 'My Orders | RIDENDINE' });
+
+    // Account
+    router.addRoute('/account', async () => {
+      await loadPage('/pages/account.html', 'My Account | RIDENDINE');
+    }, { title: 'My Account | RIDENDINE' });
+
+    // Legacy landing page (redirect to home)
+    router.addRoute('/landing', async () => {
+      router.navigate('/');
+    }, { title: 'RIDENDINE | Redirecting...' });
 
     // Customer routes
     router.addRoute('/customer', async () => {

@@ -212,22 +212,14 @@ app.use((req, res, next) => {
   res.sendFile(path.join(__dirname, '..', 'docs', 'index.html'));
 });
 
-// Error handler - returns consistent response envelope
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  
-  const statusCode = err.status || err.statusCode || 500;
-  const response = {
-    success: false,
-    error: {
-      code: err.code || 'INTERNAL_ERROR',
-      message: err.message || 'Internal server error',
-      ...(process.env.NODE_ENV === 'development' && err.stack && { stack: err.stack })
-    }
-  };
-  
-  res.status(statusCode).json(response);
-});
+// Error handling
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+
+// 404 handler
+app.use(notFoundHandler);
+
+// Global error handler
+app.use(errorHandler);
 
 app.listen(PORT, async () => {
   console.log(`🚀 RideNDine server running on port ${PORT}`);

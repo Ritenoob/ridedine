@@ -7,15 +7,8 @@ const demoData = require('../services/demoData');
 // Check if demo mode is enabled
 const isDemoMode = () => process.env.DEMO_MODE === 'true';
 
-// Order status progression
-const STATUS_FLOW = {
-  'pending': 'paid',
-  'paid': 'preparing',
-  'preparing': 'ready',
-  'ready': 'picked_up',
-  'picked_up': 'on_route',
-  'on_route': 'delivered'
-};
+// Order status progression (updated for production)
+const { ORDER_STATUS, STATUS_FLOW } = orderService;
 
 // Get order details (admin only)
 router.get('/:orderId', requireAuth, (req, res) => {
@@ -61,36 +54,48 @@ router.get('/:orderId/tracking', (req, res) => {
   let etaMinutes = null;
 
   switch (order.status) {
+    case ORDER_STATUS.CREATED:
     case 'pending':
       customerStatus = 'Order received';
       etaMinutes = '45-60';
       break;
+    case ORDER_STATUS.CONFIRMED:
     case 'paid':
       customerStatus = 'Payment confirmed';
       etaMinutes = '40-50';
       break;
+    case ORDER_STATUS.PREPARING:
     case 'preparing':
       customerStatus = 'Being prepared';
       etaMinutes = '30-40';
       break;
+    case ORDER_STATUS.READY:
     case 'ready':
       customerStatus = 'Ready for pickup';
       etaMinutes = '20-30';
       driverStatus = 'Driver assigned';
       break;
+    case ORDER_STATUS.PICKED_UP:
     case 'picked_up':
       customerStatus = 'Picked up by driver';
       driverStatus = 'Driver has your order';
       etaMinutes = '15-25';
       break;
+    case ORDER_STATUS.EN_ROUTE:
     case 'on_route':
       customerStatus = 'Out for delivery';
       driverStatus = 'Driver en route to you';
       etaMinutes = '5-15';
       break;
+    case ORDER_STATUS.DELIVERED:
     case 'delivered':
       customerStatus = 'Delivered';
       driverStatus = 'Delivered';
+      etaMinutes = '0';
+      break;
+    case ORDER_STATUS.COMPLETED:
+      customerStatus = 'Completed';
+      driverStatus = 'Completed';
       etaMinutes = '0';
       break;
     default:
@@ -187,60 +192,41 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update order status (admin/chef only)
+// Update order status (admin only)
 router.patch('/:orderId/status', requireAuth, (req, res) => {
-  const { status } = req.body;
+  const { status, message } = req.body;
   
   if (!status) {
-    return res.status(400).json({ 
-      success: false,
-      error: {
-        code: 'INVALID_INPUT',
-        message: 'Status is required'
-      }
-    });
+    return res.status(400).json({ error: 'Status is required' });
   }
-
-  if (isDemoMode()) {
-    // Use demo data advance function
-    try {
-      const result = demoData.advanceOrder(req.params.orderId);
-      res.json({ 
-        success: true,
-        data: {
-          order: result.order
-        }
-      });
-    } catch (error) {
-      res.status(400).json({ 
-        success: false,
-        error: {
-          code: 'UPDATE_ORDER_ERROR',
-          message: error.message
-        }
-      });
-    }
-  } else {
-    const order = orderService.getOrder(req.params.orderId);
-    
-    if (!order) {
-      return res.status(404).json({ 
-        success: false,
-        error: {
-          code: 'ORDER_NOT_FOUND',
-          message: 'Order not found'
-        }
-      });
-    }
-
-    const updatedOrder = orderService.updateOrder(req.params.orderId, { status });
-    res.json({ 
-      success: true,
-      data: {
-        order: updatedOrder
-      }
-    });
+  
+  // Validate status
+  if (!Object.values(ORDER_STATUS).includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
   }
+  
+  const order = isDemoMode() ?
+    demoData.updateOrderStatus(req.params.orderId, status) :
+    orderService.updateOrderStatus(req.params.orderId, status, message);
+  
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  
+  res.json({ success: true, order });
+});
+
+// Advance order to next status (admin only)
+router.post('/:orderId/advance', requireAuth, (req, res) => {
+  const order = isDemoMode() ?
+    null : // Demo data service doesn't support this yet
+    orderService.advanceOrderStatus(req.params.orderId);
+  
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found or already at final status' });
+  }
+  
+  res.json({ success: true, order });
 });
 
 // List all orders (admin only)

@@ -1,366 +1,382 @@
-<!-- Admin Dashboard Content -->
-<div class="page-header">
-  <h1 class="page-header__title">Admin Dashboard</h1>
-  <p class="page-header__subtitle">Manage your platform from this central dashboard</p>
-</div>
-
-<!-- Metrics Section -->
-<section class="section">
-  <div class="grid grid--4">
-    <div class="metric-card">
-      <div class="metric-card__label">Orders Today</div>
-      <div class="metric-card__value" id="ordersToday">-</div>
-      <div class="metric-card__change metric-card__change--positive" id="ordersChange">-</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-card__label">Revenue Today</div>
-      <div class="metric-card__value" id="revenueToday">$-</div>
-      <div class="metric-card__change metric-card__change--positive" id="revenueChange">-</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-card__label">Active Drivers</div>
-      <div class="metric-card__value" id="activeDrivers">-</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-card__label">Chefs Online</div>
-      <div class="metric-card__value" id="chefsOnline">-</div>
-    </div>
-  </div>
-</section>
-
-<!-- Order Pipeline -->
-<section class="section">
-  <div class="section__header">
-    <h2 class="section__title">Order Pipeline</h2>
-  </div>
-  <div class="card">
-    <div class="card__body">
-      <div class="grid grid--4">
-        <div class="pipeline-stage">
-          <div class="pipeline-stage__header">
-            <span class="badge badge--pending">Pending</span>
-            <span class="pipeline-stage__count" id="pipelinePending">0</span>
-          </div>
-        </div>
-        <div class="pipeline-stage">
-          <div class="pipeline-stage__header">
-            <span class="badge badge--preparing">Preparing</span>
-            <span class="pipeline-stage__count" id="pipelinePreparing">0</span>
-          </div>
-        </div>
-        <div class="pipeline-stage">
-          <div class="pipeline-stage__header">
-            <span class="badge badge--picked-up">In Transit</span>
-            <span class="pipeline-stage__count" id="pipelineTransit">0</span>
-          </div>
-        </div>
-        <div class="pipeline-stage">
-          <div class="pipeline-stage__header">
-            <span class="badge badge--delivered">Delivered</span>
-            <span class="pipeline-stage__count" id="pipelineDelivered">0</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Latest Orders -->
-<section class="section">
-  <div class="section__header">
-    <h2 class="section__title">Latest Orders</h2>
-    <div class="section__actions">
-      <button class="button button--sm button--outline" onclick="navigateTo('/admin/operations')">
-        View All Orders
-      </button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card__body p-0">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Chef</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="latestOrdersTable">
-          <tr>
-            <td colspan="6" class="text-center text-muted">Loading orders...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- Activity Feed -->
-<section class="section">
-  <div class="section__header">
-    <h2 class="section__title">Recent Activity</h2>
-  </div>
-  <div class="card">
-    <div class="card__body">
-      <div id="activityFeed" class="activity-feed">
-        <div class="text-center text-muted">Loading activity...</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<style>
-.pipeline-stage {
-  text-align: center;
-}
-
-.pipeline-stage__header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.pipeline-stage__count {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text);
-}
-
-.activity-feed {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.activity-item {
-  display: flex;
-  gap: var(--space-3);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.activity-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.activity-item__icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-lg);
-}
-
-.activity-item__content {
-  flex: 1;
-}
-
-.activity-item__title {
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--space-1);
-}
-
-.activity-item__time {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-</style>
-
-<script>
-(async function() {
-  // Initialize demo mode
-  const isDemoMode = window.AppConfig?.demoMode || false;
-  
-  if (isDemoMode) {
-    // Seed demo data if not already seeded
-    try {
-      await window.apiFetch('/api/demo/seed', { method: 'POST' });
-    } catch (error) {
-      console.error('Failed to seed demo data:', error);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - RideNDine</title>
+  <link rel="stylesheet" href="../../ui.css">
+  <link rel="stylesheet" href="../../layout.css">
+  <style>
+    :root {
+      --admin-primary: #065f46;
+      --admin-primary-dark: #064e3b;
+      --admin-secondary: #fb923c;
+      --admin-secondary-dark: #ea580c;
     }
-  }
-  
-  // Fetch and display metrics
-  async function loadMetrics() {
-    try {
+
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: 260px; background: white; border-right: 1px solid #e5e7eb; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+    .admin-brand { padding: 1.5rem; border-bottom: 1px solid #e5e7eb; background: linear-gradient(135deg, var(--admin-primary), var(--admin-primary-dark)); color: white; }
+    .admin-brand h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+    .admin-nav { padding: 1rem 0; }
+    .admin-nav a { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: #374151; text-decoration: none; transition: all 0.2s; font-weight: 500; gap: 0.75rem; }
+    .admin-nav a:hover { background: #f3f4f6; color: var(--admin-primary); }
+    .admin-nav a.active { background: #ecfdf5; color: var(--admin-primary); border-right: 3px solid var(--admin-primary); }
+    .admin-main { margin-left: 260px; flex: 1; min-height: 100vh; }
+    .admin-header { background: white; border-bottom: 1px solid #e5e7eb; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .admin-header h1 { margin: 0; font-size: 1.875rem; color: #111827; }
+    .admin-header__actions { display: flex; gap: 1rem; align-items: center; }
+    .admin-content { padding: 2rem; max-width: 1400px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .metric-card { background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid #e5e7eb; transition: all 0.2s; }
+    .metric-card:hover { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+    .metric-card__label { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500; }
+    .metric-card__value { font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem; }
+    .metric-card__change { font-size: 0.875rem; font-weight: 600; }
+    .metric-card__change--positive { color: #059669; }
+    .section { background: white; border-radius: 16px; border: 1px solid #e5e7eb; margin-bottom: 2rem; overflow: hidden; }
+    .section__header { padding: 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .section__title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111827; }
+    .section__body { padding: 1.5rem; }
+    .status-pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .pipeline-stage { background: #f9fafb; border-radius: 12px; padding: 1.25rem; text-align: center; border: 2px solid #e5e7eb; }
+    .pipeline-stage__count { font-size: 2.5rem; font-weight: 700; color: #111827; display: block; margin-bottom: 0.5rem; }
+    .pipeline-stage__label { font-size: 0.875rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .orders-container { max-height: 600px; overflow-y: auto; }
+    .orders-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+    .order-item { display: grid; grid-template-columns: 100px 1fr 120px 100px 100px 120px; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 12px; align-items: center; transition: all 0.2s; border: 1px solid transparent; }
+    .order-item:hover { background: white; border-color: var(--admin-primary); box-shadow: 0 4px 12px -2px rgba(6, 95, 70, 0.15); }
+    .order-id { font-family: 'Courier New', monospace; font-weight: 700; color: #111827; font-size: 0.875rem; }
+    .order-customer { font-weight: 600; color: #374151; }
+    .order-chef { color: #6b7280; font-size: 0.875rem; }
+    .order-total { font-weight: 700; color: var(--admin-primary); font-size: 1.125rem; }
+    .order-time { color: #6b7280; font-size: 0.8125rem; }
+    .status-badge { display: inline-flex; align-items: center; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-badge--pending { background: #fef3c7; color: #92400e; }
+    .status-badge--paid { background: #dbeafe; color: #1e40af; }
+    .status-badge--preparing { background: #fce7f3; color: #9f1239; }
+    .status-badge--ready { background: #e0e7ff; color: #3730a3; }
+    .status-badge--picked_up { background: #fed7aa; color: #7c2d12; }
+    .status-badge--delivered { background: #d1fae5; color: #065f46; }
+    .action-btn { padding: 0.5rem 1rem; background: linear-gradient(135deg, var(--admin-secondary), var(--admin-secondary-dark)); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.8125rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px -2px rgba(251, 146, 60, 0.4); }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .button { padding: 0.625rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; border: none; }
+    .button--primary { background: var(--admin-primary); color: white; }
+    .button--outline { background: white; color: var(--admin-primary); border: 1px solid var(--admin-primary); }
+    .button--outline:hover { background: var(--admin-primary); color: white; }
+    .button--danger { background: #dc2626; color: white; }
+    .button--danger:hover { background: #991b1b; }
+    .empty-state { text-align: center; padding: 3rem 2rem; color: #6b7280; }
+    .empty-state__icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-state__text { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .empty-state__hint { font-size: 0.875rem; }
+    .revenue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .revenue-item { padding: 1.25rem; background: linear-gradient(135deg, #f9fafb, #f3f4f6); border-radius: 12px; border: 1px solid #e5e7eb; }
+    .revenue-item__label { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500; }
+    .revenue-item__value { font-size: 1.75rem; font-weight: 700; color: var(--admin-primary); }
+    @media (max-width: 1024px) { .admin-sidebar { transform: translateX(-100%); } .admin-main { margin-left: 0; } .order-item { grid-template-columns: 1fr; gap: 0.5rem; } }
+    @media (max-width: 640px) { .admin-content { padding: 1rem; } .metrics-grid, .status-pipeline { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <h2>🔐 Admin Portal</h2>
+      </div>
+      <nav class="admin-nav">
+        <a href="/admin/dashboard" class="active" onclick="event.preventDefault(); navigateTo('/admin/dashboard'); return false;">📊 Dashboard</a>
+        <a href="/admin/customers" onclick="event.preventDefault(); navigateTo('/admin/customers'); return false;">👥 Customers</a>
+        <a href="/admin/drivers" onclick="event.preventDefault(); navigateTo('/admin/drivers'); return false;">🚗 Drivers</a>
+        <a href="/admin/operations" onclick="event.preventDefault(); navigateTo('/admin/operations'); return false;">📦 Operations</a>
+        <a href="/admin/payouts" onclick="event.preventDefault(); navigateTo('/admin/payouts'); return false;">💰 Payouts</a>
+        <a href="/admin/disputes" onclick="event.preventDefault(); navigateTo('/admin/disputes'); return false;">⚠️ Disputes</a>
+        <a href="/admin/integrations" onclick="event.preventDefault(); navigateTo('/admin/integrations'); return false;">🔌 Integrations</a>
+        <a href="/admin/live-map" onclick="event.preventDefault(); navigateTo('/admin/live-map'); return false;">🗺️ Live Map</a>
+        <a href="/admin/driver-simulator" onclick="event.preventDefault(); navigateTo('/admin/driver-simulator'); return false;">🎮 Simulator</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <header class="admin-header">
+        <h1>Dashboard</h1>
+        <div class="admin-header__actions">
+          <button class="button button--outline" onclick="window.location.reload()">🔄 Refresh</button>
+          <button id="logoutBtn" class="button button--danger">Logout</button>
+        </div>
+      </header>
+      <div class="admin-content">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card__label">Orders Today</div>
+            <div class="metric-card__value" id="ordersToday">0</div>
+            <div class="metric-card__change metric-card__change--positive" id="ordersChange">+0% from yesterday</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__label">Revenue Today</div>
+            <div class="metric-card__value" id="revenueToday">$0.00</div>
+            <div class="metric-card__change metric-card__change--positive" id="revenueChange">+0% from yesterday</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__label">Active Drivers</div>
+            <div class="metric-card__value" id="activeDrivers">0</div>
+            <div class="metric-card__change">Currently online</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__label">Chefs Online</div>
+            <div class="metric-card__value" id="chefsOnline">0</div>
+            <div class="metric-card__change">Currently active</div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section__header">
+            <h2 class="section__title">📈 Revenue Metrics</h2>
+          </div>
+          <div class="section__body">
+            <div class="revenue-grid">
+              <div class="revenue-item">
+                <div class="revenue-item__label">Daily Revenue</div>
+                <div class="revenue-item__value" id="dailyRevenue">$0.00</div>
+              </div>
+              <div class="revenue-item">
+                <div class="revenue-item__label">Weekly Revenue</div>
+                <div class="revenue-item__value" id="weeklyRevenue">$0.00</div>
+              </div>
+              <div class="revenue-item">
+                <div class="revenue-item__label">Monthly Revenue</div>
+                <div class="revenue-item__value" id="monthlyRevenue">$0.00</div>
+              </div>
+              <div class="revenue-item">
+                <div class="revenue-item__label">Average Order</div>
+                <div class="revenue-item__value" id="avgOrder">$0.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section__header">
+            <h2 class="section__title">📦 Order Status Pipeline</h2>
+          </div>
+          <div class="section__body">
+            <div class="status-pipeline">
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelinePending">0</span>
+                <span class="pipeline-stage__label">Pending</span>
+              </div>
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelinePaid">0</span>
+                <span class="pipeline-stage__label">Paid</span>
+              </div>
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelinePreparing">0</span>
+                <span class="pipeline-stage__label">Preparing</span>
+              </div>
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelineReady">0</span>
+                <span class="pipeline-stage__label">Ready</span>
+              </div>
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelinePickedUp">0</span>
+                <span class="pipeline-stage__label">In Transit</span>
+              </div>
+              <div class="pipeline-stage">
+                <span class="pipeline-stage__count" id="pipelineDelivered">0</span>
+                <span class="pipeline-stage__label">Delivered</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section__header">
+            <h2 class="section__title">🔥 Active Orders</h2>
+            <button class="button button--outline" onclick="event.preventDefault(); navigateTo('/admin/operations'); return false;">View All</button>
+          </div>
+          <div class="section__body">
+            <div class="orders-container">
+              <div id="activeOrdersList" class="orders-grid">
+                <div class="empty-state">
+                  <div class="empty-state__icon">📦</div>
+                  <div class="empty-state__text">Loading orders...</div>
+                  <div class="empty-state__hint">Please wait</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section__header">
+            <h2 class="section__title">👨‍🍳 Chef Approvals</h2>
+          </div>
+          <div class="section__body">
+            <div id="chefApprovalsList">
+              <div class="empty-state">
+                <div class="empty-state__icon">✅</div>
+                <div class="empty-state__text">No pending chef approvals</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section__header">
+            <h2 class="section__title">🚗 Active Drivers</h2>
+          </div>
+          <div class="section__body">
+            <div id="activeDriversList">
+              <div class="empty-state">
+                <div class="empty-state__icon">🚗</div>
+                <div class="empty-state__text">Loading drivers...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../auth-guard.js" data-required-role="admin"></script>
+  <script>
+    (async function() {
+      'use strict';
+      const isDemoMode = window.AppConfig?.demoMode || false;
+      const STATUS_PROGRESSION = { 'pending': 'paid', 'paid': 'preparing', 'preparing': 'ready', 'ready': 'picked_up', 'picked_up': 'delivered' };
+      
       if (isDemoMode) {
-        const res = await window.apiFetch('/api/demo/data');
-        const data = await res.json();
-        
-        // Calculate metrics from demo data
-        const todayOrders = data.orders.filter(o => {
-          const orderDate = new Date(o.createdAt);
-          const today = new Date();
-          return orderDate.toDateString() === today.toDateString();
-        });
-        
-        const todayRevenue = todayOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
-        const activeDrivers = data.drivers.filter(d => d.status === 'available').length;
-        const chefsOnline = data.chefs.filter(c => c.status === 'active').length;
-        
+        try { await window.apiFetch('/api/demo/seed', { method: 'POST' }); } catch (error) { console.error('Seed failed:', error); }
+      }
+      
+      async function loadDashboard() {
+        try {
+          let orders = [];
+          let drivers = [];
+          let chefs = [];
+
+          if (isDemoMode) {
+            const res = await window.apiFetch('/api/demo/data');
+            const data = await res.json();
+            if (data.success || data.orders) {
+              orders = data.orders || [];
+              drivers = data.drivers || [];
+              chefs = data.chefs || [];
+            }
+          } else {
+            // Production mode: fetch from real endpoints
+            const res = await window.apiFetch('/api/orders');
+            const data = await res.json();
+            // Handle different response shapes: { orders: [...] } or just [...]
+            orders = data.orders || data || [];
+          }
+
+          if (!orders || orders.length === 0) {
+            // No orders to display
+            return;
+          }
+
+          updateMetrics(orders, drivers, chefs);
+          updateRevenue(orders);
+          updatePipeline(orders);
+          updateActiveOrders(orders);
+          updateActiveDrivers(drivers);
+        } catch (error) { console.error('Load failed:', error); }
+      }
+      
+      function updateMetrics(orders, drivers, chefs) {
+        const today = new Date();
+        const todayOrders = orders.filter(o => { const orderDate = new Date(o.createdAt); return orderDate.toDateString() === today.toDateString(); });
+        const todayRevenue = todayOrders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const activeDrivers = drivers.filter(d => d.status === 'available' || d.status === 'active').length;
+        const chefsOnline = chefs.filter(c => c.status === 'active' || c.status === 'available').length;
         document.getElementById('ordersToday').textContent = todayOrders.length;
         document.getElementById('revenueToday').textContent = `$${todayRevenue.toFixed(2)}`;
         document.getElementById('activeDrivers').textContent = activeDrivers;
         document.getElementById('chefsOnline').textContent = chefsOnline;
-        
         document.getElementById('ordersChange').textContent = '+12% from yesterday';
         document.getElementById('revenueChange').textContent = '+8% from yesterday';
-        
-        // Update pipeline
-        const statusCounts = {
-          pending: 0,
-          preparing: 0,
-          picked_up: 0,
-          delivered: 0
-        };
-        
-        data.orders.forEach(o => {
-          if (o.status === 'pending' || o.status === 'paid') {
-            statusCounts.pending++;
-          } else if (o.status === 'preparing' || o.status === 'ready') {
-            statusCounts.preparing++;
-          } else if (o.status === 'picked_up') {
-            statusCounts.picked_up++;
-          } else if (o.status === 'delivered') {
-            statusCounts.delivered++;
-          }
-        });
-        
+      }
+      
+      function updateRevenue(orders) {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const dailyOrders = orders.filter(o => new Date(o.createdAt) >= today);
+        const weeklyOrders = orders.filter(o => new Date(o.createdAt) >= weekAgo);
+        const monthlyOrders = orders.filter(o => new Date(o.createdAt) >= monthAgo);
+        const dailyRev = dailyOrders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const weeklyRev = weeklyOrders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const monthlyRev = monthlyOrders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const avgOrder = orders.length > 0 ? orders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0) / orders.length : 0;
+        document.getElementById('dailyRevenue').textContent = `$${dailyRev.toFixed(2)}`;
+        document.getElementById('weeklyRevenue').textContent = `$${weeklyRev.toFixed(2)}`;
+        document.getElementById('monthlyRevenue').textContent = `$${monthlyRev.toFixed(2)}`;
+        document.getElementById('avgOrder').textContent = `$${avgOrder.toFixed(2)}`;
+      }
+      
+      function updatePipeline(orders) {
+        const statusCounts = { pending: 0, paid: 0, preparing: 0, ready: 0, picked_up: 0, delivered: 0 };
+        orders.forEach(o => { if (statusCounts.hasOwnProperty(o.status)) { statusCounts[o.status]++; } });
         document.getElementById('pipelinePending').textContent = statusCounts.pending;
+        document.getElementById('pipelinePaid').textContent = statusCounts.paid;
         document.getElementById('pipelinePreparing').textContent = statusCounts.preparing;
-        document.getElementById('pipelineTransit').textContent = statusCounts.picked_up;
+        document.getElementById('pipelineReady').textContent = statusCounts.ready;
+        document.getElementById('pipelinePickedUp').textContent = statusCounts.picked_up;
         document.getElementById('pipelineDelivered').textContent = statusCounts.delivered;
-        
-        // Load latest orders
-        loadLatestOrders(data.orders);
-        
-        // Load activity feed
-        loadActivityFeed(data.orders);
       }
-    } catch (error) {
-      console.error('Failed to load metrics:', error);
-    }
-  }
-  
-  // Load latest orders
-  function loadLatestOrders(orders) {
-    const tbody = document.getElementById('latestOrdersTable');
-    
-    if (!orders || orders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>';
-      return;
-    }
-    
-    // Get latest 5 orders
-    const latestOrders = orders
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 5);
-    
-    tbody.innerHTML = latestOrders.map(order => {
-      const customer = order.customer || { name: 'Unknown' };
-      const chef = order.chef || { name: 'Unknown' };
       
-      return `
-        <tr>
-          <td class="font-medium">#${order.id.substring(order.id.length - 6)}</td>
-          <td>${customer.name}</td>
-          <td>${chef.name}</td>
-          <td class="font-semibold">$${parseFloat(order.total).toFixed(2)}</td>
-          <td><span class="badge badge--${order.status}">${order.status}</span></td>
-          <td>
-            ${order.status !== 'delivered' && isDemoMode ? `
-              <button 
-                class="button button--sm button--outline" 
-                onclick="advanceOrder('${order.id}')"
-              >
-                Advance
-              </button>
-            ` : '-'}
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
-  
-  // Load activity feed
-  function loadActivityFeed(orders) {
-    const feed = document.getElementById('activityFeed');
-    
-    if (!orders || orders.length === 0) {
-      feed.innerHTML = '<div class="text-center text-muted">No recent activity</div>';
-      return;
-    }
-    
-    // Get recent activities (last 5 order updates)
-    const recentOrders = orders
-      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-      .slice(0, 5);
-    
-    feed.innerHTML = recentOrders.map(order => {
-      const timeAgo = getTimeAgo(new Date(order.updatedAt));
-      const customer = order.customer || { name: 'Unknown' };
+      function updateActiveOrders(orders) {
+        const container = document.getElementById('activeOrdersList');
+        const activeOrders = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10);
+        if (activeOrders.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-state__icon">✅</div><div class="empty-state__text">No active orders</div></div>';
+          return;
+        }
+        container.innerHTML = activeOrders.map(order => {
+          const customer = order.customer || { name: 'Unknown Customer' };
+          const chef = order.chef || { name: 'Unknown Chef' };
+          const canAdvance = STATUS_PROGRESSION[order.status];
+          const timeAgo = getTimeAgo(new Date(order.createdAt));
+          return `<div class="order-item"><div class="order-id">#${order.id.substring(order.id.length - 6)}</div><div><div class="order-customer">${customer.name}</div><div class="order-chef">Chef: ${chef.name}</div></div><div class="order-total">$${parseFloat(order.total).toFixed(2)}</div><div class="order-time">${timeAgo}</div><span class="status-badge status-badge--${order.status}">${order.status}</span><div>${canAdvance ? `<button class="action-btn" onclick="advanceOrder('${order.id}', '${order.status}')">Advance →</button>` : '<span style="color: #059669; font-weight: 600;">✓ Complete</span>'}</div></div>`;
+        }).join('');
+      }
       
-      return `
-        <div class="activity-item">
-          <div class="activity-item__icon">📦</div>
-          <div class="activity-item__content">
-            <div class="activity-item__title">
-              Order #${order.id.substring(order.id.length - 6)} - ${order.status}
-            </div>
-            <div class="activity-item__time">
-              ${customer.name} • ${timeAgo}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-  
-  // Helper: Get time ago string
-  function getTimeAgo(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
-    
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    return `${Math.floor(seconds / 86400)} days ago`;
-  }
-  
-  // Advance order (demo mode only)
-  window.advanceOrder = async function(orderId) {
-    try {
-      const res = await window.apiFetch(`/api/demo/advance-order/${orderId}`, {
-        method: 'POST'
+      function updateActiveDrivers(drivers) {
+        const container = document.getElementById('activeDriversList');
+        const activeDrivers = drivers.filter(d => d.status === 'available' || d.status === 'active' || d.status === 'delivering');
+        if (activeDrivers.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-state__icon">🚗</div><div class="empty-state__text">No active drivers</div></div>';
+          return;
+        }
+        container.innerHTML = `<div class="orders-grid">${activeDrivers.map(driver => `<div class="order-item"><div class="order-customer">${driver.name}</div><div class="order-chef">${driver.email}</div><span class="status-badge status-badge--${driver.status === 'delivering' ? 'picked_up' : 'ready'}">${driver.status}</span><div class="order-total">${driver.currentOrderId ? 'On Delivery' : 'Available'}</div></div>`).join('')}</div>`;
+      }
+      
+      window.advanceOrder = async function(orderId, currentStatus) {
+        const nextStatus = STATUS_PROGRESSION[currentStatus];
+        if (!nextStatus) { alert('Order cannot be advanced further'); return; }
+        try {
+          const res = await window.apiFetch(`/api/demo/advance-order/${orderId}`, { method: 'POST' });
+          const data = await res.json();
+          if (data.success) { loadDashboard(); } else { alert('Failed to advance order: ' + (data.error || 'Unknown error')); }
+        } catch (error) { console.error('Failed to advance order:', error); alert('Failed to advance order'); }
+      };
+      
+      function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 60) return 'Just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        return `${Math.floor(seconds / 86400)}d ago`;
+      }
+      
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          if (window.AuthClient?.logout) { await window.AuthClient.logout(); } else { localStorage.removeItem('auth_token'); localStorage.removeItem('auth_user'); }
+          window.location.href = '/admin/login';
+        } catch (error) { console.error('Logout failed:', error); window.location.href = '/admin/login'; }
       });
-      const data = await res.json();
       
-      if (data.success) {
-        // Reload metrics and orders
-        loadMetrics();
-      } else {
-        alert('Failed to advance order: ' + (data.error || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Failed to advance order:', error);
-      alert('Failed to advance order');
-    }
-  };
-  
-  // Load initial data
-  loadMetrics();
-  
-  // Refresh every 30 seconds in demo mode
-  if (isDemoMode) {
-    setInterval(loadMetrics, 30000);
-  }
-})();
-</script>
+      loadDashboard();
+      setInterval(loadDashboard, 30000);
+    })();
+  </script>
+</body>
+</html>

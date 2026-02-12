@@ -44,18 +44,10 @@
   flex-wrap: wrap;
 }
 
-/* Demo Banner */
+/* Demo Banner - REMOVED FOR PRODUCTION */
+/* Demo mode UI elements should not be visible in production */
 .demo-banner {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  animation: pulse 2s ease-in-out infinite;
+  display: none !important; /* Hidden in production build */
 }
 
 .demo-banner__icon {
@@ -67,11 +59,10 @@
   50% { opacity: 0.8; }
 }
 
-/* Role Switcher */
+/* Role Switcher - REMOVED FOR PRODUCTION */
+/* Role switching is a development feature and should not be visible in production */
 .role-switcher {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  display: none !important; /* Hidden in production build */
 }
 
 .role-switcher__label {
@@ -113,7 +104,7 @@
 
 .sidebar {
   width: 260px;
-  background-color: #1a202c;
+  background-color: var(--color-primary-dark); /* Deep Emerald sidebar */
   color: white;
   padding: var(--space-6) 0;
   position: sticky;
@@ -124,11 +115,11 @@
 }
 
 .sidebar--admin {
-  background-color: #1a202c;
+  background-color: var(--color-primary-dark);
 }
 
 .sidebar--chef {
-  background-color: #2d3748;
+  background-color: var(--color-primary);
 }
 
 .sidebar__nav {

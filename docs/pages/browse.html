@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Dishes - RideNDine</title>
+  <link rel="stylesheet" href="../ui.css">
+  <link rel="stylesheet" href="../layout.css">
+  <style>
+    /* Page Container */
+    .browse-page {
+      min-height: 100vh;
+      background: var(--color-background);
+      padding-bottom: 5rem;
+    }
+
+    /* Hero Header */
+    .browse-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .browse-header__title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      margin: 0;
+    }
+
+    .browse-header__subtitle {
+      font-size: var(--font-size-base);
+      opacity: 0.9;
+      margin-top: var(--space-2);
+    }
+
+    /* Filters Section */
+    .filters-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4);
+    }
+
+    .filters-container {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-md);
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .filter-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .filter-chip {
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-background);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    .filter-chip.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+
+    /* Dishes Section */
+    .dishes-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-4) var(--space-6);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-5);
+    }
+
+    .results-count {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* Dish Cards Grid */
+    .dishes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .dish-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: all var(--transition-base);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dish-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .dish-card__image {
+      background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-secondary-light) 100%);
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+    }
+
+    .dish-card__tags {
+      position: absolute;
+      top: var(--space-2);
+      left: var(--space-2);
+      display: flex;
+      gap: var(--space-1);
+      flex-wrap: wrap;
+    }
+
+    .dish-tag {
+      padding: var(--space-1) var(--space-2);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary);
+    }
+
+    .dish-card__content {
+      padding: var(--space-4);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dish-card__name {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin: 0 0 var(--space-2) 0;
+    }
+
+    .dish-card__chef {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+
+    .dish-card__chef a {
+      color: var(--color-primary);
+      font-weight: var(--font-weight-medium);
+      text-decoration: none;
+    }
+
+    .dish-card__chef a:hover {
+      text-decoration: underline;
+    }
+
+    .dish-card__meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .dish-card__rating {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--font-size-sm);
+      color: var(--color-warning);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .dish-card__price {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
+
+    .dish-card__actions {
+      margin-top: auto;
+    }
+
+    .dish-card__button {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-secondary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .dish-card__button:hover {
+      background: var(--color-secondary-dark);
+      transform: scale(1.02);
+    }
+
+    .dish-card__button:active {
+      transform: scale(0.98);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-16) var(--space-4);
+      color: var(--color-text-muted);
+    }
+
+    .empty-state__icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-4);
+    }
+
+    .empty-state__title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-2);
+    }
+
+    .empty-state__text {
+      font-size: var(--font-size-base);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 6rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-primary);
+      color: white;
+      padding: var(--space-4) var(--space-6);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-xl);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      z-index: var(--z-tooltip);
+      opacity: 0;
+      transition: all var(--transition-base);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .browse-header {
+        padding: 1.5rem 1rem;
+      }
+
+      .browse-header__title {
+        font-size: var(--font-size-2xl);
+      }
+
+      .filters-section {
+        padding: var(--space-4) var(--space-3);
+      }
+
+      .dishes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: var(--space-4);
+      }
+
+      .dish-card__image {
+        height: 160px;
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="browse-page">
+    <!-- Header -->
+    <div class="browse-header">
+      <h1 class="browse-header__title">Browse Dishes</h1>
+      <p class="browse-header__subtitle">Discover delicious meals from local chefs</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filters-container">
+        <!-- Cuisine Filter -->
+        <div class="filter-row">
+          <label class="filter-label">Cuisine</label>
+          <div class="filter-chips" id="cuisine-filters">
+            <button class="filter-chip active" data-cuisine="All">All</button>
+            <button class="filter-chip" data-cuisine="Italian">🍝 Italian</button>
+            <button class="filter-chip" data-cuisine="Chinese">🥡 Chinese</button>
+            <button class="filter-chip" data-cuisine="Indian">🍛 Indian</button>
+            <button class="filter-chip" data-cuisine="Mexican">🌮 Mexican</button>
+            <button class="filter-chip" data-cuisine="Thai">🍜 Thai</button>
+            <button class="filter-chip" data-cuisine="Japanese">🍱 Japanese</button>
+            <button class="filter-chip" data-cuisine="American">🍔 American</button>
+          </div>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="filter-row">
+          <label class="filter-label">Rating</label>
+          <div class="filter-chips" id="rating-filters">
+            <button class="filter-chip active" data-rating="All">All Ratings</button>
+            <button class="filter-chip" data-rating="4">⭐ 4+ Stars</button>
+            <button class="filter-chip" data-rating="3">⭐ 3+ Stars</button>
+          </div>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="filter-row">
+          <label class="filter-label">Price Range</label>
+          <div class="filter-chips" id="price-filters">
+            <button class="filter-chip active" data-price="All">All Prices</button>
+            <button class="filter-chip" data-price="low">💵 Under $15</button>
+            <button class="filter-chip" data-price="medium">💵💵 $15-$30</button>
+            <button class="filter-chip" data-price="high">💵💵💵 $30+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dishes Section -->
+    <div class="dishes-section">
+      <div class="section-header">
+        <h2 style="margin: 0; font-size: var(--font-size-2xl);">Available Dishes</h2>
+        <span class="results-count" id="results-count">16 dishes</span>
+      </div>
+
+      <div class="dishes-grid" id="dishes-grid">
+        <!-- Dishes will be rendered here by JavaScript -->
+      </div>
+
+      <!-- Empty State (hidden by default) -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-state__icon">🔍</div>
+        <h3 class="empty-state__title">No dishes found</h3>
+        <p class="empty-state__text">Try adjusting your filters to see more options</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="../components/bottom-nav.js"></script>
+  <script>
+    // Dish data
+    const dishes = [
+      { id: 1, name: 'Margherita Pizza', chef: 'Mama Rosa', chefId: 'mama-rosa', cuisine: 'Italian', rating: 4.9, price: 18, tags: ['Vegetarian'], emoji: '🍕' },
+      { id: 2, name: 'Pad Thai', chef: 'Chef Somchai', chefId: 'somchai', cuisine: 'Thai', rating: 4.8, price: 16, tags: ['Gluten-Free'], emoji: '🍜' },
+      { id: 3, name: 'Chicken Tikka Masala', chef: 'Chef Priya', chefId: 'priya', cuisine: 'Indian', rating: 4.7, price: 19, tags: ['Halal'], emoji: '🍛' },
+      { id: 4, name: 'Beef Tacos', chef: 'Taqueria del Sol', chefId: 'taqueria-sol', cuisine: 'Mexican', rating: 4.6, price: 14, tags: [], emoji: '🌮' },
+      { id: 5, name: 'Sweet & Sour Chicken', chef: 'Chef Wang', chefId: 'wang', cuisine: 'Chinese', rating: 4.5, price: 17, tags: [], emoji: '🥡' },
+      { id: 6, name: 'California Roll', chef: 'Sushi Master Ken', chefId: 'ken', cuisine: 'Japanese', rating: 4.9, price: 22, tags: [], emoji: '🍱' },
+      { id: 7, name: 'Classic Burger', chef: 'Joe\'s Diner', chefId: 'joes-diner', cuisine: 'American', rating: 4.4, price: 13, tags: [], emoji: '🍔' },
+      { id: 8, name: 'Fettuccine Alfredo', chef: 'Mama Rosa', chefId: 'mama-rosa', cuisine: 'Italian', rating: 4.8, price: 20, tags: ['Vegetarian'], emoji: '🍝' },
+      { id: 9, name: 'Green Curry', chef: 'Chef Somchai', chefId: 'somchai', cuisine: 'Thai', rating: 4.7, price: 18, tags: ['Vegan', 'Gluten-Free'], emoji: '🍛' },
+      { id: 10, name: 'Butter Chicken', chef: 'Chef Priya', chefId: 'priya', cuisine: 'Indian', rating: 4.9, price: 21, tags: ['Halal'], emoji: '🍗' },
+      { id: 11, name: 'Quesadillas', chef: 'Taqueria del Sol', chefId: 'taqueria-sol', cuisine: 'Mexican', rating: 4.5, price: 12, tags: ['Vegetarian'], emoji: '🌯' },
+      { id: 12, name: 'Kung Pao Chicken', chef: 'Chef Wang', chefId: 'wang', cuisine: 'Chinese', rating: 4.6, price: 16, tags: [], emoji: '🥢' },
+      { id: 13, name: 'Ramen Bowl', chef: 'Sushi Master Ken', chefId: 'ken', cuisine: 'Japanese', rating: 4.8, price: 19, tags: [], emoji: '🍜' },
+      { id: 14, name: 'BBQ Ribs', chef: 'Joe\'s Diner', chefId: 'joes-diner', cuisine: 'American', rating: 4.7, price: 32, tags: [], emoji: '🍖' },
+      { id: 15, name: 'Lasagna', chef: 'Mama Rosa', chefId: 'mama-rosa', cuisine: 'Italian', rating: 4.9, price: 24, tags: [], emoji: '🍝' },
+      { id: 16, name: 'Samosas', chef: 'Chef Priya', chefId: 'priya', cuisine: 'Indian', rating: 4.5, price: 9, tags: ['Vegan'], emoji: '🥟' }
+    ];
+
+    // Filter state
+    let filters = {
+      cuisine: 'All',
+      rating: 'All',
+      price: 'All'
+    };
+
+    // Initialize
+    function init() {
+      setupFilterListeners();
+      renderDishes();
+      if (window.initBottomNav) {
+        window.initBottomNav();
+      }
+    }
+
+    // Setup filter listeners
+    function setupFilterListeners() {
+      // Cuisine filters
+      document.querySelectorAll('#cuisine-filters .filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#cuisine-filters .filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          filters.cuisine = chip.dataset.cuisine;
+          renderDishes();
+        });
+      });
+
+      // Rating filters
+      document.querySelectorAll('#rating-filters .filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#rating-filters .filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          filters.rating = chip.dataset.rating;
+          renderDishes();
+        });
+      });
+
+      // Price filters
+      document.querySelectorAll('#price-filters .filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#price-filters .filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          filters.price = chip.dataset.price;
+          renderDishes();
+        });
+      });
+    }
+
+    // Filter dishes
+    function filterDishes() {
+      return dishes.filter(dish => {
+        // Cuisine filter
+        if (filters.cuisine !== 'All' && dish.cuisine !== filters.cuisine) {
+          return false;
+        }
+
+        // Rating filter
+        if (filters.rating !== 'All') {
+          const minRating = parseFloat(filters.rating);
+          if (dish.rating < minRating) {
+            return false;
+          }
+        }
+
+        // Price filter
+        if (filters.price !== 'All') {
+          if (filters.price === 'low' && dish.price >= 15) return false;
+          if (filters.price === 'medium' && (dish.price < 15 || dish.price >= 30)) return false;
+          if (filters.price === 'high' && dish.price < 30) return false;
+        }
+
+        return true;
+      });
+    }
+
+    // Render dishes
+    function renderDishes() {
+      const filteredDishes = filterDishes();
+      const grid = document.getElementById('dishes-grid');
+      const emptyState = document.getElementById('empty-state');
+      const resultsCount = document.getElementById('results-count');
+
+      // Update results count
+      resultsCount.textContent = `${filteredDishes.length} dish${filteredDishes.length !== 1 ? 'es' : ''}`;
+
+      if (filteredDishes.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      emptyState.style.display = 'none';
+
+      grid.innerHTML = filteredDishes.map(dish => `
+        <div class="dish-card">
+          <div class="dish-card__image">
+            <div class="dish-card__tags">
+              ${dish.tags.map(tag => `<span class="dish-tag">${tag}</span>`).join('')}
+            </div>
+            ${dish.emoji}
+          </div>
+          <div class="dish-card__content">
+            <h3 class="dish-card__name">${dish.name}</h3>
+            <p class="dish-card__chef">by <a href="#" onclick="navigateTo('/chefs/${dish.chefId}'); return false;">${dish.chef}</a></p>
+            <div class="dish-card__meta">
+              <div class="dish-card__rating">
+                ⭐ ${dish.rating.toFixed(1)}
+              </div>
+              <div class="dish-card__price">$${dish.price.toFixed(2)}</div>
+            </div>
+            <div class="dish-card__actions">
+              <button class="dish-card__button" onclick="addToCart(${dish.id})">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Add to cart
+    function addToCart(dishId) {
+      const dish = dishes.find(d => d.id === dishId);
+      if (!dish) return;
+
+      // Get cart from localStorage
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+      // Check if dish already in cart
+      const existingItem = cart.find(item => item.dishId === dishId);
+      
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          dishId: dish.id,
+          name: dish.name,
+          chef: dish.chef,
+          price: dish.price,
+          quantity: 1,
+          emoji: dish.emoji
+        });
+      }
+      
+      // Save cart
+      localStorage.setItem('cart', JSON.stringify(cart));
+      
+      // Show feedback with toast
+      showToast(`✅ ${dish.name} added to cart!`);
+      
+      // Update cart count if available
+      updateCartCount();
+    }
+
+    // Show toast notification
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // Update cart count
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const cartCountEl = document.getElementById('cart-count');
+      if (cartCountEl) {
+        cartCountEl.textContent = count;
+      }
+    }
+
+    // Navigation helper (if not already defined)
+    if (typeof navigateTo === 'undefined') {
+      window.navigateTo = function(path) {
+        if (window.Router) {
+          Router.push(path);
+        } else {
+          window.location.href = path;
+        }
+      };
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
