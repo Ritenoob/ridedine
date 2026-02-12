@@ -259,7 +259,18 @@
             type="text" 
             id="orderId" 
             name="orderId" 
-            placeholder="e.g., ORD-10000" 
+            placeholder="e.g., 12345" 
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="trackingToken">Tracking Token</label>
+          <input 
+            type="text" 
+            id="trackingToken" 
+            name="trackingToken" 
+            placeholder="Enter your tracking token from confirmation email" 
             required
           >
         </div>
@@ -311,47 +322,62 @@
   <script>
     const trackForm = document.getElementById('trackForm');
     const orderIdInput = document.getElementById('orderId');
+    const trackingTokenInput = document.getElementById('trackingToken');
     const errorMessage = document.getElementById('errorMessage');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const trackingResult = document.getElementById('trackingResult');
+    
+    let autoRefreshInterval = null;
 
-    // Check URL params for orderId
+    // Check URL params for orderId and token
     const urlParams = new URLSearchParams(window.location.search);
     const orderIdFromUrl = urlParams.get('orderId');
-    if (orderIdFromUrl) {
+    const tokenFromUrl = urlParams.get('token');
+    
+    if (orderIdFromUrl && tokenFromUrl) {
       orderIdInput.value = orderIdFromUrl;
-      trackOrder(orderIdFromUrl);
+      trackingTokenInput.value = tokenFromUrl;
+      trackOrder(orderIdFromUrl, tokenFromUrl);
     }
 
     trackForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const orderId = orderIdInput.value.trim();
-      if (orderId) {
-        await trackOrder(orderId);
+      const token = trackingTokenInput.value.trim();
+      if (orderId && token) {
+        await trackOrder(orderId, token);
       }
     });
 
-    async function trackOrder(orderId) {
+    async function trackOrder(orderId, token) {
       // Hide previous results and errors
       errorMessage.classList.remove('visible');
       trackingResult.classList.remove('visible');
       loadingSpinner.classList.remove('hidden');
 
       try {
-        const response = await window.apiFetch(`/api/public/track?orderId=${encodeURIComponent(orderId)}`);
+        const response = await window.apiFetch(`/api/public/track?orderId=${encodeURIComponent(orderId)}&token=${encodeURIComponent(token)}`);
         
-        if (!response.ok || !response.data.success) {
-          throw new Error(response.data?.error?.message || 'Order not found');
+        const data = await response.json();
+        
+        if (!response.ok || !data.success) {
+          throw new Error(data?.error?.message || 'Order not found');
         }
 
-        const data = response.data.data;
-        displayTrackingInfo(data);
+        displayTrackingInfo(data.data);
         
         loadingSpinner.classList.add('hidden');
         trackingResult.classList.add('visible');
+        
+        // Start auto-refresh every 15 seconds if order not delivered
+        if (data.data.status !== 'DELIVERED' && !autoRefreshInterval) {
+          autoRefreshInterval = setInterval(() => {
+            trackOrder(orderId, token);
+          }, 15000); // 15 seconds
+        }
       } catch (error) {
         console.error('Tracking error:', error);
-        errorMessage.textContent = error.message || 'Unable to track order. Please check your order ID and try again.';
+        errorMessage.textContent = error.message || 'Unable to track order. Please check your order ID and tracking token.';
         errorMessage.classList.add('visible');
         loadingSpinner.classList.add('hidden');
       }
@@ -359,26 +385,54 @@
 
     function displayTrackingInfo(data) {
       document.getElementById('orderIdDisplay').textContent = data.orderId;
-      document.getElementById('orderStatus').textContent = data.customerStatus;
-      document.getElementById('estimatedDelivery').textContent = formatDate(data.estimatedDelivery);
-      document.getElementById('etaMinutes').textContent = data.etaMinutes === '0' ? 'Delivered' : `${data.etaMinutes} minutes`;
-      document.getElementById('orderTotal').textContent = `$${data.total}`;
-      document.getElementById('orderCreated').textContent = formatDate(data.createdAt);
-      document.getElementById('supportContact').textContent = data.supportContact;
-      document.getElementById('supportPhone').textContent = data.supportPhone;
+      document.getElementById('orderStatus').textContent = data.status;
+      document.getElementById('estimatedDelivery').textContent = data.eta || 'N/A';
+      document.getElementById('etaMinutes').textContent = data.eta || 'N/A';
+      document.getElementById('orderTotal').textContent = data.total ? `$${data.total}` : 'N/A';
+      document.getElementById('orderCreated').textContent = formatDate(data.lastUpdated);
+      document.getElementById('supportContact').textContent = 'support@ridendine.com';
+      document.getElementById('supportPhone').textContent = '1-800-RIDENDINE';
 
-      // Build timeline
+      // Simple timeline based on status
+      const statuses = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE', 'DELIVERED'];
+      const statusLabels = {
+        'CREATED': 'Order Placed',
+        'CONFIRMED': 'Order Confirmed',
+        'PREPARING': 'Being Prepared',
+        'READY': 'Ready for Pickup',
+        'PICKED_UP': 'Picked Up',
+        'EN_ROUTE': 'Out for Delivery',
+        'DELIVERED': 'Delivered'
+      };
+      
+      const currentStatusIndex = statuses.indexOf(data.status);
+      
       const timeline = document.getElementById('timeline');
-      timeline.innerHTML = data.timeline.map((step, index) => `
-        <div class="timeline-step ${step.status}">
-          <div class="timeline-dot">${step.status === 'complete' ? '✓' : step.step}</div>
-          ${index < data.timeline.length - 1 ? '<div class="timeline-line"></div>' : ''}
-          <div class="timeline-content">
-            <h3>${step.label}</h3>
-            <p>${step.timestamp ? formatDate(step.timestamp) : 'Pending'}</p>
+      timeline.innerHTML = statuses.map((status, index) => {
+        let stepClass = 'pending';
+        if (index < currentStatusIndex) {
+          stepClass = 'complete';
+        } else if (index === currentStatusIndex) {
+          stepClass = 'active';
+        }
+        
+        return `
+          <div class="timeline-step ${stepClass}">
+            <div class="timeline-dot">${stepClass === 'complete' ? '✓' : index + 1}</div>
+            ${index < statuses.length - 1 ? '<div class="timeline-line"></div>' : ''}
+            <div class="timeline-content">
+              <h3>${statusLabels[status]}</h3>
+              <p>${stepClass === 'complete' || stepClass === 'active' ? formatDate(data.lastUpdated) : 'Pending'}</p>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+      
+      // Stop auto-refresh if delivered
+      if (data.status === 'DELIVERED' && autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+      }
     }
 
     function formatDate(dateString) {
@@ -405,6 +459,13 @@
         return dateString; // Return as-is on error
       }
     }
+    
+    // Clean up interval on page unload
+    window.addEventListener('beforeunload', () => {
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+      }
+    });
   </script>
 </body>
 </html>
