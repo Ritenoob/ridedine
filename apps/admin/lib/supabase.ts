@@ -1,5 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
-import { createBrowserClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 // Server-side Supabase client (for Server Components and Server Actions)
@@ -14,7 +13,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
@@ -27,13 +26,5 @@ export async function createClient() {
         },
       },
     }
-  )
-}
-
-// Client-side Supabase client (for Client Components)
-export function createBrowserSupabaseClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 }

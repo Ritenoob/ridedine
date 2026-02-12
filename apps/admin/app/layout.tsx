@@ -1,9 +1,6 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import Script from 'next/script'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Home Chef Delivery - Admin',
@@ -35,7 +32,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className={inter.className}>
+      <body style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
         {children}
         <Script id="register-sw" strategy="afterInteractive">
           {`
