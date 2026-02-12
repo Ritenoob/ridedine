@@ -2,6 +2,9 @@ const crypto = require('crypto');
 const db = require('../db');
 const dataService = require('./dataService');
 
+// In-memory order storage when database is not available
+const inMemoryOrders = new Map();
+
 /**
  * Generate a secure random tracking token
  */
@@ -15,21 +18,33 @@ function generateTrackingToken() {
  */
 async function createOrder({ customerName, customerEmail, items, totalAmount, customerId = null, chefId = null, partnerId = null }) {
   if (!dataService.isDbAvailable()) {
-    // Fallback for no database
+    // Fallback for no database - use in-memory storage
     const orderId = `order_${Date.now()}`;
     const trackingToken = generateTrackingToken();
+    
+    const order = {
+      id: orderId,
+      orderId,
+      trackingToken,
+      customerName,
+      customerEmail,
+      items,
+      total: parseFloat(totalAmount).toFixed(2),
+      status: 'CREATED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Store in memory
+    inMemoryOrders.set(orderId, order);
     
     return {
       success: true,
       data: {
         orderId,
         trackingToken,
-        customerName,
-        customerEmail,
-        items,
-        totalAmount,
         status: 'CREATED',
-        createdAt: new Date().toISOString()
+        createdAt: order.createdAt
       }
     };
   }
@@ -155,11 +170,64 @@ async function createOrder({ customerName, customerEmail, items, totalAmount, cu
  */
 async function getOrderTracking(orderId, token) {
   if (!dataService.isDbAvailable()) {
+    // Use in-memory storage
+    const order = inMemoryOrders.get(orderId);
+    
+    if (!order) {
+      return {
+        success: false,
+        error: {
+          code: 'ORDER_NOT_FOUND',
+          message: 'Order not found'
+        }
+      };
+    }
+    
+    // Validate tracking token
+    if (order.trackingToken !== token) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Invalid tracking token'
+        }
+      };
+    }
+    
+    // Calculate ETA based on status
+    let eta = null;
+    switch (order.status) {
+      case 'CREATED':
+      case 'CONFIRMED':
+        eta = '45-60 minutes';
+        break;
+      case 'PREPARING':
+        eta = '30-40 minutes';
+        break;
+      case 'READY':
+        eta = '20-30 minutes';
+        break;
+      case 'PICKED_UP':
+        eta = '15-25 minutes';
+        break;
+      case 'EN_ROUTE':
+        eta = '5-15 minutes';
+        break;
+      case 'DELIVERED':
+        eta = 'Delivered';
+        break;
+      default:
+        eta = '45-60 minutes';
+    }
+    
     return {
-      success: false,
-      error: {
-        code: 'DB_UNAVAILABLE',
-        message: 'Database not available'
+      success: true,
+      data: {
+        orderId: order.id,
+        status: order.status,
+        eta,
+        total: order.total,
+        lastUpdated: order.updatedAt
       }
     };
   }
@@ -254,9 +322,36 @@ async function getOrderTracking(orderId, token) {
  */
 async function updateOrderStatus(orderId, newStatus) {
   if (!dataService.isDbAvailable()) {
+    // Use in-memory storage
+    const order = inMemoryOrders.get(orderId);
+    
+    if (!order) {
+      return {
+        success: false,
+        error: 'Order not found'
+      };
+    }
+    
+    const validStatuses = ['CREATED', 'CONFIRMED', 'PREPARING', 'READY', 'PICKED_UP', 'EN_ROUTE', 'DELIVERED'];
+    
+    if (!validStatuses.includes(newStatus)) {
+      return {
+        success: false,
+        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      };
+    }
+    
+    order.status = newStatus;
+    order.updatedAt = new Date().toISOString();
+    inMemoryOrders.set(orderId, order);
+    
     return {
-      success: false,
-      error: 'Database not available'
+      success: true,
+      data: {
+        id: order.id,
+        status: order.status,
+        updated_at: order.updatedAt
+      }
     };
   }
   
@@ -302,9 +397,31 @@ async function updateOrderStatus(orderId, newStatus) {
  */
 async function listOrders(filters = {}) {
   if (!dataService.isDbAvailable()) {
+    // Use in-memory storage
+    let orders = Array.from(inMemoryOrders.values());
+    
+    // Apply status filter
+    if (filters.status) {
+      orders = orders.filter(order => order.status === filters.status);
+    }
+    
+    // Sort by created_at descending
+    orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    // Transform to match database format
+    const formattedOrders = orders.map(order => ({
+      id: order.id,
+      customer_name: order.customerName,
+      customer_email: order.customerEmail,
+      status: order.status,
+      total: order.total,
+      created_at: order.createdAt,
+      updated_at: order.updatedAt
+    }));
+    
     return {
-      success: false,
-      error: 'Database not available'
+      success: true,
+      data: formattedOrders.slice(0, 100) // Limit to 100
     };
   }
   
