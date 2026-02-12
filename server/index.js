@@ -97,6 +97,7 @@ const integrationRoutes = require('./routes/integrations');
 const demoRoutes = require('./routes/demo');
 const chefRoutes = require('./routes/chefs');
 const simulatorRoutes = require('./routes/simulator');
+const adminRoutes = require('./routes/admin');
 
 // Config endpoint
 app.get('/api/config', (req, res) => {
@@ -170,6 +171,7 @@ app.get('/api/routes/:id', async (req, res) => {
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/public', publicRoutes); // Public endpoints (no auth required)
+app.use('/api/admin', adminRoutes); // Admin endpoints (requires admin role)
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);
