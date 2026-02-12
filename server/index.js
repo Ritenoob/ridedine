@@ -6,74 +6,56 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://seancfafinlay.github.io");
-  res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
-app.use(cors({
-  origin: ["https://seancfafinlay.github.io"],
-  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"]
-}));
-app.options("*", cors());
 
 // ✅ IMPORTANT: Railway runs behind a proxy. This MUST be set before rate-limit.
 app.set('trust proxy', 1);
 
-const PORT = Number(process.env.PORT || 8080);
+const PORT = Number(process.env.PORT || 3000);
 
-// Robust env parsing - DEMO_MODE is TRUE by default for easy access
-const DEMO_MODE = process.env.DEMO_MODE !== 'false';
+// IMPORTANT: DEMO_MODE is FALSE by default for production security
+// Only enable it explicitly for development/testing
+const DEMO_MODE = process.env.DEMO_MODE === 'true';
 const DISABLE_RATE_LIMIT = ['true', '1', 'yes', 'y', 'on'].includes(String(process.env.DISABLE_RATE_LIMIT || '').toLowerCase());
-
-// Set DEMO_MODE as environment variable so it can be accessed by other modules
-if (DEMO_MODE && !process.env.DEMO_MODE) {
-  process.env.DEMO_MODE = 'true';
-}
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS: allow GitHub Pages and localhost to call this API
-// Use environment variable for GitHub Pages origin (makes it portable)
-// No default - must be explicitly configured for production
-const githubPagesOrigin = process.env.GITHUB_PAGES_ORIGIN;
+// CORS: Support environment-based origins for flexible deployment
+const FRONTEND_URL = process.env.FRONTEND_URL || process.env.GITHUB_PAGES_ORIGIN;
+
 const allowedOrigins = [
-  "http://localhost:8080",
-  "http://localhost:3000",
-  "http://127.0.0.1:8080",
-  "http://127.0.0.1:3000"
+  'http://localhost:3000',
+  'http://localhost:8080',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:8080'
 ];
 
-// Only add GitHub Pages origin if explicitly configured
-if (githubPagesOrigin) {
-  allowedOrigins.unshift(githubPagesOrigin);
-  console.log(`✅ GitHub Pages CORS enabled: ${githubPagesOrigin}`);
+// Add production frontend URL if configured
+if (FRONTEND_URL) {
+  allowedOrigins.unshift(FRONTEND_URL);
+  console.log(`✅ Production CORS enabled: ${FRONTEND_URL}`);
 } else {
-  console.log('⚠️  GitHub Pages CORS not configured (set GITHUB_PAGES_ORIGIN env var)');
+  console.log('⚠️  Production frontend URL not configured (set FRONTEND_URL env var)');
 }
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     
-    // Use exact matching to prevent malicious origins like evil.com/seancfafinlay.github.io
+    // Check if origin is in allowed list (exact match for security)
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, false);
+      console.warn(`⚠️  Blocked CORS request from: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 // Rate limiting (can be disabled)
 if (!DISABLE_RATE_LIMIT) {
@@ -108,6 +90,7 @@ const simulationService = require('./services/simulationService');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const publicRoutes = require('./routes/public');
 const paymentRoutes = require('./routes/payments');
 const orderRoutes = require('./routes/orders');
 const integrationRoutes = require('./routes/integrations');
@@ -186,6 +169,7 @@ app.get('/api/routes/:id', async (req, res) => {
 
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/public', publicRoutes); // Public endpoints (no auth required)
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/integrations', integrationRoutes);

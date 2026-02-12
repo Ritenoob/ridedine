@@ -9,15 +9,15 @@
   const redirectUrl = scriptTag?.dataset?.redirectUrl || null;
 
   try {
-    // Load auth client if not already loaded
-    if (!window.AuthClient) {
-      await loadScript('/auth-client.js');
-    }
+    // Check for stored JWT token
+    const authToken = localStorage.getItem('auth_token');
+    const authUserStr = localStorage.getItem('auth_user');
+    
+    // Try to verify session with backend
+    const sessionRes = await window.apiFetch('/api/auth/session');
+    const session = sessionRes.data?.data || sessionRes.data || {};
 
-    // Check session
-    const session = await window.AuthClient.checkSession();
-
-    // If demo mode, allow access
+    // If demo mode is enabled on backend, allow access
     if (session.demoMode) {
       console.log('🔧 Development mode enabled - bypassing authentication');
       showDemoBanner();
@@ -25,24 +25,49 @@
     }
 
     // Check if authenticated
-    if (!session.authenticated) {
+    if (!session.authenticated && !authToken) {
       console.log('🔒 Not authenticated - redirecting to login');
       redirectToLogin(requiredRole, redirectUrl);
       return;
     }
 
+    // If we have a token but session check failed, try to use stored user data
+    let userRole = session.user?.role;
+    if (!userRole && authUserStr) {
+      try {
+        const authUser = JSON.parse(authUserStr);
+        userRole = authUser.role;
+      } catch (e) {
+        console.error('Failed to parse stored user data:', e);
+      }
+    }
+
     // Check role if specified
-    if (requiredRole && session.role !== requiredRole) {
+    if (requiredRole && userRole !== requiredRole) {
+      console.error(`Access denied: This page requires ${requiredRole} role, but user has ${userRole} role`);
       alert(`Access denied: This page requires ${requiredRole} role`);
-      window.location.href = '/';
+      
+      // Redirect based on user role
+      if (userRole === 'admin') {
+        window.location.href = '/admin';
+      } else if (userRole === 'chef') {
+        window.location.href = '/chef-portal/dashboard';
+      } else if (userRole === 'driver') {
+        window.location.href = '/driver/jobs';
+      } else {
+        window.location.href = '/';
+      }
       return;
     }
 
-    console.log(`✅ Authenticated as ${session.role}`);
-    showLogoutButton(session);
+    console.log(`✅ Authenticated as ${userRole || session.user?.role || 'unknown'}`);
+    showLogoutButton(session.user || { role: userRole });
 
   } catch (error) {
     console.error('Auth guard error:', error);
+    // Clear potentially invalid tokens
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
     redirectToLogin(requiredRole, redirectUrl);
   }
 })();
