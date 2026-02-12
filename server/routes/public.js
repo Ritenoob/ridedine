@@ -1,166 +1,97 @@
 const express = require('express');
 const router = express.Router();
-const demoData = require('../services/demoData');
-const orderService = require('../services/orders');
+const orderService = require('../services/orderService');
 
-// Check if demo mode is enabled
-const isDemoMode = () => process.env.DEMO_MODE === 'true';
+// POST /api/public/orders - Create a new order
+router.post('/orders', async (req, res) => {
+  try {
+    const { customerName, customerEmail, items, totalAmount } = req.body;
 
-// Public order tracking endpoint
-// Query params: orderId (required), token (optional for future token-based tracking)
-router.get('/track', (req, res) => {
-  const { orderId, token } = req.query;
+    // Validate input
+    if (!customerName || !customerEmail) {
+      return res.status(400).json({
+        success: false,
+        error: 'Customer name and email are required'
+      });
+    }
 
-  if (!orderId) {
-    return res.status(400).json({
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Items are required'
+      });
+    }
+
+    if (!totalAmount || parseFloat(totalAmount) <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Total amount must be greater than 0'
+      });
+    }
+
+    // Create order
+    const result = await orderService.createOrder({
+      customerName,
+      customerEmail,
+      items,
+      totalAmount
+    });
+
+    if (!result.success) {
+      return res.status(500).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Create order error:', error);
+    res.status(500).json({
       success: false,
-      error: {
-        code: 'MISSING_ORDER_ID',
-        message: 'Order ID is required'
-      }
+      error: 'Failed to create order'
     });
   }
+});
 
+// GET /api/public/track - Track order by ID and token
+router.get('/track', async (req, res) => {
   try {
-    // Get order from appropriate service
-    const order = isDemoMode() ? 
-      demoData.getOrder(orderId) : 
-      orderService.getOrder(orderId);
+    const { orderId, token } = req.query;
 
-    if (!order) {
-      return res.status(404).json({
+    if (!orderId) {
+      return res.status(400).json({
         success: false,
         error: {
-          code: 'ORDER_NOT_FOUND',
-          message: 'Order not found. Please check your order ID.'
+          code: 'MISSING_ORDER_ID',
+          message: 'Order ID is required'
         }
       });
     }
 
-    // Calculate customer-friendly status and ETA
-    let customerStatus = 'Order received';
-    let driverStatus = null;
-    let etaMinutes = null;
-    let statusStep = 0; // For timeline visualization
-
-    switch (order.status) {
-      case 'pending':
-        customerStatus = 'Order received';
-        etaMinutes = '45-60';
-        statusStep = 1;
-        break;
-      case 'paid':
-        customerStatus = 'Payment confirmed';
-        etaMinutes = '40-50';
-        statusStep = 2;
-        break;
-      case 'preparing':
-        customerStatus = 'Being prepared';
-        etaMinutes = '30-40';
-        statusStep = 3;
-        break;
-      case 'ready':
-        customerStatus = 'Ready for pickup';
-        etaMinutes = '20-30';
-        driverStatus = 'Driver assigned';
-        statusStep = 4;
-        break;
-      case 'picked_up':
-        customerStatus = 'Picked up by driver';
-        driverStatus = 'Driver has your order';
-        etaMinutes = '15-25';
-        statusStep = 5;
-        break;
-      case 'on_route':
-        customerStatus = 'Out for delivery';
-        driverStatus = 'Driver en route to you';
-        etaMinutes = '5-15';
-        statusStep = 6;
-        break;
-      case 'delivered':
-        customerStatus = 'Delivered';
-        driverStatus = 'Delivered successfully';
-        etaMinutes = '0';
-        statusStep = 7;
-        break;
-      default:
-        customerStatus = 'Processing';
-        etaMinutes = '45-60';
-        statusStep = 1;
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_TOKEN',
+          message: 'Tracking token is required'
+        }
+      });
     }
 
-    // Build status timeline
-    const timeline = [
-      {
-        step: 1,
-        label: 'Order Placed',
-        status: statusStep >= 1 ? 'complete' : 'pending',
-        timestamp: order.createdAt || order.orderDate
-      },
-      {
-        step: 2,
-        label: 'Payment Confirmed',
-        status: statusStep >= 2 ? 'complete' : statusStep === 1 ? 'active' : 'pending',
-        timestamp: statusStep >= 2 ? order.updatedAt : null
-      },
-      {
-        step: 3,
-        label: 'Preparing Your Order',
-        status: statusStep >= 3 ? 'complete' : statusStep === 2 ? 'active' : 'pending',
-        timestamp: statusStep >= 3 ? order.updatedAt : null
-      },
-      {
-        step: 4,
-        label: 'Ready for Pickup',
-        status: statusStep >= 4 ? 'complete' : statusStep === 3 ? 'active' : 'pending',
-        timestamp: statusStep >= 4 ? order.updatedAt : null
-      },
-      {
-        step: 5,
-        label: 'Picked Up',
-        status: statusStep >= 5 ? 'complete' : statusStep === 4 ? 'active' : 'pending',
-        timestamp: statusStep >= 5 ? order.updatedAt : null
-      },
-      {
-        step: 6,
-        label: 'Out for Delivery',
-        status: statusStep >= 6 ? 'complete' : statusStep === 5 ? 'active' : 'pending',
-        timestamp: statusStep >= 6 ? order.updatedAt : null
-      },
-      {
-        step: 7,
-        label: 'Delivered',
-        status: statusStep >= 7 ? 'complete' : statusStep === 6 ? 'active' : 'pending',
-        timestamp: statusStep >= 7 ? order.deliveredAt || order.updatedAt : null
-      }
-    ];
+    const result = await orderService.getOrderTracking(orderId, token);
 
-    // Return safe tracking data (no chef address, no internal data)
-    res.json({
-      success: true,
-      data: {
-        orderId: order.id || order.orderId,
-        status: order.status,
-        customerStatus,
-        driverStatus,
-        etaMinutes,
-        estimatedDelivery: order.estimatedDelivery || order.deliveryWindow || 'Today, 5:00-6:00 PM',
-        timeline,
-        items: order.items || [],
-        total: order.total,
-        createdAt: order.createdAt || order.orderDate,
-        lastUpdated: order.updatedAt || order.lastUpdated || new Date().toISOString(),
-        supportContact: 'support@ridendine.com',
-        supportPhone: '1-800-RIDENDINE'
-      }
-    });
+    if (!result.success) {
+      const statusCode = result.error.code === 'ORDER_NOT_FOUND' ? 404 : 
+                         result.error.code === 'INVALID_TOKEN' ? 403 : 500;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
   } catch (error) {
-    console.error('Public tracking error:', error);
+    console.error('Track order error:', error);
     res.status(500).json({
       success: false,
       error: {
         code: 'SERVER_ERROR',
-        message: 'Unable to retrieve order tracking information. Please try again later.'
+        message: 'Failed to retrieve tracking information'
       }
     });
   }
