@@ -221,18 +221,29 @@ app.use(notFoundHandler);
 // Global error handler
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
-  console.log(`🚀 RideNDine server running on port ${PORT}`);
-  console.log(`📦 Demo Mode: ${DEMO_MODE ? 'ENABLED' : 'DISABLED'} (raw=${process.env.DEMO_MODE})`);
-  console.log(`🔒 Authentication: ${DEMO_MODE ? 'BYPASSED' : 'REQUIRED'}`);
-  console.log(`🧯 Rate limiting: ${DISABLE_RATE_LIMIT ? 'DISABLED' : 'ENABLED'}`);
-  
-  // Check database connectivity
-  await dataService.checkDatabase();
-});
+let server;
+
+function startServer() {
+  server = app.listen(PORT, async () => {
+    console.log(`🚀 RideNDine server running on port ${PORT}`);
+    console.log(`📦 Demo Mode: ${DEMO_MODE ? 'ENABLED' : 'DISABLED'} (raw=${process.env.DEMO_MODE})`);
+    console.log(`🔒 Authentication: ${DEMO_MODE ? 'BYPASSED' : 'REQUIRED'}`);
+    console.log(`🧯 Rate limiting: ${DISABLE_RATE_LIMIT ? 'DISABLED' : 'ENABLED'}`);
+
+    // Check database connectivity
+    await dataService.checkDatabase();
+  });
+
+  return server;
+}
+
+if (require.main === module) {
+  startServer();
+}
 
 module.exports = app;
-
+module.exports.startServer = startServer;
+module.exports.getServer = () => server;
 
 
 
