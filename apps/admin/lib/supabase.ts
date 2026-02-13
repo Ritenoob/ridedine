@@ -1,3 +1,8 @@
+﻿function getSupabaseEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return { url, key };
+}
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 function requireEnv(name: string): string {
@@ -26,3 +31,4 @@ export function createBrowserSupabaseClient() {
   const anonKey = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   return createSupabaseClient(url, anonKey);
 }
+

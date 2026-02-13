@@ -1,38 +1,38 @@
-{
-  "name": "home-chef-delivery",
-  "version": "1.0.0",
-  "description": "Home Chef Delivery Marketplace - Monorepo",
-  "private": true,
-  "workspaces": [
-    "apps/mobile",
-    "apps/admin",
-    "packages/shared",
-    "packages/ui"
-  ],
-  "scripts": {
-    "dev": "npm run dev --workspace=apps/admin",
-    "dev:mobile": "npm run start --workspace=apps/mobile",
-    "dev:admin": "npm run dev --workspace=apps/admin",
-    "build": "npm run build --workspaces --if-present",
-    "build:mobile": "npm run build --workspace=apps/mobile",
-    "build:admin": "npm run build --workspace=apps/admin",
-    "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
-  },
-  "keywords": [
-    "delivery",
-    "food",
-    "marketplace",
-    "monorepo"
-  ],
-  "author": "Home Chef Delivery Team",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.3.0"
-  }
+﻿{
+    "name":  "home-chef-delivery",
+    "version":  "1.0.0",
+    "description":  "Home Chef Delivery Marketplace - Monorepo",
+    "private":  true,
+    "workspaces":  [
+                       "apps/mobile",
+                       "apps/admin",
+                       "packages/shared",
+                       "packages/ui"
+                   ],
+    "scripts":  {
+                    "dev":  "npm run dev --workspace=apps/admin",
+                    "dev:mobile":  "npm run start --workspace=apps/mobile",
+                    "dev:admin":  "npm run dev --workspace=apps/admin",
+                    "build":  "npm run build --workspaces --if-present",
+                    "build:mobile":  "npm run build --workspace=apps/mobile",
+                    "build:admin":  "npm run build --workspace=apps/admin",
+                    "lint":  "npm run lint --workspaces --if-present",
+                    "test":  "npm run test --workspaces --if-present",
+                    "clean":  "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+                },
+    "keywords":  [
+                     "delivery",
+                     "food",
+                     "marketplace",
+                     "monorepo"
+                 ],
+    "author":  "Home Chef Delivery Team",
+    "license":  "MIT",
+    "engines":  {
+                    "node":  "\u003e=20",
+                    "npm":  "\u003e=9.0.0"
+                },
+    "devDependencies":  {
+                            "typescript":  "^5.3.0"
+                        }
 }
