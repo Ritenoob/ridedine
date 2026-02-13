@@ -1,4 +1,5 @@
-﻿"use client";
+﻿export const dynamic = 'force-dynamic';
+"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -106,3 +107,4 @@ export default function TrackingPage() {
     </main>
   );
 }
+

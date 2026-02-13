@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
@@ -159,3 +160,4 @@ export default async function Dashboard() {
     </div>
   )
 }
+
