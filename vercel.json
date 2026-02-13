@@ -1,7 +1,5 @@
-{{
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
-  }
+﻿{
+  "framework": "nextjs",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build --workspace=@home-chef/admin"
 }
