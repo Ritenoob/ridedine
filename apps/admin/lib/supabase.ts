@@ -4,13 +4,19 @@ function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
     // During build time, use placeholder values to allow static generation
-    // These will be overridden at runtime by actual env vars
-    if (name === "NEXT_PUBLIC_SUPABASE_URL") {
-      return "https://placeholder.supabase.co";
+    // Runtime validation will occur in the client components
+    // This is safe because Next.js 15 pre-renders pages at build time but
+    // the actual Supabase client is only created at runtime in the browser
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildTime) {
+      if (name === "NEXT_PUBLIC_SUPABASE_URL") {
+        return "https://placeholder.supabase.co";
+      }
+      if (name === "NEXT_PUBLIC_SUPABASE_ANON_KEY") {
+        return "placeholder-anon-key";
+      }
     }
-    if (name === "NEXT_PUBLIC_SUPABASE_ANON_KEY") {
-      return "placeholder-anon-key";
-    }
+    // At runtime, throw an error if env vars are missing
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
