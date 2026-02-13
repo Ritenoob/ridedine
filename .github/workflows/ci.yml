@@ -9,83 +9,129 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
-    
+
     strategy:
+      fail-fast: false
       matrix:
         node-version: [18.x, 20.x]
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Lint shared package
-      run: npm run lint --workspace=packages/shared --if-present
-    
-    - name: Lint mobile app
-      run: npm run lint --workspace=apps/mobile --if-present
-    
-    - name: Lint admin app
-      run: npm run lint --workspace=apps/admin --if-present
-    
-    - name: Build shared package
-      run: npm run build --workspace=packages/shared --if-present
-    
-    - name: Type check mobile
-      run: |
-        cd apps/mobile
-        if [ -f "tsconfig.json" ]; then
-          npx tsc --noEmit || true
-        fi
-    
-    - name: Type check admin
-      run: |
-        cd apps/admin
-        if [ -f "tsconfig.json" ]; then
-          npx tsc --noEmit || true
-        fi
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies (repo root)
+        run: npm ci
+
+      # ---- Shared package ----
+      - name: Lint shared package
+        run: |
+          if [ -f "packages/shared/package.json" ]; then
+            cd packages/shared
+            npm run lint --if-present
+          else
+            echo "packages/shared not found - skipping"
+          fi
+
+      - name: Build shared package
+        run: |
+          if [ -f "packages/shared/package.json" ]; then
+            cd packages/shared
+            npm run build --if-present
+          else
+            echo "packages/shared not found - skipping"
+          fi
+
+      # ---- Mobile app ----
+      - name: Lint mobile app
+        run: |
+          if [ -f "apps/mobile/package.json" ]; then
+            cd apps/mobile
+            npm run lint --if-present
+          else
+            echo "apps/mobile not found - skipping"
+          fi
+
+      - name: Type check mobile
+        run: |
+          if [ -f "apps/mobile/tsconfig.json" ]; then
+            cd apps/mobile
+            npx tsc --noEmit || true
+          else
+            echo "apps/mobile/tsconfig.json not found - skipping"
+          fi
+
+      # ---- Admin app ----
+      - name: Lint admin app
+        run: |
+          if [ -f "apps/admin/package.json" ]; then
+            cd apps/admin
+            npm run lint --if-present
+          else
+            echo "apps/admin not found - skipping"
+          fi
+
+      - name: Type check admin
+        run: |
+          if [ -f "apps/admin/tsconfig.json" ]; then
+            cd apps/admin
+            npx tsc --noEmit || true
+          else
+            echo "apps/admin/tsconfig.json not found - skipping"
+          fi
+
+      - name: Build admin app
+        run: |
+          if [ -f "apps/admin/package.json" ]; then
+            cd apps/admin
+            npm run build --if-present
+          else
+            echo "apps/admin not found - skipping"
+          fi
 
   validate-migrations:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Validate SQL migrations
-      run: |
-        echo "Checking SQL migration files..."
-        find backend/supabase/migrations -name "*.sql" -type f | while read file; do
-          echo "Validating $file"
-          # Basic SQL syntax check
-          if ! grep -q "CREATE\|ALTER\|DROP\|INSERT" "$file"; then
-            echo "Warning: $file may not be a valid migration"
+      - uses: actions/checkout@v4
+      - name: Validate SQL migrations
+        run: |
+          echo "Checking SQL migration files..."
+          if [ -d "backend/supabase/migrations" ]; then
+            find backend/supabase/migrations -name "*.sql" -type f | while read file; do
+              echo "Validating $file"
+              if ! grep -Eq "CREATE|ALTER|DROP|INSERT" "$file"; then
+                echo "Warning: $file may not be a valid migration"
+              fi
+            done
+          else
+            echo "No migrations directory found - skipping"
           fi
-        done
 
   validate-edge-functions:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Deno
-      uses: denoland/setup-deno@v1
-      with:
-        deno-version: v1.x
-    
-    - name: Validate Edge Functions
-      run: |
-        echo "Checking Edge Functions..."
-        for func in backend/supabase/functions/*/index.ts; do
-          if [ -f "$func" ]; then
-            echo "Linting $func"
-            deno lint "$func" || true
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Validate Edge Functions
+        run: |
+          echo "Checking Edge Functions..."
+          if [ -d "backend/supabase/functions" ]; then
+            for func in backend/supabase/functions/*/index.ts; do
+              if [ -f "$func" ]; then
+                echo "Linting $func"
+                deno lint "$func" || true
+              fi
+            done
+          else
+            echo "No edge functions directory found - skipping"
           fi
-        done
+=
