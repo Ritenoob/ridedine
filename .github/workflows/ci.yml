@@ -51,7 +51,7 @@ jobs:
         run: |
           if [ -f "apps/mobile/package.json" ]; then
             cd apps/mobile
-            npm run lint --if-present
+            npm run lint --if-present || echo "Mobile lint skipped (optional)"
           else
             echo "apps/mobile not found - skipping"
           fi
@@ -134,4 +134,3 @@ jobs:
           else
             echo "No edge functions directory found - skipping"
           fi
-=

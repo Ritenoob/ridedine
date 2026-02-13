@@ -32,17 +32,13 @@ const STATUS_OPTIONS = [
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [supabase] = useState(() => typeof window !== 'undefined' ? createClient() : null)
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    if (supabase) {
-      loadOrders()
-    }
+    loadOrders()
   }, [])
 
   const loadOrders = async () => {
-    if (!supabase) return
-    
     try {
       const { data, error } = await supabase
         .from('orders')
@@ -67,8 +63,6 @@ export default function OrdersPage() {
   }
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    if (!supabase) return
-    
     try {
       const { error } = await supabase
         .from('orders')
