@@ -14,13 +14,20 @@ export default function Login() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    setSupabase(createBrowserSupabaseClient())
+    try {
+      setSupabase(createBrowserSupabaseClient())
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to initialize authentication')
+    }
   }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!supabase) return
+    if (!supabase) {
+      setError('Authentication not initialized. Please refresh the page.')
+      return
+    }
     
     setLoading(true)
     setError('')
@@ -54,7 +61,7 @@ export default function Login() {
     router.refresh()
   }
 
-  if (!supabase) {
+  if (!supabase && !error) {
     return (
       <div style={{ 
         minHeight: '100vh', 
