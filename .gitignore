@@ -25,3 +25,6 @@ out/
 **/supabase/.branches/
 
 ridendine-demo-FIX/
+
+apps/admin/app/api/
+
