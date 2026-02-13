@@ -28,3 +28,5 @@ ridendine-demo-FIX/
 
 apps/admin/app/api/
 
+# Local run logs
+_run_logs_*.txt
