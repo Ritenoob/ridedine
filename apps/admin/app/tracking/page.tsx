@@ -1,5 +1,5 @@
 ﻿"use client";
-
+export const dynamic = 'force-dynamic';
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-browser";
@@ -106,3 +106,5 @@ export default function TrackingPage() {
     </main>
   );
 }
+
+
