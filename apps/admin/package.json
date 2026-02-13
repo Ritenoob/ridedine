@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run copy-docs && next build",
+    "copy-docs": "rm -rf public/docs && cp -r ../../docs public/docs",
     "start": "next start",
     "lint": "next lint"
   },
