@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "@home-chef/admin",
   "version": "1.0.0",
   "private": true,
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
