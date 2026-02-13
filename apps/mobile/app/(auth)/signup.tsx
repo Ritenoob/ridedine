@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { UserRole } from '@home-chef/shared';
 
 export default function SignUp() {
