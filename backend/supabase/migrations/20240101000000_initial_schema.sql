@@ -25,6 +25,10 @@ CREATE POLICY "Users can read own profile" ON profiles
 CREATE POLICY "Users can update own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
 
+-- Users can create their own profile during signup
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
 -- Create chefs table
 CREATE TABLE IF NOT EXISTS chefs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

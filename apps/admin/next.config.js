@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // serverActions are now stable in Next.js 15, no experimental flag needed
-}
+  reactStrictMode: true
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

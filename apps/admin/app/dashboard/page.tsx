@@ -3,24 +3,53 @@ import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default async function Dashboard() {
-  const supabase = await createClient()
+  // Check for dev auth bypass
+  const devAuthBypass = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true'
   
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  if (!session) {
-    redirect('/login')
+  let pendingChefs = 0
+  let totalOrders = 0
+  let isDevMode = false
+
+  if (devAuthBypass && process.env.NODE_ENV === 'development') {
+    // Dev mode - skip auth check, just fetch data
+    isDevMode = true
+    const supabase = await createClient()
+    
+    const { count: pendingCount } = await supabase
+      .from('chefs')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
+    
+    const { count: ordersCount } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+
+    pendingChefs = pendingCount || 0
+    totalOrders = ordersCount || 0
+  } else {
+    // Production mode - check auth
+    const supabase = await createClient()
+    
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+      redirect('/login')
+    }
+
+    // Get pending chefs count
+    const { count: pendingCount } = await supabase
+      .from('chefs')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
+
+    // Get recent orders count
+    const { count: ordersCount } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+
+    pendingChefs = pendingCount || 0
+    totalOrders = ordersCount || 0
   }
-
-  // Get pending chefs count
-  const { count: pendingChefs } = await supabase
-    .from('chefs')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending')
-
-  // Get recent orders count
-  const { count: totalOrders } = await supabase
-    .from('orders')
-    .select('*', { count: 'exact', head: true })
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
@@ -31,6 +60,18 @@ export default async function Dashboard() {
       }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
           Home Chef Delivery - Admin
+          {isDevMode && (
+            <span style={{ 
+              marginLeft: '1rem',
+              fontSize: '0.75rem',
+              background: '#fff3cd',
+              color: '#856404',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '4px'
+            }}>
+              DEV MODE
+            </span>
+          )}
         </h1>
       </nav>
 
@@ -53,7 +94,7 @@ export default async function Dashboard() {
               Pending Chef Approvals
             </h3>
             <p style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-              {pendingChefs || 0}
+              {pendingChefs}
             </p>
           </div>
 
@@ -67,7 +108,7 @@ export default async function Dashboard() {
               Total Orders
             </h3>
             <p style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-              {totalOrders || 0}
+              {totalOrders}
             </p>
           </div>
         </div>

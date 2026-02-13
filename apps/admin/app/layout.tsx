@@ -1,19 +1,19 @@
-import './globals.css'
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Home Chef Delivery - Admin',
-  description: 'Admin dashboard for Home Chef Delivery marketplace',
-}
+  title: "RIDENDINE Admin",
+  description: "Admin dashboard for RIDENDINE"
+};
 
 export default function RootLayout({
-  children,
+  children
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body>{children}</body>
     </html>
-  )
+  );
 }

@@ -1,0 +1,9 @@
+﻿{
+  "mode": "demo",
+  "apiBase": "",
+  "features": {
+    "auth": "demo",
+    "orders": "demo",
+    "payments": "demo"
+  }
+}

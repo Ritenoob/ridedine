@@ -1,0 +1,10 @@
+﻿{
+  "ok": true,
+  "authenticated": true,
+  "role": "admin",
+  "user": {
+    "email": "admin@ridendine.com",
+    "name": "Admin"
+  },
+  "token": "demo-token"
+}

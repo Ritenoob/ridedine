@@ -1,5 +1,7 @@
-{
-  "buildCommand": "cd apps/admin && npm run build",
-  "outputDirectory": "apps/admin/.next",
-  "installCommand": "npm install"
+{{
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
 }
