@@ -7,6 +7,11 @@ export async function createClient() {
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
+  
+  // Warn if using placeholders (server-side)
+  if (supabaseUrl === 'https://placeholder.supabase.co') {
+    console.warn('⚠️ Supabase environment variables not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.')
+  }
 
   return createServerClient(
     supabaseUrl,
