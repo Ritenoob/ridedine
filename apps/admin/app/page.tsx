@@ -1,38 +1,49 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
+"use client";
 
-export default async function Home() {
-  // Check for dev auth bypass
-  const devAuthBypass = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true'
-  
-  if (devAuthBypass && process.env.NODE_ENV === 'development') {
-    // In dev mode, skip auth and go to dashboard
-    redirect('/dashboard')
-  }
+import { useMemo, useState } from "react";
 
-  const supabase = await createClient()
-  
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  if (!session) {
-    redirect('/login')
-  }
+export default function AdminHome() {
+  const MASTER = useMemo(
+    () => process.env.NEXT_PUBLIC_ADMIN_MASTER_PASSWORD || "admin123",
+    []
+  );
 
-  // Check if user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single()
+  const [password, setPassword] = useState("");
+  const [authed, setAuthed] = useState(false);
 
-  if (profile?.role !== 'admin') {
+  const onLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === MASTER) {
+      setAuthed(true);
+    } else {
+      alert("Invalid password");
+    }
+  };
+
+  if (!authed) {
     return (
-      <div style={{ padding: '2rem' }}>
-        <h1>Access Denied</h1>
-        <p>You must be an admin to access this dashboard.</p>
-      </div>
-    )
+      <main style={{ padding: 40 }}>
+        <h1>RIDENDINE Admin</h1>
+        <p>Enter master password to continue.</p>
+
+        <form onSubmit={onLogin} style={{ marginTop: 16 }}>
+          <input
+            type="password"
+            placeholder="Master Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ display: "block", marginBottom: 10, minWidth: 320 }}
+          />
+          <button type="submit">Enter</button>
+        </form>
+      </main>
+    );
   }
 
-  redirect('/dashboard')
+  return (
+    <main style={{ padding: 40 }}>
+      <h1>RIDENDINE Admin Dashboard</h1>
+      <p>Authenticated (dev gate). Build your dashboard here.</p>
+    </main>
+  );
 }

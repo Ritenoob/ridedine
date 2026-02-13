@@ -152,27 +152,68 @@ npm run build --workspace=packages/shared
 
 ## 🚢 Deployment
 
-### Mobile App (Expo)
+### Admin Dashboard (Vercel)
+
+The admin dashboard is a Next.js application ready for deployment on Vercel:
+
+1. **Import Project to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Vercel will auto-detect Next.js
+
+2. **Environment Variables**
+   Set these in Vercel dashboard:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
+
+3. **Build Settings** (auto-detected, but verify):
+   - Build Command: `cd apps/admin && npm run build`
+   - Output Directory: `apps/admin/.next`
+   - Install Command: `npm install`
+
+4. **Deploy**
+   - Push to main branch for auto-deployment
+   - Or manually deploy via Vercel dashboard
+
+### Mobile App (Expo Application Services)
 ```bash
 cd apps/mobile
+
+# Build for iOS
 eas build --platform ios
+
+# Build for Android
 eas build --platform android
+
+# Submit to app stores
 eas submit
 ```
 
-### Admin Dashboard (Vercel)
-```bash
-cd apps/admin
-vercel
-# or push to main for auto-deployment
-```
+### Backend (Supabase Cloud)
 
-### Backend (Supabase)
-```bash
-cd backend/supabase
-supabase db push
-supabase functions deploy
-```
+1. **Create Supabase Project**
+   - Go to [supabase.com](https://supabase.com)
+   - Create a new project
+   - Note your project URL and anon key
+
+2. **Run Migrations**
+   ```bash
+   cd backend/supabase
+   supabase link --project-ref your-project-ref
+   supabase db push
+   ```
+
+3. **Deploy Edge Functions**
+   ```bash
+   supabase functions deploy
+   ```
+
+4. **Configure Stripe Webhooks**
+   - Set your Stripe keys in Supabase dashboard
+   - Configure webhook endpoint: `https://your-project.supabase.co/functions/v1/webhook_stripe`
+
 
 ## 🔒 Security
 
