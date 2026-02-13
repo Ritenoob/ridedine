@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 
@@ -13,7 +13,7 @@ const STATUS_STEPS = [
   { key: 'delivered', label: 'Delivered' },
 ]
 
-export default function TrackingPage() {
+function TrackingPageContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const [order, setOrder] = useState<any>(null)
@@ -273,4 +273,18 @@ const currentLabelStyle: React.CSSProperties = {
   fontSize: '0.875rem',
   fontWeight: '600',
 }
+
+export default function TrackingPage() {
+  return (
+    <Suspense fallback={<div style={centerContainerStyle}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={spinnerStyle} />
+        <p style={{ marginTop: '1rem', color: '#666' }}>Loading...</p>
+      </div>
+    </div>}>
+      <TrackingPageContent />
+    </Suspense>
+  )
+}
+
 export const dynamic = 'force-dynamic'
