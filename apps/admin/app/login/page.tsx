@@ -1,19 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createBrowserSupabaseClient } from '@/lib/supabase-browser'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export default function Login() {
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    setSupabase(createBrowserSupabaseClient())
+  }, [])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!supabase) return
+    
     setLoading(true)
     setError('')
 
@@ -44,6 +52,20 @@ export default function Login() {
 
     router.push('/dashboard')
     router.refresh()
+  }
+
+  if (!supabase) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#f5f5f5'
+      }}>
+        <div>Loading...</div>
+      </div>
+    )
   }
 
   return (
