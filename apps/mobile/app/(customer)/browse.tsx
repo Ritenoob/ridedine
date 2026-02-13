@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function Browse() {
-  const [chefs, setChefs] = useState([]);
+  const [chefs, setChefs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

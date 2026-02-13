@@ -1,12 +1,12 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
 
 export default function Dishes() {
-  const [dishes, setDishes] = useState([]);
+  const [dishes, setDishes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Dishes() {
     }
   };
 
-  const addToCart = (dish) => {
+  const addToCart = (dish: any) => {
     setCart([...cart, dish]);
   };
 
