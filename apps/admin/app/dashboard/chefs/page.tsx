@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 interface Chef {
@@ -19,13 +19,9 @@ export default function ChefsPage() {
   const [chefs, setChefs] = useState<Chef[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
-  const supabase = createBrowserSupabaseClient();
+  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
 
-  useEffect(() => {
-    loadChefs();
-  }, [filter]);
-
-  const loadChefs = async () => {
+  const loadChefs = useCallback(async () => {
     setLoading(true);
     try {
       let query = supabase
@@ -45,7 +41,11 @@ export default function ChefsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, supabase]);
+
+  useEffect(() => {
+    loadChefs();
+  }, [loadChefs]);
 
   const updateChefStatus = async (chefId: string, newStatus: string) => {
     try {
