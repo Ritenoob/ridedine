@@ -2,53 +2,7 @@
 import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
-  return (
-    <main style={{ padding: 40, maxWidth: 1200, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 32, marginBottom: 10 }}>
-        🍽️ RidenDine Admin Dashboard
-      </h1>
-      <p style={{ color: '#666', marginBottom: 40 }}>
-        Manage your premium home chef marketplace
-      </p>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: 20 
-      }}>
-        <DashboardCard
-          title="📦 Orders"
-          description="View and manage all orders"
-          href="/dashboard/orders"
-        />
-        <DashboardCard
-          title="👨‍🍳 Chefs"
-          description="Approve and manage chef profiles"
-          href="/dashboard/chefs"
-        />
-        <DashboardCard
-          title="🍱 Meals"
-          description="Review and feature meals"
-          href="/dashboard/meals"
-        />
-        <DashboardCard
-          title="📊 Analytics"
-          description="View platform metrics"
-          href="/dashboard/analytics"
-        />
-        <DashboardCard
-          title="🎫 Promo Codes"
-          description="Manage promotional codes"
-          href="/dashboard/promos"
-        />
-        <DashboardCard
-          title="📍 Tracking"
-          description="Public order tracking"
-          href="/tracking"
-        />
-      </div>
-    </main>
-  );
+  redirect("/dashboard/orders");
 }
 
 function DashboardCard({ title, description, href }: { 
