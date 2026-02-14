@@ -1,6 +1,6 @@
 # Vercel Deployment Instructions
 
-This guide provides step-by-step instructions for deploying the Home Chef Admin app to Vercel.
+This guide provides step-by-step instructions for deploying the Home Chef Admin and Web apps to Vercel.
 
 ## Prerequisites
 
@@ -10,40 +10,28 @@ This guide provides step-by-step instructions for deploying the Home Chef Admin 
 
 ## Deployment Steps
 
-### 1. Import Project to Vercel
+### 1. Create Two Vercel Projects
 
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Click "Add New" → "Project"
-3. Import your GitHub repository `SeanCFAFinlay/ridendine-demo`
-4. Vercel will auto-detect it as a monorepo
+Import the GitHub repo twice so you have **two separate projects**:
 
-### 2. Configure Build Settings
+- **Admin project**
+  - Root Directory: `apps/admin`
+  - Framework: Next.js
+  - Install Command: `npm ci`
+  - Build Command: `npm run build`
+  - Output Directory: `.next`
+  - Node.js Version: 20.x
+- **Web project**
+  - Root Directory: `apps/web`
+  - Framework: auto-detect (Next.js)
+  - Install Command: `npm ci`
+  - Build Command: `npm run build`
+  - Output Directory: `.next`
+  - Node.js Version: 20.x
 
-**CRITICAL: Monorepo Configuration**
+No `vercel.json` files are required when Root Directory is set in project settings.
 
-Since this is a monorepo with the admin app at `apps/admin`, you MUST configure the Root Directory:
-
-**Root Directory:** `apps/admin`
-- Click "Edit" next to "Root Directory" in project settings
-- Set it to `apps/admin`
-- This tells Vercel to treat `apps/admin` as the project root
-
-**Framework Preset:** Next.js (auto-detected)
-
-**Build Command:** `npm run build` (auto-detected)
-
-**Output Directory:** `.next` (default)
-
-**Install Command:** `npm ci`
-- Vercel will run this from the repository root
-- The root package.json contains workspace configuration
-- Dependencies for apps/admin will be installed via npm workspaces
-
-**Node Version:** 20.x
-- Set in Settings → General → Node.js Version
-- Or ensure `.nvmrc` file at repo root contains `20`
-
-### 3. Configure Environment Variables
+### 2. Configure Environment Variables (Admin)
 
 Go to Settings → Environment Variables and add:
 
@@ -58,28 +46,31 @@ NEXT_PUBLIC_DEV_AUTH_BYPASS=false
 ```
 ⚠️ **WARNING:** Never set `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` in production!
 
-### 4. Deploy
+### 3. Deploy
 
-1. Click "Deploy"
+1. Click "Deploy" in each project
 2. Vercel will:
    - Install dependencies using npm workspaces from repository root
-   - Build the Next.js app from `apps/admin`
+   - Build the Next.js app from the configured Root Directory
    - Deploy to production
 
-### 5. Verify Deployment
+### 4. Verify Deployment
 
 After deployment completes, verify:
 
-1. **Admin App:** Visit your Vercel domain (e.g., `https://your-app.vercel.app`)
+1. **Admin App:** Visit your admin Vercel domain (e.g., `https://your-app-admin.vercel.app`)
    - Should redirect to `/dashboard` (or `/dashboard/orders`)
    - Dashboard pages should load correctly
    - Login via Supabase authentication should work
+2. **Web App:** Visit your web Vercel domain (e.g., `https://your-app-web.vercel.app`)
+   - Home should redirect to `/dashboard`
+   - Placeholder dashboard page renders successfully
 
 ## Troubleshooting
 
 ### Build Fails: "Module not found" or dependency errors
-- **Cause:** Root Directory not set to `apps/admin`
-- **Fix:** Edit Root Directory in project settings to `apps/admin`
+- **Cause:** Root Directory not set to `apps/admin` or `apps/web`
+- **Fix:** Edit Root Directory in project settings to the correct app folder
 
 ### Build Fails: "npm ci can only install packages when your package.json and package-lock.json are in sync"
 - **Cause:** package-lock.json out of sync or corrupted
