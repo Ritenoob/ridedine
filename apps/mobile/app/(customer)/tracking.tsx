@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 const STATUS_STEPS = [
   { key: 'placed', label: 'Order Placed' },
@@ -14,7 +14,7 @@ const STATUS_STEPS = [
 
 export default function Tracking() {
   const { trackingToken } = useLocalSearchParams();
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

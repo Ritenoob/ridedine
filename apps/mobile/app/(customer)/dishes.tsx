@@ -1,13 +1,14 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
+import { useCart } from '@/lib/context/CartContext';
 
 export default function Dishes() {
-  const [dishes, setDishes] = useState([]);
+  const [dishes, setDishes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
   const router = useRouter();
+  const { items, addItem, getTotalItems, getTotalPrice, getChefId } = useCart();
 
   useEffect(() => {
     loadDishes();
@@ -40,8 +41,22 @@ export default function Dishes() {
     }
   };
 
-  const addToCart = (dish) => {
-    setCart([...cart, dish]);
+  const handleAddToCart = (dish: any) => {
+    const cartChefId = getChefId();
+    
+    // Check if adding from a different chef
+    if (cartChefId && cartChefId !== dish.chefs.id) {
+      alert('You can only order from one chef at a time. Please clear your cart first.');
+      return;
+    }
+
+    addItem({
+      dishId: dish.id,
+      name: dish.name,
+      price: dish.price,
+      chefId: dish.chefs.id,
+      chefName: dish.chefs.profiles.name,
+    });
   };
 
   if (loading) {
@@ -57,16 +72,19 @@ export default function Dishes() {
     <View style={styles.container}>
       <Text style={styles.title}>Available Dishes</Text>
       
-      {cart.length > 0 && (
-        <View style={styles.cartBanner}>
-          <Text style={styles.cartText}>{cart.length} items in cart</Text>
-          <TouchableOpacity 
-            style={styles.checkoutButton}
-            onPress={() => router.push('/(customer)/checkout')}
-          >
-            <Text style={styles.checkoutButtonText}>Checkout</Text>
-          </TouchableOpacity>
-        </View>
+      {items.length > 0 && (
+        <TouchableOpacity 
+          style={styles.cartBanner}
+          onPress={() => router.push('/(customer)/cart')}
+        >
+          <View>
+            <Text style={styles.cartText}>{getTotalItems()} items in cart</Text>
+            <Text style={styles.cartSubtext}>${getTotalPrice().toFixed(2)} total</Text>
+          </View>
+          <View style={styles.checkoutButton}>
+            <Text style={styles.checkoutButtonText}>View Cart →</Text>
+          </View>
+        </TouchableOpacity>
       )}
 
       <FlatList
@@ -84,9 +102,9 @@ export default function Dishes() {
             </Text>
             <TouchableOpacity 
               style={styles.addButton}
-              onPress={() => addToCart(item)}
+              onPress={() => handleAddToCart(item)}
             >
-              <Text style={styles.addButtonText}>Add to Order</Text>
+              <Text style={styles.addButtonText}>Add to Cart</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -120,7 +138,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#1976d2',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
@@ -128,15 +146,21 @@ const styles = StyleSheet.create({
   cartText: {
     fontSize: 16,
     fontWeight: '600',
+    color: 'white',
+  },
+  cartSubtext: {
+    fontSize: 14,
+    color: '#e3f2fd',
+    marginTop: 4,
   },
   checkoutButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: 'white',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 4,
   },
   checkoutButtonText: {
-    color: 'white',
+    color: '#1976d2',
     fontWeight: '600',
   },
   dishCard: {
