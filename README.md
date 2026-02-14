@@ -22,7 +22,8 @@ Home Chef Delivery is a production-ready marketplace platform built with modern 
 home-chef-delivery/
 ├── apps/
 │   ├── mobile/              # React Native (Expo) app
-│   └── admin/               # Next.js admin dashboard
+│   ├── admin/               # Next.js admin dashboard
+│   └── web/                 # Customer-facing Next.js web app
 ├── backend/
 │   └── supabase/            # Database, Auth, Edge Functions
 │       ├── migrations/      # SQL migrations
@@ -41,7 +42,7 @@ home-chef-delivery/
 - **Admin**: Next.js 14 (App Router) + React
 - **Payments**: Stripe Connect (marketplace payments)
 - **Maps**: Google Maps API
-- **Deployment**: Vercel (admin), EAS (mobile), Supabase Cloud (backend)
+- **Deployment**: Vercel (admin + web), EAS (mobile), Supabase Cloud (backend)
 
 ## 🚀 Quick Start
 
@@ -77,6 +78,9 @@ npm run dev:admin
 
 # Build admin app
 npm run build:admin
+
+# Build web app
+npm run build:web
 
 # Lint all workspaces
 npm run lint
@@ -153,41 +157,31 @@ npm run build --workspace=packages/shared
 
 ## 🚢 Deployment
 
-### Admin Dashboard (Vercel)
+### Deploy Admin on Vercel
 
-The admin dashboard is a Next.js application deployed on Vercel in a monorepo setup.
+- Create a **Vercel project** with **Root Directory** set to `apps/admin`
+- Framework preset: **Next.js**
+- Install Command: `npm ci`
+- Build Command: `npm run build`
+- Node.js Version: **20.x**
+- Set environment variables:
+  ```
+  NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+  ```
 
-**Quick Deploy:**
+### Deploy Web on Vercel
 
-1. **Import Project to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Import GitHub repository: `SeanCFAFinlay/ridendine-demo`
+- Create a **separate Vercel project** with **Root Directory** `apps/web`
+- Framework: auto-detect (Next.js)
+- Install Command: `npm ci`
+- Build Command: `npm run build`
+- Node.js Version: **20.x**
+- No Vercel config files are required in the repo; use project settings instead.
 
-2. **Configure Root Directory** (CRITICAL for monorepo)
-   - Set **Root Directory** to: `apps/admin`
-   - This tells Vercel to treat `apps/admin` as the project root
+### Deploy Mobile via EAS
 
-3. **Environment Variables**
-   Set in Vercel project settings:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
-
-4. **Build Configuration** (auto-detected when Root Directory is set)
-   - Framework: Next.js
-   - Build Command: `npm run build`
-   - Install Command: `npm ci` (runs from repo root)
-   - Output Directory: `.next`
-   - Node.js Version: 20.x
-
-5. **Deploy**
-   - Push to main branch triggers automatic deployment
-   - Pull requests create preview deployments
-
-**See [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) for detailed instructions and troubleshooting.**
-
-### Mobile App (Expo Application Services)
+- The mobile app is deployed with Expo Application Services (not Vercel).
 ```bash
 cd apps/mobile
 
