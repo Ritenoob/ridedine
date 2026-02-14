@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import Stripe from 'https://esm.sh/stripe@14.10.0?target=deno';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
@@ -7,6 +8,12 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 });
 
 const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
+
+// Create Supabase client with service role key for admin operations
+const supabaseAdmin = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 serve(async (req) => {
   const signature = req.headers.get('stripe-signature');
@@ -30,8 +37,20 @@ serve(async (req) => {
         const orderId = session.metadata?.order_id;
 
         if (orderId) {
-          // TODO: Update order payment status to 'succeeded' via Supabase
-          console.log(`Payment succeeded for order: ${orderId}`);
+          // Update order payment status to 'succeeded'
+          const { error } = await supabaseAdmin
+            .from('orders')
+            .update({ 
+              payment_status: 'succeeded',
+              payment_intent_id: session.payment_intent as string
+            })
+            .eq('id', orderId);
+
+          if (error) {
+            console.error('Error updating order payment status:', error);
+          } else {
+            console.log(`Payment succeeded for order: ${orderId}`);
+          }
         }
         break;
       }
@@ -39,28 +58,78 @@ serve(async (req) => {
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log('PaymentIntent succeeded:', paymentIntent.id);
-        // TODO: Update payment record in database
+        
+        // Find order by payment_intent_id and update status
+        const { error } = await supabaseAdmin
+          .from('orders')
+          .update({ payment_status: 'succeeded' })
+          .eq('payment_intent_id', paymentIntent.id);
+
+        if (error) {
+          console.error('Error updating payment status:', error);
+        }
         break;
       }
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log('PaymentIntent failed:', paymentIntent.id);
-        // TODO: Update order status and notify customer
+        
+        // Update order status to failed and notify customer
+        const { error } = await supabaseAdmin
+          .from('orders')
+          .update({ 
+            payment_status: 'failed',
+            status: 'cancelled'
+          })
+          .eq('payment_intent_id', paymentIntent.id);
+
+        if (error) {
+          console.error('Error updating payment failure:', error);
+        }
         break;
       }
 
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
-        // TODO: Update chef payout_enabled status based on account.charges_enabled
-        console.log('Account updated:', account.id, 'Charges enabled:', account.charges_enabled);
+        
+        // Update chef payout_enabled status based on account.charges_enabled
+        const { error } = await supabaseAdmin
+          .from('chefs')
+          .update({ 
+            payout_enabled: account.charges_enabled || false 
+          })
+          .eq('connect_account_id', account.id);
+
+        if (error) {
+          console.error('Error updating chef payout status:', error);
+        } else {
+          console.log(
+            'Account updated:', 
+            account.id, 
+            'Charges enabled:', 
+            account.charges_enabled
+          );
+        }
         break;
       }
 
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
         console.log('Charge refunded:', charge.id);
-        // TODO: Update order status to 'refunded'
+        
+        // Update order status to 'refunded'
+        const { error } = await supabaseAdmin
+          .from('orders')
+          .update({ 
+            payment_status: 'refunded',
+            status: 'refunded'
+          })
+          .eq('payment_intent_id', charge.payment_intent as string);
+
+        if (error) {
+          console.error('Error updating refund status:', error);
+        }
         break;
       }
 
