@@ -13,7 +13,7 @@
                     "dev":  "npm run dev --workspace=apps/admin",
                     "dev:mobile":  "npm run start --workspace=apps/mobile",
                     "dev:admin":  "npm run dev --workspace=apps/admin",
-                    "build":  "npm run build --workspaces --if-present",
+                    "build":  "npm run build --workspace=apps/admin",
                     "build:mobile":  "npm run build --workspace=apps/mobile",
                     "build:admin":  "npm run build --workspace=apps/admin",
                     "lint":  "npm run lint --workspaces --if-present",
