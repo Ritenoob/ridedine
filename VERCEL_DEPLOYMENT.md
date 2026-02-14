@@ -19,22 +19,29 @@ This guide provides step-by-step instructions for deploying the Home Chef Admin 
 
 ### 2. Configure Build Settings
 
-Set the following in the project settings:
+**CRITICAL: Monorepo Configuration**
 
-**Framework Preset:** Next.js
+Since this is a monorepo with the admin app at `apps/admin`, you MUST configure the Root Directory:
 
 **Root Directory:** `apps/admin`
-- This is critical! Click "Edit" next to "Root Directory" and set it to `apps/admin`
+- Click "Edit" next to "Root Directory" in project settings
+- Set it to `apps/admin`
+- This tells Vercel to treat `apps/admin` as the project root
 
-**Build Command:** `npm run build`
-- This will automatically run `npm run copy-docs && next build`
+**Framework Preset:** Next.js (auto-detected)
 
-**Output Directory:** `.next` (default, leave as is)
+**Build Command:** `npm run build` (auto-detected)
+
+**Output Directory:** `.next` (default)
 
 **Install Command:** `npm ci`
+- Vercel will run this from the repository root
+- The root package.json contains workspace configuration
+- Dependencies for apps/admin will be installed via npm workspaces
 
 **Node Version:** 20.x
-- Set this in Settings → General → Node.js Version
+- Set in Settings → General → Node.js Version
+- Or ensure `.nvmrc` file at repo root contains `20`
 
 ### 3. Configure Environment Variables
 
@@ -55,9 +62,8 @@ NEXT_PUBLIC_DEV_AUTH_BYPASS=false
 
 1. Click "Deploy"
 2. Vercel will:
-   - Install dependencies from `apps/admin`
-   - Copy docs from `/docs` to `apps/admin/public/docs`
-   - Build the Next.js app
+   - Install dependencies using npm workspaces from repository root
+   - Build the Next.js app from `apps/admin`
    - Deploy to production
 
 ### 5. Verify Deployment
@@ -65,26 +71,23 @@ NEXT_PUBLIC_DEV_AUTH_BYPASS=false
 After deployment completes, verify:
 
 1. **Admin App:** Visit your Vercel domain (e.g., `https://your-app.vercel.app`)
-   - Should show the admin login page
-   - Login should work with valid Supabase credentials
-
-2. **Docs:** Visit `https://your-app.vercel.app/docs/`
-   - Should serve the GitHub Pages documentation
-   - All assets (CSS, JS, images) should load correctly
-
-3. **API Routes:** Test that the app can connect to Supabase
-   - Try logging in
-   - Check dashboard pages load
+   - Should redirect to `/dashboard` (or `/dashboard/orders`)
+   - Dashboard pages should load correctly
+   - Login via Supabase authentication should work
 
 ## Troubleshooting
 
-### Build Fails: "Module not found"
+### Build Fails: "Module not found" or dependency errors
 - **Cause:** Root Directory not set to `apps/admin`
-- **Fix:** Edit Root Directory in project settings
+- **Fix:** Edit Root Directory in project settings to `apps/admin`
 
-### Docs 404 Error
-- **Cause:** Docs not copied during build
-- **Fix:** Check that build command runs `npm run copy-docs`
+### Build Fails: "npm ci can only install packages when your package.json and package-lock.json are in sync"
+- **Cause:** package-lock.json out of sync or corrupted
+- **Fix:** Run `npm install` locally and commit the updated package-lock.json
+
+### Build Fails: Workspace errors
+- **Cause:** Vercel not running install from repository root
+- **Fix:** Ensure Install Command is `npm ci` (run from root) and Build Command is `npm run build` (run from apps/admin)
 
 ### Supabase Connection Error
 - **Cause:** Missing environment variables

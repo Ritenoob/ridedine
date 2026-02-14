@@ -1,5 +1,5 @@
-﻿import AdminGate from "./ui/AdminGate";
+﻿import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <AdminGate />;
+  redirect("/dashboard");
 }

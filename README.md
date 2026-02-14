@@ -47,7 +47,7 @@ home-chef-delivery/
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.0.0 (see `.nvmrc`)
 - npm >= 9.0.0
 - Supabase account
 - Stripe account (for payments)
@@ -60,28 +60,29 @@ home-chef-delivery/
 git clone https://github.com/SeanCFAFinlay/ridendine-demo.git
 cd ridendine-demo
 
-# Install all dependencies
-npm install
+# Install all dependencies (monorepo with npm workspaces)
+npm ci
 
-# Setup environment variables (see docs/ENVIRONMENT.md)
-cp apps/mobile/.env.example apps/mobile/.env
+# Setup environment variables
 cp apps/admin/.env.example apps/admin/.env.local
-cp backend/supabase/.env.example backend/supabase/.env
+# Edit apps/admin/.env.local with your Supabase credentials
 ```
 
 ### Running Locally
 
 ```bash
-# Start Supabase locally (requires Supabase CLI)
-cd backend/supabase
-supabase start
-supabase db reset  # Run migrations
-
-# Start mobile app
-npm run dev:mobile
-
-# Start admin dashboard
+# Run admin dashboard (Next.js)
 npm run dev:admin
+# Opens at http://localhost:3000
+
+# Build admin app
+npm run build:admin
+
+# Lint all workspaces
+npm run lint
+
+# Test all workspaces
+npm run test
 ```
 
 ## 📱 Mobile App
@@ -154,28 +155,37 @@ npm run build --workspace=packages/shared
 
 ### Admin Dashboard (Vercel)
 
-The admin dashboard is a Next.js application ready for deployment on Vercel:
+The admin dashboard is a Next.js application deployed on Vercel in a monorepo setup.
+
+**Quick Deploy:**
 
 1. **Import Project to Vercel**
    - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Vercel will auto-detect Next.js
+   - Import GitHub repository: `SeanCFAFinlay/ridendine-demo`
 
-2. **Environment Variables**
-   Set these in Vercel dashboard:
+2. **Configure Root Directory** (CRITICAL for monorepo)
+   - Set **Root Directory** to: `apps/admin`
+   - This tells Vercel to treat `apps/admin` as the project root
+
+3. **Environment Variables**
+   Set in Vercel project settings:
    ```
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
    ```
 
-3. **Build Settings** (auto-detected, but verify):
-   - Build Command: `cd apps/admin && npm run build`
-   - Output Directory: `apps/admin/.next`
-   - Install Command: `npm install`
+4. **Build Configuration** (auto-detected when Root Directory is set)
+   - Framework: Next.js
+   - Build Command: `npm run build`
+   - Install Command: `npm ci` (runs from repo root)
+   - Output Directory: `.next`
+   - Node.js Version: 20.x
 
-4. **Deploy**
-   - Push to main branch for auto-deployment
-   - Or manually deploy via Vercel dashboard
+5. **Deploy**
+   - Push to main branch triggers automatic deployment
+   - Pull requests create preview deployments
+
+**See [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) for detailed instructions and troubleshooting.**
 
 ### Mobile App (Expo Application Services)
 ```bash
