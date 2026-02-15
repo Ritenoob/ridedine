@@ -2,9 +2,7 @@
 
 ## 🎯 System Overview
 
-This is a **unified Supabase-only** system. Railway and Render backends have been completely removed.
-
-### Infrastructure
+This is a **unified Supabase-only** system. Legacy non-Vercel hosting configs have been removed. ### Infrastructure
 
 - **Database**: Supabase PostgreSQL
 - **Authentication**: Supabase Auth
@@ -266,3 +264,4 @@ npm install
 - Ensure RLS policies are tested
 - Rotate Supabase keys regularly
 - Use environment-specific credentials
+

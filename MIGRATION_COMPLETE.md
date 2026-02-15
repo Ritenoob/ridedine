@@ -312,7 +312,6 @@ EXPO_PUBLIC_DEV_AUTH_BYPASS=true    # Mobile app
 
 ### Infrastructure
 - [x] Railway removed
-- [x] Render removed
 - [x] Backend server removed
 - [x] Only Supabase remains
 
@@ -395,7 +394,6 @@ npm run dev:mobile
 
 ### REMOVED ❌
 - Railway.json (228 bytes)
-- Render.yaml (845 bytes)
 - /server directory (4,955+ lines of code)
   - 8 route files
   - 1 controller
@@ -480,3 +478,4 @@ npm install
 ---
 
 **Migration Complete! System is now 100% Supabase-based.**
+
