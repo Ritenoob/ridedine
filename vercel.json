@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build --workspace=apps/admin",
+  "installCommand": "npm ci",
+  "outputDirectory": "apps/admin/.next",
+  "framework": "nextjs",
+  "functions": {
+    "runtime": "nodejs20.x"
+  }
+}
