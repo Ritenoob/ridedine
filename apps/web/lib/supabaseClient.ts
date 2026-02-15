@@ -1,18 +1,15 @@
-﻿import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+﻿/**
+ * Compatibility wrapper for older imports:
+ *   import supabase from "@/lib/supabaseClient"
+ *   import { supabaseClient } from "@/lib/supabaseClient"
+ */
+import { createClient } from "@supabase/supabase-js";
+import { env, assertEnv } from "./env";
 
-let _client: SupabaseClient | null = null;
+assertEnv();
 
-export function getSupabaseClient(): SupabaseClient | null {
-  // Only create the client in the browser
-  if (typeof window === "undefined") return null;
+export const supabaseClient = () =>
+  createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anon) return null;
-
-  if (!_client) {
-    _client = createClient(url, anon);
-  }
-  return _client;
-}
+// Some codebases default-export the client factory.
+export default supabaseClient;
