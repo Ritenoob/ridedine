@@ -32,3 +32,21 @@ apps/admin/app/api/
 _run_logs_*.txt
 .vercel
 apps/admin/MERGED_INTO_WEB.txt
+# Local diagnostics (do not commit)
+repo-tree.txt
+repo-root.txt
+apps-root.txt
+packages-root.txt
+tracked-files.txt
+tracked-apps.txt
+tracked-packages.txt
+tracked-configs.txt
+*.bak
+*.disabled
+.vercel/
+**/.next/
+**/out/
+**/dist/
+**/build/
+.env.*
+!.env.example

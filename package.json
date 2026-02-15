@@ -1,4 +1,4 @@
-{
+﻿{
     "name":  "home-chef-delivery",
     "version":  "1.0.0",
     "description":  "Home Chef Delivery Marketplace - Monorepo",
@@ -31,7 +31,7 @@
     "author":  "Home Chef Delivery Team",
     "license":  "MIT",
     "engines":  {
-                    "node":  "\u003e=20",
+                    "node":  "\u003e=20 \u003c23",
                     "npm":  "\u003e=9.0.0"
                 },
     "devDependencies":  {
