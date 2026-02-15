@@ -1,4 +1,4 @@
-﻿{
+{
   "buildCommand": "npm run build --workspace=apps/web",
   "installCommand": "npm ci",
   "outputDirectory": "apps/web/.next",
