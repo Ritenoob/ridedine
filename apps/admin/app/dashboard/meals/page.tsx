@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { createBrowserSupabaseClient } from "../../../lib/supabase";
 
 interface Dish {
   id: string;
@@ -89,7 +89,7 @@ export default function MealsPage() {
   return (
     <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>🍱 Meal Management</h1>
+        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ± Meal Management</h1>
         <p style={{ color: "#666" }}>Manage and feature meals on the platform</p>
       </div>
 
@@ -164,7 +164,7 @@ export default function MealsPage() {
                     fontWeight: 600,
                   }}
                 >
-                  ⭐ FEATURED
+                  â­ FEATURED
                 </div>
               )}
 
@@ -215,7 +215,7 @@ export default function MealsPage() {
                     fontSize: 13,
                   }}
                 >
-                  {dish.featured ? "⭐ Unfeature" : "☆ Feature on Homepage"}
+                  {dish.featured ? "â­ Unfeature" : "â˜† Feature on Homepage"}
                 </button>
                 <button
                   onClick={() => toggleAvailability(dish.id, dish.available)}
@@ -230,7 +230,7 @@ export default function MealsPage() {
                     fontSize: 13,
                   }}
                 >
-                  {dish.available ? "❌ Make Unavailable" : "✓ Make Available"}
+                  {dish.available ? "âŒ Make Unavailable" : "âœ“ Make Available"}
                 </button>
               </div>
             </div>
@@ -240,3 +240,4 @@ export default function MealsPage() {
     </main>
   );
 }
+

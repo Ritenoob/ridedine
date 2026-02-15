@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "../../lib/supabaseClient";
 
 type Status = "idle" | "ok" | "error";
 
@@ -62,3 +62,4 @@ export default function DashboardPage() {
     </main>
   );
 }
+

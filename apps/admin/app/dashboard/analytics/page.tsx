@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { createBrowserSupabaseClient } from "../../../lib/supabase";
 
 interface Analytics {
   totalOrders: number;
@@ -82,7 +82,7 @@ export default function AnalyticsPage() {
   return (
     <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>📊 Platform Analytics</h1>
+        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ“Š Platform Analytics</h1>
         <p style={{ color: "#666" }}>Overview of your marketplace performance</p>
       </div>
 
@@ -107,13 +107,13 @@ export default function AnalyticsPage() {
               <StatCard
                 title="Orders Today"
                 value={analytics.ordersToday}
-                icon="📦"
+                icon="ðŸ“¦"
                 color="#e3f2fd"
               />
               <StatCard
                 title="Revenue Today"
                 value={`$${analytics.revenueToday.toFixed(2)}`}
-                icon="💰"
+                icon="ðŸ’°"
                 color="#e8f5e9"
               />
             </div>
@@ -130,37 +130,37 @@ export default function AnalyticsPage() {
               <StatCard
                 title="Total Orders"
                 value={analytics.totalOrders}
-                icon="📊"
+                icon="ðŸ“Š"
                 color="#f3e5f5"
               />
               <StatCard
                 title="Total Revenue"
                 value={`$${analytics.totalRevenue.toFixed(2)}`}
-                icon="💵"
+                icon="ðŸ’µ"
                 color="#e8f5e9"
               />
               <StatCard
                 title="Active Chefs"
                 value={analytics.activeChefs}
-                icon="👨‍🍳"
+                icon="ðŸ‘¨â€ðŸ³"
                 color="#fff3e0"
               />
               <StatCard
                 title="Total Customers"
                 value={analytics.totalCustomers}
-                icon="👥"
+                icon="ðŸ‘¥"
                 color="#e3f2fd"
               />
               <StatCard
                 title="Active Dishes"
                 value={analytics.activeDishes}
-                icon="🍱"
+                icon="ðŸ±"
                 color="#fce4ec"
               />
               <StatCard
                 title="Pending Chefs"
                 value={analytics.pendingChefs}
-                icon="⏳"
+                icon="â³"
                 color="#fff9c4"
               />
             </div>
@@ -265,3 +265,4 @@ function StatCard({
     </div>
   );
 }
+

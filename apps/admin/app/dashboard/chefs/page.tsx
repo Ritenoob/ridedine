@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { createBrowserSupabaseClient } from "../../../lib/supabase";
 
 interface Chef {
   id: string;
@@ -68,7 +68,7 @@ export default function ChefsPage() {
   return (
     <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>👨‍🍳 Chef Management</h1>
+        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ‘¨â€ðŸ³ Chef Management</h1>
         <p style={{ color: "#666" }}>Approve and manage chef applications</p>
       </div>
 
@@ -171,7 +171,7 @@ export default function ChefsPage() {
                         fontWeight: 600,
                       }}
                     >
-                      ✓ Approve
+                      âœ“ Approve
                     </button>
                     <button
                       onClick={() => updateChefStatus(chef.id, "rejected")}
@@ -185,7 +185,7 @@ export default function ChefsPage() {
                         fontWeight: 600,
                       }}
                     >
-                      ✗ Reject
+                      âœ— Reject
                     </button>
                   </div>
                 )}
@@ -243,3 +243,4 @@ function getStatusColor(status: string): string {
       return "#666";
   }
 }
+

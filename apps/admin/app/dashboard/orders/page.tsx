@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase-browser";
+import { createClient } from "../../../lib/supabase-browser";
 
 interface Order {
   id: string;
@@ -86,5 +86,6 @@ export default function OrdersPage() {
     </main>
   );
 }
+
 
 
