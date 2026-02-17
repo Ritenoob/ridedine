@@ -1,16 +1,19 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { ReactNode } from "react";
+import { CartProvider } from "../lib/CartContext";
 
 export const metadata: Metadata = {
-  title: "Home Chef Web",
-  description: "Customer-facing web experience for Home Chef Delivery"
+  title: "Home Chef Delivery",
+  description: "Order home-cooked meals from local chefs"
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
