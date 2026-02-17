@@ -51,3 +51,4 @@ tracked-configs.txt
 **/build/
 .env.*
 !.env.example
+.playwright/
