@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-and-test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,25 +33,31 @@ jobs:
             npm run build --workspace=packages/shared
           fi
 
-      - name: Build apps (if present)
+      - name: Build web (if present)
         run: |
           if [ -f "apps/web/package.json" ]; then
             npm run build --workspace=apps/web
           fi
+
+      - name: Build admin (if present)
+        run: |
           if [ -f "apps/admin/package.json" ]; then
             npm run build --workspace=apps/admin
           fi
+
+      - name: Build mobile (if present)
+        run: |
           if [ -f "apps/mobile/package.json" ]; then
             npm run build --workspace=apps/mobile
           fi
 
-      - name: Lint (if present)
+      - name: Lint (root, if present)
         run: |
           if npm run -s | grep -q "^  lint$"; then
             npm run lint
           fi
 
-      - name: Test (if present)
+      - name: Test (root, if present)
         run: |
           if npm run -s | grep -q "^  test$"; then
             npm run test
