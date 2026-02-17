@@ -11,5 +11,6 @@ assertEnv();
 export const supabaseClient = () =>
   createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-// Some codebases default-export the client factory.
+export const getSupabaseClient = supabaseClient;
+
 export default supabaseClient;

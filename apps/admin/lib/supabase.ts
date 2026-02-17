@@ -7,3 +7,4 @@
  */
 export { supabaseServer as createClient } from "./supabase-server";
 export { supabaseServer } from "./supabase-server";
+export { supabaseBrowser as createBrowserSupabaseClient } from "./supabase-browser";

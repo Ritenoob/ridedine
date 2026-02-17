@@ -1,40 +1,27 @@
-﻿{
-    "name":  "home-chef-delivery",
-    "version":  "1.0.0",
-    "description":  "Home Chef Delivery Marketplace - Monorepo",
-    "private":  true,
-    "workspaces":  [
-                       "apps/mobile",
-                       "apps/admin",
-                       "apps/web",
-                       "packages/shared"
-                   ],
-    "scripts":  {
-                    "dev":  "npm run dev --workspace=apps/admin",
-                    "dev:mobile":  "npm run start --workspace=apps/mobile",
-                    "dev:admin":  "npm run dev --workspace=apps/admin",
-                    "dev:web":  "npm run dev --workspace=apps/web",
-                    "build":  "npm run build --workspace=apps/admin",
-                    "build:mobile":  "npm run build --workspace=apps/mobile",
-                    "build:admin":  "npm run build --workspace=apps/admin",
-                    "build:web":  "npm run build --workspace=apps/web",
-                    "lint":  "npm run lint --workspaces --if-present",
-                    "test":  "npm run test --workspaces --if-present",
-                    "clean":  "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
-                },
-    "keywords":  [
-                     "delivery",
-                     "food",
-                     "marketplace",
-                     "monorepo"
-                 ],
-    "author":  "Home Chef Delivery Team",
-    "license":  "MIT",
-    "engines":  {
-                    "node":  "\u003e=20 \u003c23",
-                    "npm":  "\u003e=9.0.0"
-                },
-    "devDependencies":  {
-                            "typescript":  "^5.3.0"
-                        }
+{
+  "name": "home-chef-delivery",
+  "version": "1.0.0",
+  "description": "Home Chef Delivery Marketplace - Monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @home-chef/admin dev",
+    "dev:mobile": "pnpm --filter @home-chef/mobile start",
+    "dev:admin": "pnpm --filter @home-chef/admin dev",
+    "dev:web": "pnpm --filter @home-chef/web dev",
+    "build": "pnpm --filter @home-chef/admin build",
+    "build:mobile": "pnpm --filter @home-chef/mobile build",
+    "build:admin": "pnpm --filter @home-chef/admin build",
+    "build:web": "pnpm --filter @home-chef/web build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "clean": "rm -rf node_modules pnpm-lock.yaml apps/*/node_modules packages/*/node_modules"
+  },
+  "packageManager": "pnpm@10.30.0",
+  "engines": {
+    "node": ">=20 <23",
+    "pnpm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }

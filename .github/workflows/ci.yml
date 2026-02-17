@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -12,53 +12,38 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [20.x]
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: ${{ matrix.node }}
-          cache: npm
+          version: 10
 
-      - name: Install (deterministic)
-        run: npm ci
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
 
-      - name: Build shared (if present)
-        run: |
-          if [ -f "packages/shared/package.json" ]; then
-            npm run build --workspace=packages/shared
-          fi
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build web (if present)
-        run: |
-          if [ -f "apps/web/package.json" ]; then
-            npm run build --workspace=apps/web
-          fi
+      - name: Build shared
+        run: pnpm --filter @home-chef/shared build
 
-      - name: Build admin (if present)
-        run: |
-          if [ -f "apps/admin/package.json" ]; then
-            npm run build --workspace=apps/admin
-          fi
+      - name: Build web
+        run: pnpm --filter @home-chef/web build
 
-      - name: Build mobile (if present)
-        run: |
-          if [ -f "apps/mobile/package.json" ]; then
-            npm run build --workspace=apps/mobile
-          fi
+      - name: Build admin
+        run: pnpm --filter @home-chef/admin build
 
-      - name: Lint (root, if present)
-        run: |
-          if npm run -s | grep -q "^  lint$"; then
-            npm run lint
-          fi
+      - name: Lint web
+        run: pnpm --filter @home-chef/web lint
 
-      - name: Test (root, if present)
-        run: |
-          if npm run -s | grep -q "^  test$"; then
-            npm run test
-          fi
+      - name: Lint admin
+        run: pnpm --filter @home-chef/admin lint
+
+      - name: Test admin
+        run: pnpm --filter @home-chef/admin test
