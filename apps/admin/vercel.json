@@ -1,4 +1,4 @@
-﻿{
+{
   "outputDirectory": ".next",
   "buildCommand": "pnpm build",
   "framework": "nextjs",
