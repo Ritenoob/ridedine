@@ -1,7 +1,9 @@
-{
-  "buildCommand": "npm run build",
-  "installCommand": "npm ci",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "functions": { "runtime": "nodejs20.x" }
+﻿{
+    "outputDirectory":  ".next",
+    "buildCommand":  "pnpm build",
+    "functions":  {
+                      "runtime":  "nodejs22.x"
+                  },
+    "framework":  "nextjs",
+    "installCommand":  "pnpm install --frozen-lockfile"
 }
