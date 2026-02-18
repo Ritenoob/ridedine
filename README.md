@@ -14,6 +14,20 @@ Home Chef Delivery is a production-ready marketplace platform built with modern 
 - **Drivers** to accept delivery jobs and navigate to customers (Phase 2)
 - **Admins** to approve chefs, manage orders, and monitor platform metrics
 
+
+## 📐 Architecture Model
+
+This repository is built and maintained according to the architecture described in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). That document is the canonical reference for:
+
+- System design and technology stack
+- Database schema and security model
+- Payment and real-time flows
+- Development, testing, and deployment workflows
+
+All new features, migrations, and deployments should follow the patterns and best practices outlined in the architecture doc. Please review [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before making major changes or proposing new features.
+
+---
+
 ## 🏗️ Architecture
 
 ### Monorepo Structure
