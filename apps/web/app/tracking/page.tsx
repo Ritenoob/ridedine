@@ -1,84 +1,126 @@
-"use client";
-import { useEffect, useState } from "react";
+﻿"use client";
+
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { getSupabaseClient } from "../../lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 
-const STEPS = [
-  { key: "placed", label: "Order Placed" },
-  { key: "accepted", label: "Accepted by Chef" },
-  { key: "preparing", label: "Preparing" },
-  { key: "ready", label: "Ready for Pickup" },
-  { key: "picked_up", label: "Out for Delivery" },
-  { key: "delivered", label: "Delivered" },
-];
+type TrackingRow = {
+  status?: string | null;
+  total_cents?: number | null;
+  chef_name?: string | null;
+  updated_at?: string | null;
+  delivery_status?: string | null;
+  driver_name?: string | null;
+};
 
-export default function TrackingPage() {
-  const params = useSearchParams();
-  const token = params.get("token") ?? "";
-  const [order, setOrder] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) return null;
 
-  const load = async () => {
-    if (!token) { setErr("No tracking token provided."); setLoading(false); return; }
-    const { data, error } = await getSupabaseClient()
-      .from("orders").select("*, chefs!inner(profiles!inner(name))").eq("tracking_token", token).single();
-    if (error) { setErr("Order not found."); }
-    else { setOrder(data); setErr(""); }
-    setLoading(false);
-  };
+  return createClient(url, anon, { auth: { persistSession: false } });
+}
+
+function TrackingInner() {
+  const searchParams = useSearchParams();
+  const token = useMemo(() => searchParams.get("token") || "", [searchParams]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<TrackingRow | null>(null);
+
+  const load = useCallback(async () => {
+    setError(null);
+
+    if (!token) {
+      setData(null);
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError("Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+      setData(null);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await supabase.rpc("get_order_tracking", { token });
+      if (res.error) {
+        setError(res.error.message);
+        setData(null);
+      } else {
+        const row = Array.isArray(res.data) ? res.data[0] : res.data;
+        setData((row ?? null) as TrackingRow | null);
+      }
+    } catch (e: any) {
+      setError(e?.message || "Unknown error");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => {
     load();
-    const id = setInterval(load, 10000);
-    return () => clearInterval(id);
-  }, [token]);
-
-  if (loading) return <main style={{ padding: 32 }}><p>Loading order...</p></main>;
-  if (err) return <main style={{ padding: 32, textAlign: "center" }}><p style={{ color: "#d32f2f", fontSize: 18 }}>{err}</p><Link href="/orders" style={{ color: "#1976d2" }}>← My Orders</Link></main>;
-  if (!order) return null;
-
-  const currentIdx = STEPS.findIndex((s) => s.key === order.status);
+    const t = setInterval(load, 10000);
+    return () => clearInterval(t);
+  }, [load]);
 
   return (
-    <main style={{ maxWidth: 640, margin: "0 auto", padding: 0 }}>
-      <div style={{ background: "#1976d2", color: "white", padding: "24px 32px" }}>
-        <Link href="/orders" style={{ color: "rgba(255,255,255,0.85)", textDecoration: "none", fontSize: 14 }}>← My Orders</Link>
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginTop: 8, marginBottom: 4 }}>Order Tracking</h1>
-        <p style={{ fontSize: 13, opacity: 0.85 }}>Token: {token}</p>
-      </div>
+    <main style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Order Tracking</h1>
 
-      <div style={{ padding: 32 }}>
-        <div style={{ background: "#f5f5f5", borderRadius: 8, padding: 20, marginBottom: 28 }}>
-          {[["Chef", order.chefs?.profiles?.name], ["Total", `$${(order.total_cents / 100).toFixed(2)}`], ["Delivery", order.delivery_method]].map(([l, v]) => (
-            <div key={l} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 12, color: "#666" }}>{l}</div>
-              <div style={{ fontWeight: 600, fontSize: 15 }}>{v}</div>
-            </div>
-          ))}
+      {!token && (
+        <div style={{ padding: 12, border: "1px solid #ddd", borderRadius: 8 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>No tracking token</div>
+          <div>Add <code>?token=...</code> to the URL.</div>
         </div>
+      )}
 
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Order Status</h2>
-        {STEPS.map((step, idx) => {
-          const done = idx <= currentIdx;
-          const current = idx === currentIdx;
-          return (
-            <div key={step.key} style={{ display: "flex", alignItems: "flex-start", marginBottom: 24, position: "relative" }}>
-              <div style={{ position: "relative", marginRight: 16, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div style={{ width: 20, height: 20, borderRadius: "50%", background: done ? "#1976d2" : "#ddd", flexShrink: 0 }} />
-                {idx < STEPS.length - 1 && (
-                  <div style={{ width: 2, height: 28, background: idx < currentIdx ? "#1976d2" : "#ddd", marginTop: 2 }} />
-                )}
-              </div>
-              <div style={{ paddingTop: 1 }}>
-                <div style={{ fontWeight: done ? 600 : 400, color: done ? "#000" : "#666", fontSize: 15 }}>{step.label}</div>
-                {current && <div style={{ fontSize: 12, color: "#1976d2", fontWeight: 600, marginTop: 2 }}>Current</div>}
+      {token && (
+        <div style={{ padding: 12, border: "1px solid #ddd", borderRadius: 8 }}>
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ fontWeight: 600 }}>Token:</span> <code>{token}</code>
+          </div>
+
+          {loading && <div>Loading…</div>}
+
+          {error && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ fontWeight: 700 }}>Error</div>
+              <div>{error}</div>
+              <div style={{ marginTop: 6, opacity: 0.8 }}>
+                If you have not added the RPC yet, create Supabase function <code>get_order_tracking(token)</code>.
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
+
+          {!loading && !error && data && (
+            <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+              <div><b>Status:</b> {data.status ?? "-"}</div>
+              <div><b>Chef:</b> {data.chef_name ?? "-"}</div>
+              <div><b>Total:</b> {typeof data.total_cents === "number" ? `$${(data.total_cents / 100).toFixed(2)}` : "-"}</div>
+              <div><b>Delivery:</b> {data.delivery_status ?? "-"}</div>
+              <div><b>Driver:</b> {data.driver_name ?? "-"}</div>
+              <div><b>Updated:</b> {data.updated_at ?? "-"}</div>
+            </div>
+          )}
+
+          {!loading && !error && !data && (
+            <div style={{ marginTop: 8 }}>No tracking data yet.</div>
+          )}
+        </div>
+      )}
     </main>
+  );
+}
+
+export default function TrackingPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 16 }}>Loading tracking…</div>}>
+      <TrackingInner />
+    </Suspense>
   );
 }
