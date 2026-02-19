@@ -1,9 +1,3 @@
-﻿{
-    "outputDirectory":  "apps/admin/.next",
-    "buildCommand":  "pnpm --filter @home-chef/admin build",
-    "functions":  {
-                      "runtime":  "nodejs22.x"
-                  },
-    "framework":  "nextjs",
-    "installCommand":  "pnpm install --frozen-lockfile"
+{
+  "version": 2
 }
