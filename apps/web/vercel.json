@@ -1,5 +1,0 @@
-﻿{
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @home-chef/web build",
-  "outputDirectory": ".next"
-}
