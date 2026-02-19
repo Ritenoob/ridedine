@@ -8,7 +8,8 @@ The RideNDine Home Cooks Marketplace is a modern, comprehensive food delivery pl
 
 ### 🏠 For Customers
 
-**Marketplace Browse (`/marketplace`)**
+#### Marketplace Browse (`/marketplace`)
+
 - Modern search interface with auto-complete
 - Category chips for quick filtering (Vegan, Halal, Gluten-Free, etc.)
 - "Today's Offers" promotional carousel
@@ -17,6 +18,7 @@ The RideNDine Home Cooks Marketplace is a modern, comprehensive food delivery pl
 - Browse by cuisine type
 
 **Cook Profile Pages (`/cook/:slug`)**
+
 - Comprehensive cook information with bio and story
 - Menu organized by categories
 - Dish filtering by category
