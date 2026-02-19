@@ -1,6 +1,5 @@
-{
-  "outputDirectory": ".next",
-  "buildCommand": "pnpm build",
-  "framework": "nextjs",
-  "installCommand": "pnpm install"
+﻿{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter @home-chef/web build",
+  "outputDirectory": ".next"
 }
