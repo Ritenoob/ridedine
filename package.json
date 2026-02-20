@@ -1,27 +1,9 @@
-{
-  "name": "home-chef-delivery",
-  "version": "1.0.0",
-  "description": "Home Chef Delivery Marketplace - Monorepo",
-  "private": true,
-  "scripts": {
-    "dev": "pnpm --filter @home-chef/admin dev",
-    "dev:mobile": "pnpm --filter @home-chef/mobile start",
-    "dev:admin": "pnpm --filter @home-chef/admin dev",
-    "dev:web": "pnpm --filter @home-chef/web dev",
-    "build": "pnpm --filter @home-chef/admin build",
-    "build:mobile": "pnpm --filter @home-chef/mobile build",
-    "build:admin": "pnpm --filter @home-chef/admin build",
-    "build:web": "pnpm --filter @home-chef/web build",
-    "lint": "pnpm -r lint",
-    "test": "pnpm -r test",
-    "clean": "rm -rf node_modules pnpm-lock.yaml apps/*/node_modules packages/*/node_modules"
-  },
-  "packageManager": "pnpm@10.30.0",
-  "engines": {
-    "node": ">=20 <23",
-    "pnpm": ">=10.0.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.3"
-  }
+﻿{
+    "name":  "home-chef-delivery",
+    "version":  "1.0.0",
+    "private":  true,
+    "packageManager":  "pnpm@10.30.0",
+    "engines":  {
+                    "node":  "\u003e=20"
+                }
 }
