@@ -1,157 +1,98 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSupabaseClient } from "../../lib/supabaseClient";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "../../lib/CartContext";
-
-const TIPS = [{ label: "No Tip", value: 0 }, { label: "$2", value: 2 }, { label: "$5", value: 5 }, { label: "$10", value: 10 }];
+import { supabase } from "../../lib/supabaseClient";
 
 export default function CheckoutPage() {
+  const { items, total, chefId, clearCart } = useCart();
   const router = useRouter();
-  const { items, getTotalPrice, clearCart, getChefId } = useCart();
-  const [address, setAddress] = useState("");
-  const [notes, setNotes] = useState("");
-  const [tip, setTip] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
-  const subtotal = getTotalPrice();
-  const delivery = 4.99;
-  const platform = subtotal * 0.15;
-  const total = subtotal + delivery + platform + tip;
 
   useEffect(() => {
-    getSupabaseClient().auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
-      setAuthLoading(false);
-    });
-  }, []);
+    if (items.length === 0) router.push("/cart");
+  }, [items.length, router]);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setAuthLoading(true);
-    const sb = getSupabaseClient();
-    const fn = isSignUp ? sb.auth.signUp({ email, password }) : sb.auth.signInWithPassword({ email, password });
-    const { data, error: authErr } = await fn;
-    if (authErr) { setError(authErr.message); setAuthLoading(false); return; }
-    setUser(data.user);
-    setAuthLoading(false);
-  };
+  const placeOrder = async () => {
+    if (!chefId || items.length === 0) return;
 
-  const handlePlaceOrder = async () => {
-    if (!address.trim()) { setError("Please enter a delivery address."); return; }
-    setLoading(true); setError("");
-    try {
-      const sb = getSupabaseClient();
-      const { data: { user: u } } = await sb.auth.getUser();
-      if (!u) { setError("Please sign in to place an order."); setLoading(false); return; }
-      const chefId = getChefId();
-      if (!chefId) { setError("Cart is empty."); setLoading(false); return; }
+    // Create order in Supabase (NO payment)
+    const { data: order, error: orderErr } = await supabase
+      .from("orders")
+      .insert({
+        chef_id: chefId,
+        customer_name: "Guest",
+        customer_email: "guest@example.com",
+        delivery_address: "",
+        status: "pending",
+        payment_status: "unpaid",
+        total_cents: Math.round(total * 100),
+      })
+      .select()
+      .single();
 
-      const { data: order, error: oErr } = await sb.from("orders").insert({
-        customer_id: u.id, chef_id: chefId, status: "placed",
-        subtotal_cents: Math.round(subtotal * 100), delivery_fee_cents: Math.round(delivery * 100),
-        platform_fee_cents: Math.round(platform * 100), tip_cents: Math.round(tip * 100),
-        total_cents: Math.round(total * 100), delivery_method: "delivery", address, notes: notes || null,
-      }).select().single();
-      if (oErr) throw oErr;
-
-      const { error: iErr } = await sb.from("order_items").insert(
-        items.map((i) => ({ order_id: order.id, dish_id: i.dishId, quantity: i.quantity, price_cents: Math.round(i.price * 100) }))
-      );
-      if (iErr) throw iErr;
-
-      clearCart();
-      router.push(`/orders/${order.id}?placed=1`);
-    } catch (err: any) {
-      setError(err.message || "Failed to place order.");
-    } finally {
-      setLoading(false);
+    if (orderErr) {
+      alert(orderErr.message);
+      return;
     }
+
+    // Insert order items
+    await supabase.from("order_items").insert(
+      items.map((i: any) => ({
+        order_id: order.id,
+        dish_id: i.id,
+        quantity: i.quantity,
+        price_cents: Math.round(i.price * 100),
+      }))
+    );
+
+    clearCart();
+    router.push(`/tracking?token=${order.tracking_token}`);
   };
-
-  if (items.length === 0) return (
-    <main style={{ maxWidth: 600, margin: "80px auto", padding: 32, textAlign: "center" }}>
-      <h1 style={{ marginBottom: 16 }}>Nothing to checkout</h1>
-      <Link href="/chefs"><button style={{ background: "#1976d2", color: "white", border: "none", padding: "12px 28px", borderRadius: 8, fontSize: 15, fontWeight: 600, cursor: "pointer" }}>Browse Chefs</button></Link>
-    </main>
-  );
-
-  if (authLoading) return <main style={{ padding: 32 }}><p>Loading...</p></main>;
-
-  if (!user) return (
-    <main style={{ maxWidth: 440, margin: "60px auto", padding: 32 }}>
-      <Link href="/cart" style={{ color: "#1976d2", textDecoration: "none" }}>← Back to Cart</Link>
-      <h1 style={{ fontSize: 26, fontWeight: 700, margin: "16px 0 4px" }}>{isSignUp ? "Create Account" : "Sign In to Order"}</h1>
-      <p style={{ color: "#666", marginBottom: 24 }}>You need an account to place an order</p>
-      {error && <div style={{ padding: 12, background: "#ffebee", color: "#c62828", borderRadius: 6, marginBottom: 16 }}>{error}</div>}
-      <form onSubmit={handleAuth}>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: "100%", padding: 12, marginBottom: 12, border: "1px solid #ddd", borderRadius: 6, fontSize: 15, boxSizing: "border-box" }} />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: "100%", padding: 12, marginBottom: 16, border: "1px solid #ddd", borderRadius: 6, fontSize: 15, boxSizing: "border-box" }} />
-        <button type="submit" style={{ width: "100%", padding: 13, background: "#1976d2", color: "white", border: "none", borderRadius: 6, fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
-          {isSignUp ? "Create Account" : "Sign In"}
-        </button>
-      </form>
-      <button onClick={() => setIsSignUp(!isSignUp)} style={{ marginTop: 12, background: "none", border: "none", color: "#1976d2", cursor: "pointer", fontSize: 14 }}>
-        {isSignUp ? "Already have an account? Sign In" : "No account? Create one"}
-      </button>
-    </main>
-  );
 
   return (
-    <main style={{ maxWidth: 640, margin: "0 auto", padding: 32 }}>
-      <Link href="/cart" style={{ color: "#1976d2", textDecoration: "none" }}>← Back to Cart</Link>
-      <h1 style={{ fontSize: 28, fontWeight: 700, margin: "16px 0 24px" }}>Checkout</h1>
-      {error && <div style={{ padding: 12, background: "#ffebee", color: "#c62828", borderRadius: 6, marginBottom: 16 }}>{error}</div>}
+    <div>
+      <nav className="nav">
+        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
+        <Link href="/cart" className="nav-link">← Back to Cart</Link>
+      </nav>
 
-      <Section title="Delivery Address">
-        <textarea value={address} onChange={e => setAddress(e.target.value)} placeholder="Enter your delivery address" rows={3}
-          style={{ width: "100%", padding: 12, border: "1px solid #ddd", borderRadius: 6, fontSize: 15, resize: "vertical", boxSizing: "border-box" }} />
-      </Section>
+      <div className="page" style={{ maxWidth: 900 }}>
+        <h1 className="page-title" style={{ marginBottom: 16 }}>Checkout</h1>
 
-      <Section title="Delivery Instructions (Optional)">
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="E.g., Ring doorbell, leave at door" rows={2}
-          style={{ width: "100%", padding: 12, border: "1px solid #ddd", borderRadius: 6, fontSize: 15, resize: "vertical", boxSizing: "border-box" }} />
-      </Section>
-
-      <Section title="Add a Tip for the Chef">
-        <div style={{ display: "flex", gap: 10 }}>
-          {TIPS.map((t) => (
-            <button key={t.value} onClick={() => setTip(t.value)}
-              style={{ flex: 1, padding: 12, border: `2px solid ${tip === t.value ? "#1976d2" : "#e0e0e0"}`, borderRadius: 8, background: tip === t.value ? "#e3f2fd" : "white", color: tip === t.value ? "#1976d2" : "#666", fontWeight: 600, cursor: "pointer" }}>
-              {t.label}
-            </button>
-          ))}
+        <div className="alert alert-error" style={{ marginBottom: 16 }}>
+          Payments are temporarily disabled (Stripe not configured). You can still place a test order.
         </div>
-      </Section>
 
-      <Section title="Order Summary">
-        <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 16 }}>
-          {[["Subtotal", `$${subtotal.toFixed(2)}`], ["Delivery Fee", `$${delivery.toFixed(2)}`], ["Platform Fee (15%)", `$${platform.toFixed(2)}`], ...(tip > 0 ? [["Tip", `$${tip.toFixed(2)}`]] : [])].map(([l, v]) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, color: "#666" }}><span>{l}</span><span style={{ fontWeight: 600 }}>{v}</span></div>
-          ))}
-          <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #e0e0e0", paddingTop: 12 }}>
-            <span style={{ fontSize: 18, fontWeight: 700 }}>Total</span>
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#1976d2" }}>${total.toFixed(2)}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: 24 }}>
+          <div>
+            <div className="card card-body" style={{ marginBottom: 20 }}>
+              <h3 style={{ fontWeight: 700, marginBottom: 10 }}>Place Test Order</h3>
+              <p style={{ color: "var(--text-secondary)", marginBottom: 16 }}>
+                This creates an order in Supabase with payment_status = unpaid.
+              </p>
+              <button className="btn btn-primary btn-lg" style={{ width: "100%" }} onClick={placeOrder}>
+                Place Order (No Payment) — ${total.toFixed(2)}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="card card-body">
+              <h3 style={{ fontWeight: 700, marginBottom: 16 }}>Order Summary</h3>
+              {items.map((i: any) => (
+                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, fontSize: 14 }}>
+                  <span>{i.name} × {i.quantity}</span>
+                  <span style={{ fontWeight: 600 }}>${(i.price * i.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: "1px solid var(--border)", marginTop: 12, paddingTop: 12, display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 16 }}>
+                <span>Total</span><span>${total.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
-      </Section>
-
-      <button onClick={handlePlaceOrder} disabled={loading}
-        style={{ width: "100%", padding: 16, background: loading ? "#999" : "#1976d2", color: "white", border: "none", borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", marginTop: 8 }}>
-        {loading ? "Placing Order..." : `Place Order ($${total.toFixed(2)})`}
-      </button>
-    </main>
+      </div>
+    </div>
   );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <div style={{ marginBottom: 24 }}><h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>{title}</h2>{children}</div>;
 }

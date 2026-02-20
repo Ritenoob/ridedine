@@ -1,46 +1,72 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getSupabaseClient } from "../../lib/supabaseClient";
-
-interface Chef { id: string; bio: string; cuisine_types: string[]; profiles: { name: string } }
+import { supabase } from "../../lib/supabaseClient";
 
 export default function ChefsPage() {
-  const [chefs, setChefs] = useState<Chef[]>([]);
+  const [chefs, setChefs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    getSupabaseClient()
-      .from("chefs").select("*, profiles(name)").eq("status", "approved").order("created_at", { ascending: false })
-      .then(({ data }) => { setChefs(data ?? []); setLoading(false); });
+    supabase.from("chefs").select("*, profiles(name,email)").eq("status","approved")
+      .then(({data})=>{ setChefs(data||[]); setLoading(false); });
   }, []);
 
+  const filtered = chefs.filter(c => {
+    const name = c.profiles?.name || "";
+    const cuisine = (c.cuisine_types||[]).join(" ");
+    return (name+cuisine).toLowerCase().includes(search.toLowerCase());
+  });
+
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 32 }}>
-      <Link href="/dashboard" style={{ color: "#1976d2", textDecoration: "none" }}>← Back</Link>
-      <h1 style={{ fontSize: 32, fontWeight: 700, margin: "12px 0 4px" }}>Browse Chefs</h1>
-      <p style={{ color: "#666", marginBottom: 32 }}>Order home-cooked meals from local chefs</p>
-      {loading && <p style={{ color: "#666" }}>Loading chefs...</p>}
-      {!loading && chefs.length === 0 && <p style={{ color: "#666", textAlign: "center", padding: 60 }}>No chefs available right now.</p>}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))", gap: 20 }}>
-        {chefs.map((chef) => (
-          <Link key={chef.id} href={`/chefs/${chef.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-            <div style={{ border: "1px solid #e0e0e0", borderRadius: 12, padding: 24, background: "#fff", cursor: "pointer" }}>
-              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#1976d2", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12, fontSize: 20 }}>👨‍🍳</div>
-              <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>{chef.profiles?.name}</h2>
-              <p style={{ color: "#666", fontSize: 14, marginBottom: 10, lineHeight: 1.5 }}>{chef.bio || "Home chef offering delicious meals"}</p>
-              {chef.cuisine_types?.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
-                  {chef.cuisine_types.map((c) => (
-                    <span key={c} style={{ background: "#e3f2fd", color: "#1976d2", padding: "2px 8px", borderRadius: 10, fontSize: 12, fontWeight: 600 }}>{c}</span>
-                  ))}
+    <div>
+      <nav className="nav">
+        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
+        <div className="nav-links">
+          <Link href="/chefs" className="nav-link active">Chefs</Link>
+          <Link href="/orders" className="nav-link">My Orders</Link>
+          <Link href="/cart" className="btn btn-primary btn-sm">🛒 Cart</Link>
+        </div>
+      </nav>
+      <div className="page">
+        <div className="page-header">
+          <h1 className="page-title">Our Home Chefs</h1>
+          <p className="page-subtitle">Authentic meals made by talented home cooks in your community</p>
+        </div>
+        <div style={{marginBottom:24}}>
+          <input className="form-input" style={{maxWidth:400}} placeholder="Search by name or cuisine..."
+            value={search} onChange={e=>setSearch(e.target.value)} />
+        </div>
+        {loading ? (
+          <div style={{textAlign:"center",padding:60,color:"var(--text-secondary)"}}>Loading chefs...</div>
+        ) : filtered.length === 0 ? (
+          <div style={{textAlign:"center",padding:60,color:"var(--text-secondary)"}}>No chefs found</div>
+        ) : (
+          <div className="grid-3">
+            {filtered.map(chef=>(
+              <Link href={`/chefs/${chef.id}`} key={chef.id} style={{textDecoration:"none"}}>
+                <div className="card chef-card">
+                  <div className="chef-card-img" style={{background:"linear-gradient(135deg,#e3f2fd,#1976d2)"}}>
+                    <span style={{fontSize:56}}>🧑‍🍳</span>
+                  </div>
+                  <div className="chef-card-body">
+                    <div className="chef-name">{chef.profiles?.name || "Chef"}</div>
+                    <div className="chef-cuisine">{(chef.cuisine_types||[]).join(" · ")}</div>
+                    <div style={{fontSize:13,color:"var(--text-secondary)",margin:"8px 0",lineHeight:1.5}}>
+                      {(chef.bio||"").slice(0,80)}{(chef.bio||"").length>80?"...":""}
+                    </div>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
+                      <div className="chef-rating">⭐ {chef.rating?.toFixed(1)||"5.0"}</div>
+                      <span className="btn btn-primary btn-sm">View Menu →</span>
+                    </div>
+                  </div>
                 </div>
-              )}
-              <span style={{ color: "#1976d2", fontWeight: 600, fontSize: 14 }}>View Menu →</span>
-            </div>
-          </Link>
-        ))}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-    </main>
+    </div>
   );
 }
