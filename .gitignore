@@ -1,5 +1,8 @@
 node_modules/
+
+# pnpm content-addressable store (can contain files exceeding GitHub's 100 MB limit)
 .pnpm-store/
+
 .env
 .env.local
 .env*.local
