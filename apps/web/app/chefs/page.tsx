@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "../../lib/supabaseClient";
+import { getSupabaseClient } from "../../lib/supabaseClient";
 
 export default function ChefsPage() {
   const [chefs, setChefs] = useState<any[]>([]);
@@ -9,7 +9,8 @@ export default function ChefsPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    supabase.from("chefs").select("*, profiles(name,email)").eq("status","approved")
+    const sb = getSupabaseClient();
+    sb.from("chefs").select("*, profiles(name,email)").eq("status","approved")
       .then(({data})=>{ setChefs(data||[]); setLoading(false); });
   }, []);
 

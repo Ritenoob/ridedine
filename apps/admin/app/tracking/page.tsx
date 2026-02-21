@@ -29,6 +29,9 @@ export default function TrackingPage() {
 
     try {
       const supabase = createClient();
+      if (!supabase) {
+        throw new Error("Supabase env vars are not configured");
+      }
 
       const { data, error } = await supabase
         .from("orders")

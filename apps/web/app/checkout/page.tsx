@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../lib/CartContext";
-import { supabase } from "../../lib/supabaseClient";
+import { getSupabaseClient } from "../../lib/supabaseClient";
 
 export default function CheckoutPage() {
   const { items, total, chefId, clearCart } = useCart();
@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   }, [items.length, router]);
 
   const placeOrder = async () => {
+    const supabase = getSupabaseClient();
     if (!chefId || items.length === 0) return;
 
     // Create order in Supabase (NO payment)

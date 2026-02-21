@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "../../../lib/supabase";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Dish {
   id: string;
@@ -24,9 +24,10 @@ export default function MealsPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
-  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const loadDishes = useCallback(async () => {
+    if (!supabase) { setLoading(false); return; }
     setLoading(true);
     try {
       let query = supabase
@@ -57,6 +58,7 @@ export default function MealsPage() {
   }, [loadDishes]);
 
   const toggleFeatured = async (dishId: string, currentFeatured: boolean) => {
+    if (!supabase) return;
     try {
       const { error } = await supabase
         .from("dishes")
@@ -72,6 +74,7 @@ export default function MealsPage() {
   };
 
   const toggleAvailability = async (dishId: string, currentAvailable: boolean) => {
+    if (!supabase) return;
     try {
       const { error } = await supabase
         .from("dishes")

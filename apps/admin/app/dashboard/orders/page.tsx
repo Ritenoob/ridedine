@@ -1,25 +1,26 @@
-﻿"use client";
-import { useEffect, useState, useCallback } from "react";
+"use client";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createBrowserClient } from "@supabase/ssr";
-
-const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+import { supabaseBrowser } from "@/lib/supabase-browser";
 const STATUSES = ["pending","accepted","preparing","ready","picked_up","delivered","cancelled"];
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [newOrder, setNewOrder] = useState<any>(null);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const fetchOrders = useCallback(async () => {
-    const { data } = await sb.from("orders").select("*, chefs(*, profiles(name))").order("created_at", { ascending: false }).limit(50);
+    if (!supabase) return;
+    const { data } = await supabase.from("orders").select("*, chefs(*, profiles(name))").order("created_at", { ascending: false }).limit(50);
     setOrders(data || []); setLoading(false);
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
+    if (!supabase) { setLoading(false); return; }
     fetchOrders();
     // Real-time: new orders
-    const channel = sb.channel("admin-orders")
+    const channel = supabase.channel("admin-orders")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, payload => {
         setNewOrder(payload.new);
         setOrders(prev => [payload.new, ...prev]);
@@ -29,11 +30,12 @@ export default function AdminOrdersPage() {
         setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o));
       })
       .subscribe();
-    return () => { sb.removeChannel(channel); };
-  }, [fetchOrders]);
+    return () => { supabase.removeChannel(channel); };
+  }, [supabase, fetchOrders]);
 
   const updateStatus = async (orderId: string, status: string) => {
-    await sb.from("orders").update({ status }).eq("id", orderId);
+    if (!supabase) return;
+    await supabase.from("orders").update({ status }).eq("id", orderId);
   };
 
   return (

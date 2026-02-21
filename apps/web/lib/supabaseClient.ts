@@ -1,10 +1,20 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { env } from "./env";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+let supabase: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+function createSupabaseClient() {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+    throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  }
+  return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+}
 
-// Legacy exports so nothing breaks
-export const getSupabaseClient = () => supabase;
-export default supabase;
+export function getSupabaseClient() {
+  if (!supabase) {
+    supabase = createSupabaseClient();
+  }
+  return supabase;
+}
+
+export { getSupabaseClient as default };

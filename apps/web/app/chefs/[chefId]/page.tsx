@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "../../../lib/supabaseClient";
+import { getSupabaseClient } from "../../../lib/supabaseClient";
 import { useCart } from "../../../lib/CartContext";
 
 export default function ChefPage() {
@@ -14,6 +14,7 @@ export default function ChefPage() {
   const { addItem, totalItems, total } = useCart();
 
   useEffect(()=>{
+    const supabase = getSupabaseClient();
     Promise.all([
       supabase.from("chefs").select("*, profiles(name)").eq("id", chefId).single(),
       supabase.from("dishes").select("*").eq("chef_id", chefId).eq("available", true)

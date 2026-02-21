@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "../../lib/supabaseClient";
+import { getSupabaseClient } from "../../lib/supabaseClient";
 
 const STATUSES = ["pending","accepted","preparing","ready","picked_up","delivered"];
 const LABELS: any = {pending:"Order Placed",accepted:"Accepted",preparing:"Being Prepared",ready:"Ready for Pickup",picked_up:"Out for Delivery",delivered:"Delivered!"};
@@ -16,6 +16,7 @@ export default function TrackingClient() {
   const [tokenInput, setTokenInput] = useState("");
 
   useEffect(()=>{
+    const supabase = getSupabaseClient();
     if(!token){ setLoading(false); return; }
     supabase.from("orders").select("*, chefs(*, profiles(name))").eq("tracking_token",token).single()
       .then(({data})=>{ setOrder(data); setLoading(false); });

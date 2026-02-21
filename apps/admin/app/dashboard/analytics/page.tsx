@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "../../../lib/supabase";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Analytics {
   totalOrders: number;
@@ -26,9 +26,10 @@ export default function AnalyticsPage() {
     activeDishes: 0,
   });
   const [loading, setLoading] = useState(true);
-  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const loadAnalytics = useCallback(async () => {
+    if (!supabase) { setLoading(false); return; }
     setLoading(true);
     try {
       const today = new Date();
