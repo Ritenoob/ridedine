@@ -1,9 +1,9 @@
-﻿{
+{
     "name":  "home-chef-delivery",
     "version":  "1.0.0",
     "private":  true,
     "packageManager":  "pnpm@10.30.0",
     "engines":  {
-                    "node":  "\u003e=20"
+                    "node":  ">=20"
                 }
 }
