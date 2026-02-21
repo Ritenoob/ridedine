@@ -1,0 +1,6 @@
+[submodule "ridendine-admin"]
+    path = ridendine-admin
+    url = https://github.com/SeanCFAFinlay/ridendine-admin.git
+[submodule "ridendine-web"]
+    path = ridendine-web
+    url = https://github.com/SeanCFAFinlay/ridendine-web.git
