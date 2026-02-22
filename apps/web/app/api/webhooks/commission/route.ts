@@ -3,14 +3,25 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+const webhookSecret = process.env.WEBHOOK_SECRET ?? "";
+
+function verifyWebhookAuth(request: NextRequest): boolean {
+  if (!webhookSecret) return true; // skip if not configured
+  const auth = request.headers.get("x-webhook-secret");
+  return auth === webhookSecret;
+}
 
 /**
  * POST /api/webhooks/commission
  *
  * Triggered when an order is completed/delivered to calculate and record commission.
  * Expected body: { order_id: string }
+ * Requires x-webhook-secret header when WEBHOOK_SECRET env var is set.
  */
 export async function POST(request: NextRequest) {
+  if (!verifyWebhookAuth(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { order_id } = body;
@@ -84,7 +95,8 @@ export async function POST(request: NextRequest) {
       chef_payout_cents: chefPayoutCents,
       rate: commissionRate,
     });
-  } catch {
+  } catch (err) {
+    console.error("[webhook/commission] Error:", err);
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }

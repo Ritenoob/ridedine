@@ -3,14 +3,25 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+const webhookSecret = process.env.WEBHOOK_SECRET ?? "";
+
+function verifyWebhookAuth(request: NextRequest): boolean {
+  if (!webhookSecret) return true; // skip if not configured
+  const auth = request.headers.get("x-webhook-secret");
+  return auth === webhookSecret;
+}
 
 /**
  * POST /api/webhooks/order-status
  *
  * Receives order status change events from external systems (e.g. POS, driver app).
- * Expected body: { order_id: string, status: string, signature?: string }
+ * Expected body: { order_id: string, status: string }
+ * Requires x-webhook-secret header when WEBHOOK_SECRET env var is set.
  */
 export async function POST(request: NextRequest) {
+  if (!verifyWebhookAuth(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { order_id, status } = body;
@@ -40,7 +51,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, order_id, status });
-  } catch {
+  } catch (err) {
+    console.error("[webhook/order-status] Error:", err);
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }

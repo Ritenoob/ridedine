@@ -119,7 +119,7 @@ async function seed() {
           chef_id: chef.id,
           ...dish,
         });
-        if (dishErr && !dishErr.message.includes("duplicate")) {
+        if (dishErr && dishErr.code !== "23505") {
           console.error(`  ❌ Failed to create dish ${dish.name}:`, dishErr.message);
         } else {
           console.log(`  ✅ Created dish: ${dish.name} ($${(dish.price_cents / 100).toFixed(2)})`);
