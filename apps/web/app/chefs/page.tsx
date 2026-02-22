@@ -32,7 +32,7 @@ export default function ChefsPage() {
       </nav>
       <div className="page">
         <div className="page-header">
-          <h1 className="page-title">Our Home Chefs</h1>
+          <h1 className="page-title">Our Chefs</h1>
           <p className="page-subtitle">Authentic meals made by talented home cooks in your community</p>
         </div>
         <div style={{marginBottom:24}}>
