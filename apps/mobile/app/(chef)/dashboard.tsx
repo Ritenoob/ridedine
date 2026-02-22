@@ -107,7 +107,7 @@ export default function ChefDashboard() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color="#FF7A00" />
         <Text style={styles.loadingText}>Loading dashboard...</Text>
       </View>
     );

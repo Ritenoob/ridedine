@@ -117,7 +117,7 @@ export default function ChefOrders() {
       case 'placed':
         return '#ff9800';
       default:
-        return '#1976d2';
+        return '#FF7A00';
     }
   };
 
@@ -135,7 +135,7 @@ export default function ChefOrders() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color="#FF7A00" />
         <Text style={styles.loadingText}>Loading orders...</Text>
       </View>
     );
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   tabActive: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
   },
   tabText: {
     fontSize: 14,
@@ -388,10 +388,10 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: '#FF7A00',
   },
   actionButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 6,
