@@ -41,7 +41,7 @@ export default function AdminOrdersPage() {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <div className="sidebar">
-        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>🍜 RidenDine</Link>
+        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
         <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
         {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"]].map(([icon,label,href])=>(
           <Link key={href} href={href} className={`sidebar-link ${href==="/dashboard/orders"?"active":""}`}>{icon} {label}</Link>

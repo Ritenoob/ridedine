@@ -54,7 +54,7 @@ export default function CheckoutPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
+        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
         <Link href="/cart" className="nav-link">← Back to Cart</Link>
       </nav>
 

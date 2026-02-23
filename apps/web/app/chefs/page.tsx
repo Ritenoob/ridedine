@@ -23,7 +23,7 @@ export default function ChefsPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
+        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link active">Chefs</Link>
           <Link href="/orders" className="nav-link">My Orders</Link>

@@ -31,7 +31,7 @@ export default function TrackingClient() {
 
   if(!token && !loading) return (
     <div>
-      <nav className="nav"><Link href="/" className="nav-brand">🍜 RidenDine</Link></nav>
+      <nav className="nav"><Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link></nav>
       <div style={{textAlign:"center",padding:80}}>
         <div style={{fontSize:64,marginBottom:16}}>📦</div>
         <h2 style={{marginBottom:24}}>Track Your Order</h2>
@@ -46,7 +46,7 @@ export default function TrackingClient() {
 
   return (
     <div>
-      <nav className="nav"><Link href="/" className="nav-brand">🍜 RidenDine</Link></nav>
+      <nav className="nav"><Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link></nav>
       <div className="page" style={{maxWidth:600}}>
         {loading ? <div style={{textAlign:"center",padding:60}}>Loading...</div> : !order ? (
           <div className="alert alert-error">Order not found. Check your tracking token.</div>
