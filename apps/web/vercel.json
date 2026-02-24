@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "installCommand": "pnpm -w install --frozen-lockfile",
-  "buildCommand": "pnpm -w build:shared && pnpm --filter @home-chef/web build",
-  "outputDirectory": ".next"
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm build:shared && pnpm --filter @home-chef/web build"
 }
