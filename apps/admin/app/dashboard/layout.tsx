@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { createClient } from "../../lib/supabase-browser";
@@ -7,8 +7,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const supabase = createClient();
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const handleSignOut = async () => {
+    const sb = supabase;
+    if (!sb) return;
+    await sb.auth.signOut();
     router.push("/");
   };
 
@@ -33,3 +35,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
