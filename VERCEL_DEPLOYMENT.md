@@ -2,11 +2,113 @@
 
 This guide provides step-by-step instructions for deploying the Home Chef Admin and Web apps to Vercel.
 
+---
+
+## CLI Linking Workflow (Recommended for Local Development)
+
+Use these exact terminal commands to link your local project to existing Vercel projects and deploy.
+
+### Step 1 — Install Vercel CLI
+
+```bash
+# Using pnpm (matches this project's package manager)
+pnpm add -g vercel
+
+# Or using npm
+npm install -g vercel
+```
+
+### Step 2 — Login
+
+Skip this step if you are already logged in. The Vercel CLI stores credentials globally.
+
+```bash
+vercel login
+```
+
+Follow the prompt to authenticate via browser (GitHub, GitLab, email, etc.).
+Verify you are logged in with:
+
+```bash
+vercel whoami
+```
+
+### Step 3 — Link Each App to Its Existing Vercel Project
+
+Each Next.js app is a separate Vercel project. Run `vercel link` **from inside each app directory**.
+
+**Link the Web app:**
+
+```bash
+cd apps/web
+vercel link
+```
+
+When prompted:
+- **Set up and deploy?** → `Y`
+- **Which scope?** → select your Vercel team/account
+- **Link to existing project?** → `Y`
+- **What's the name of your existing project?** → type the exact project name (e.g. `ridendine-web`)
+
+**Link the Admin app:**
+
+```bash
+cd ../admin
+vercel link
+```
+
+Repeat the same prompts, providing the admin project name (e.g. `ridendine-admin`).
+
+Each linked app creates a `.vercel/project.json` inside its directory (already ignored by `.gitignore`).
+
+### Step 4 — Pull Environment Variables
+
+Pull the environment variables from Vercel into a local `.env.local` file for each app.
+
+```bash
+# Web app
+cd apps/web
+vercel env pull .env.local
+
+# Admin app
+cd ../admin
+vercel env pull .env.local
+```
+
+> **Tip:** Run `vercel env pull --environment=preview .env.local` or `--environment=development`
+> to pull variables for a specific Vercel environment.
+
+### Step 5 — Deploy
+
+**Deploy to production:**
+
+```bash
+# Web app
+cd apps/web
+vercel --prod
+
+# Admin app
+cd ../admin
+vercel --prod
+```
+
+**Deploy a preview (e.g. for a feature branch):**
+
+```bash
+cd apps/web
+vercel
+```
+
+Vercel prints the preview URL when the deployment finishes.
+
+---
+
 ## Prerequisites
 
 - Vercel account (free tier works)
 - GitHub repository access
 - Supabase project set up
+- Vercel CLI installed (see CLI Linking Workflow above)
 
 ## Deployment Steps
 
