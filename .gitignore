@@ -53,3 +53,6 @@ tracked-configs.txt
 !.env.example
 .playwright/
 code/
+
+code
+
