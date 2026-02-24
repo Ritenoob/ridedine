@@ -1,18 +1,26 @@
-import { createBrowserClient } from '@supabase/ssr';
-import { env } from './env';
+import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
+import { env } from "./env";
 
-export function createClient() {
-  // During build time, return a mock client to allow static generation
-  if (typeof window === 'undefined') {
-    return null as any;
-  }
+let supabase: SupabaseClient | null = null;
 
-  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('Supabase env vars are not configured in the browser');
+/**
+ * Returns a browser-ready Supabase client.
+ *
+ * If env vars are missing we return null to allow static builds to succeed
+ * while clearly warning in development. Callers should handle the null case
+ * (e.g., by showing a configuration error or skipping Supabase calls).
+ */
+export const supabaseBrowser = (): SupabaseClient | null => {
+  if (!supabase) {
+    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Supabase env vars are not configured in the browser");
+      }
+      return null;
     }
-    return null as any;
+    supabase = createSupabaseClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
   }
+  return supabase;
+};
 
-  return createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-}
+export const createClient = supabaseBrowser;

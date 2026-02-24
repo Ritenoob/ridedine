@@ -1,11 +1,11 @@
 {
-  "name": "RideNDine Admin",
-  "short_name": "RideNDine Admin",
-  "description": "Admin dashboard for RideNDine",
+  "name": "Home Chef Delivery - Admin",
+  "short_name": "Chef Admin",
+  "description": "Admin dashboard for Home Chef Delivery platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#FF7A00",
+  "theme_color": "#1976d2",
   "orientation": "portrait-primary",
   "icons": [
     {

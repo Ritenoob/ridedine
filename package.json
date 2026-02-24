@@ -6,20 +6,21 @@
   "engines": {
     "node": ">=20"
   },
-  "scripts": {
-    "build:shared": "pnpm --filter @home-chef/shared build",
-    "build:web": "pnpm --filter @home-chef/web build",
-    "build:admin": "pnpm --filter @home-chef/admin build",
-    "build": "pnpm build:shared && pnpm build:web && pnpm build:admin",
-    "lint": "pnpm --filter @home-chef/web lint && pnpm --filter @home-chef/admin lint",
-    "typecheck": "pnpm --filter @home-chef/shared build && pnpm --filter @home-chef/web exec tsc --noEmit && pnpm --filter @home-chef/admin exec tsc --noEmit",
-    "test": "pnpm --filter @home-chef/shared test -- --run && pnpm --filter @home-chef/data test -- --run",
-    "test:coverage": "pnpm --filter @home-chef/shared test -- --run --coverage && pnpm --filter @home-chef/data test -- --run --coverage",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "seed": "npx tsx scripts/seed.ts"
-  },
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "lightningcss": "^1.21.0",
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0"
+  },
+  "scripts": {
+    "ci": "pnpm -r test && pnpm -r exec tsc --noEmit",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r exec eslint .",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "test": "pnpm -r test"
+  },
+  "pnpm": {
+    "overrides": {
+      "eslint": "9.39.3"
+    }
   }
 }

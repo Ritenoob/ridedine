@@ -114,95 +114,6 @@ export const AddToCartSchema = z.object({
 });
 
 /**
- * Checkout Schemas
- */
-export const CheckoutAddressSchema = z.object({
-  customer_name: z.string().min(2, 'Name must be at least 2 characters'),
-  customer_email: z.string().email('Invalid email address'),
-  customer_phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  delivery_address: z.string().optional(),
-  delivery_method: z.nativeEnum(DeliveryMethod),
-  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
-}).refine(
-  (data) => {
-    // If delivery method is DELIVERY, address must be provided and at least 5 characters
-    if (data.delivery_method === DeliveryMethod.DELIVERY) {
-      return data.delivery_address && data.delivery_address.length >= 5;
-    }
-    return true;
-  },
-  {
-    message: 'Delivery address is required and must be at least 5 characters for delivery orders',
-    path: ['delivery_address'],
-  }
-);
-
-/**
- * Review Schemas
- */
-export const CreateReviewSchema = z.object({
-  chef_id: z.string().uuid(),
-  order_id: z.string().uuid(),
-  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
-  comment: z.string().max(1000, 'Comment must be less than 1000 characters').optional(),
-});
-
-export const UpdateReviewSchema = z.object({
-  rating: z.number().int().min(1).max(5).optional(),
-  comment: z.string().max(1000).optional(),
-});
-
-/**
- * Saved Address Schemas
- */
-export const CreateSavedAddressSchema = z.object({
-  label: z.string().min(1, 'Label is required').max(50, 'Label must be less than 50 characters'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
-  lat: z.number().optional(),
-  lng: z.number().optional(),
-  is_default: z.boolean().default(false),
-});
-
-export const UpdateSavedAddressSchema = z.object({
-  label: z.string().min(1).max(50).optional(),
-  address: z.string().min(5).optional(),
-  lat: z.number().optional(),
-  lng: z.number().optional(),
-  is_default: z.boolean().optional(),
-});
-
-/**
- * Favorite Schemas
- */
-export const CreateFavoriteSchema = z.object({
-  favoritable_type: z.enum(['chef', 'dish']),
-  favoritable_id: z.string().uuid(),
-});
-
-/**
- * Dish Schemas
- */
-export const CreateDishSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  description: z.string().optional(),
-  price_cents: z.number().int().positive('Price must be positive'),
-  image_url: z.string().url().optional(),
-  available: z.boolean().default(true),
-  cuisine_type: z.string().optional(),
-  dietary_tags: z.array(z.string()).optional(),
-});
-
-export const UpdateDishSchema = z.object({
-  name: z.string().min(2).optional(),
-  description: z.string().optional(),
-  price_cents: z.number().int().positive().optional(),
-  image_url: z.string().url().optional(),
-  available: z.boolean().optional(),
-  cuisine_type: z.string().optional(),
-  dietary_tags: z.array(z.string()).optional(),
-});
-
-/**
  * Type exports for inference
  */
 export type SignUpInput = z.infer<typeof SignUpSchema>;
@@ -217,11 +128,3 @@ export type UpdateMenuItemInput = z.infer<typeof UpdateMenuItemSchema>;
 export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
 export type AddToCartInput = z.infer<typeof AddToCartSchema>;
-export type CheckoutAddressInput = z.infer<typeof CheckoutAddressSchema>;
-export type CreateReviewInput = z.infer<typeof CreateReviewSchema>;
-export type UpdateReviewInput = z.infer<typeof UpdateReviewSchema>;
-export type CreateSavedAddressInput = z.infer<typeof CreateSavedAddressSchema>;
-export type UpdateSavedAddressInput = z.infer<typeof UpdateSavedAddressSchema>;
-export type CreateFavoriteInput = z.infer<typeof CreateFavoriteSchema>;
-export type CreateDishInput = z.infer<typeof CreateDishSchema>;
-export type UpdateDishInput = z.infer<typeof UpdateDishSchema>;

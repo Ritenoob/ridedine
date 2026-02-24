@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tipButtonSelected: {
-    borderColor: '#FF7A00',
+    borderColor: '#1976d2',
     backgroundColor: '#e3f2fd',
   },
   tipButtonText: {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   tipButtonTextSelected: {
-    color: '#FF7A00',
+    color: '#1976d2',
   },
   summary: {
     backgroundColor: '#f8f9fa',
@@ -317,10 +317,10 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF7A00',
+    color: '#1976d2',
   },
   placeOrderButton: {
-    backgroundColor: '#FF7A00',
+    backgroundColor: '#1976d2',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   browseButton: {
-    backgroundColor: '#FF7A00',
+    backgroundColor: '#1976d2',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,

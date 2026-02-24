@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase-browser";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Dish {
   id: string;
@@ -24,7 +24,7 @@ export default function MealsPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const loadDishes = useCallback(async () => {
     if (!supabase) { setLoading(false); return; }
@@ -104,7 +104,7 @@ export default function MealsPage() {
             onClick={() => setFilter(status)}
             style={{
               padding: "10px 20px",
-              backgroundColor: filter === status ? "#FF7A00" : "#f0f0f0",
+              backgroundColor: filter === status ? "#1976d2" : "#f0f0f0",
               color: filter === status ? "white" : "#333",
               border: "none",
               borderRadius: 4,
@@ -176,7 +176,7 @@ export default function MealsPage() {
                 <p style={{ color: "#666", fontSize: 14, marginBottom: 8 }}>
                   {dish.description}
                 </p>
-                <p style={{ fontSize: 20, fontWeight: "bold", color: "#FF7A00", marginBottom: 8 }}>
+                <p style={{ fontSize: 20, fontWeight: "bold", color: "#1976d2", marginBottom: 8 }}>
                   ${dish.price}
                 </p>
                 <p style={{ fontSize: 12, color: "#999", marginBottom: 4 }}>

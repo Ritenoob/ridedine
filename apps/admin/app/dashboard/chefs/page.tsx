@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase-browser";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Chef {
   id: string;
@@ -19,7 +19,7 @@ export default function ChefsPage() {
   const [chefs, setChefs] = useState<Chef[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const loadChefs = useCallback(async () => {
     if (!supabase) { setLoading(false); return; }
@@ -82,7 +82,7 @@ export default function ChefsPage() {
             onClick={() => setFilter(status)}
             style={{
               padding: "10px 20px",
-              backgroundColor: filter === status ? "#FF7A00" : "#f0f0f0",
+              backgroundColor: filter === status ? "#1976d2" : "#f0f0f0",
               color: filter === status ? "white" : "#333",
               border: "none",
               borderRadius: 4,

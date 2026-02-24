@@ -1,25 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase-browser";
-
-interface Order {
-  status: string;
-  total_cents: number;
-  created_at: string;
-}
-
-interface Chef {
-  status: string;
-}
-
-interface Customer {
-  role: string;
-}
-
-interface Dish {
-  available: boolean;
-}
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Analytics {
   totalOrders: number;
@@ -44,7 +26,7 @@ export default function AnalyticsPage() {
     activeDishes: 0,
   });
   const [loading, setLoading] = useState(true);
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const loadAnalytics = useCallback(async () => {
     if (!supabase) { setLoading(false); return; }
@@ -60,10 +42,10 @@ export default function AnalyticsPage() {
         supabase.from("dishes").select("available"),
       ]);
 
-      const orders: Order[] = ordersData.data as Order[] || [];
-      const chefs: Chef[] = chefsData.data as Chef[] || [];
-      const customers: Customer[] = customersData.data as Customer[] || [];
-      const dishes: Dish[] = dishesData.data as Dish[] || [];
+      const orders = ordersData.data || [];
+      const chefs = chefsData.data || [];
+      const customers = customersData.data || [];
+      const dishes = dishesData.data || [];
 
       const ordersToday = orders.filter(
         (o) => new Date(o.created_at) >= today

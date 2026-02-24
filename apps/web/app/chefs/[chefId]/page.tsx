@@ -48,7 +48,7 @@ export default function ChefPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
+        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link">← All Chefs</Link>
           <Link href="/cart" className="btn btn-primary btn-sm">
@@ -57,24 +57,9 @@ export default function ChefPage() {
         </div>
       </nav>
 
-      <div style={{background:"linear-gradient(135deg,#FF7A00,#0F766E)",color:"white",padding:"48px 24px"}}>
+      <div style={{background:"linear-gradient(135deg,#1976d2,#115293)",color:"white",padding:"48px 24px"}}>
         <div style={{maxWidth:1200,margin:"0 auto",display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
-          {chef.photo_url ? (
-            <img
-              src={chef.photo_url}
-              alt={chef.profiles?.name}
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "4px solid white",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-              }}
-            />
-          ) : (
-            <div style={{fontSize:80}}>🧑‍🍳</div>
-          )}
+          <div style={{fontSize:80}}>🧑‍🍳</div>
           <div>
             <h1 style={{fontSize:36,fontWeight:800}}>{chef.profiles?.name}</h1>
             <p style={{opacity:0.85,fontSize:16,margin:"8px 0"}}>{(chef.cuisine_types||[]).join(" · ")}</p>

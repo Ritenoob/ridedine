@@ -1,9 +1,10 @@
-/**
+﻿/**
  * Compatibility wrapper for older imports:
  *   import { createClient } from "@/lib/supabase"
  * or similar.
  *
- * Use createClient() for server components/route handlers with SSR support.
+ * Use supabaseServer() for server components/route handlers.
  */
-export { createClient, createActionClient } from "./supabase-server";
-export { createClient as createBrowserClient } from "./supabase-browser";
+export { supabaseServer as createClient } from "./supabase-server";
+export { supabaseServer } from "./supabase-server";
+export { supabaseBrowser as createBrowserSupabaseClient } from "./supabase-browser";

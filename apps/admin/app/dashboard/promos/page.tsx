@@ -76,7 +76,7 @@ export default function PromosPage() {
           style={{
             marginTop: 20,
             padding: "12px 24px",
-            backgroundColor: "#FF7A00",
+            backgroundColor: "#1976d2",
             color: "white",
             border: "none",
             borderRadius: 4,

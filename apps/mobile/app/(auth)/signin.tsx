@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { requestPushNotificationPermissions, getExpoPushToken, registerPushToken } from '@/lib/notifications';
 
 export default function SignIn() {
   const router = useRouter();
@@ -27,20 +26,6 @@ export default function SignIn() {
     if (error) {
       Alert.alert('Error', error.message);
       return;
-    }
-
-    // Register push notification token
-    try {
-      const permissions = await requestPushNotificationPermissions();
-      if (permissions.granted) {
-        const token = await getExpoPushToken();
-        if (token) {
-          await registerPushToken(supabase, data.user.id, token);
-        }
-      }
-    } catch (error) {
-      console.error('Error registering push token:', error);
-      // Don't block sign-in if push notification registration fails
     }
 
     // Get user role and redirect

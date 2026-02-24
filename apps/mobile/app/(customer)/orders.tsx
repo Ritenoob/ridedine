@@ -9,13 +9,11 @@ interface Order {
   total_cents: number;
   created_at: string;
   tracking_token: string;
-  chef_id: string;
   chefs: {
     profiles: {
       name: string;
     };
   };
-  reviews?: Array<{ id: string }>;
 }
 
 export default function Orders() {
@@ -39,8 +37,7 @@ export default function Orders() {
           *,
           chefs (
             profiles (name)
-          ),
-          reviews (id)
+          )
         `)
         .eq('customer_id', user.id)
         .order('created_at', { ascending: false });
@@ -70,7 +67,7 @@ export default function Orders() {
       case 'placed':
         return '#ff9800';
       default:
-        return '#FF7A00';
+        return '#1976d2';
     }
   };
 
@@ -81,7 +78,7 @@ export default function Orders() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#FF7A00" />
+        <ActivityIndicator size="large" color="#1976d2" />
         <Text style={styles.loadingText}>Loading orders...</Text>
       </View>
     );
@@ -142,18 +139,6 @@ export default function Orders() {
               </View>
               <Text style={styles.trackingText}>Track →</Text>
             </View>
-
-            {item.status === 'delivered' && (!item.reviews || item.reviews.length === 0) && (
-              <TouchableOpacity
-                style={styles.reviewButton}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  router.push(`/(customer)/review?orderId=${item.id}&chefId=${item.chef_id}`);
-                }}
-              >
-                <Text style={styles.reviewButtonText}>⭐ Leave a Review</Text>
-              </TouchableOpacity>
-            )}
           </TouchableOpacity>
         )}
       />
@@ -211,7 +196,7 @@ const styles = StyleSheet.create({
   orderAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF7A00',
+    color: '#1976d2',
   },
   orderFooter: {
     flexDirection: 'row',
@@ -231,19 +216,7 @@ const styles = StyleSheet.create({
   },
   trackingText: {
     fontSize: 14,
-    color: '#FF7A00',
-    fontWeight: '600',
-  },
-  reviewButton: {
-    backgroundColor: '#FFB800',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  reviewButtonText: {
-    color: 'white',
-    fontSize: 14,
+    color: '#1976d2',
     fontWeight: '600',
   },
   emptyContainer: {
@@ -269,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   browseButton: {
-    backgroundColor: '#FF7A00',
+    backgroundColor: '#1976d2',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,

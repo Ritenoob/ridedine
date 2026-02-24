@@ -28,7 +28,7 @@ export default function OrderDetailPage() {
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: 32 }}>
-      <Link href="/orders" style={{ color: "#FF7A00", textDecoration: "none" }}>← My Orders</Link>
+      <Link href="/orders" style={{ color: "#1976d2", textDecoration: "none" }}>← My Orders</Link>
 
       {placed && (
         <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 16, margin: "16px 0", color: "#2e7d32", fontWeight: 600 }}>
@@ -39,7 +39,7 @@ export default function OrderDetailPage() {
       <div style={{ marginTop: 20, marginBottom: 24 }}>
         <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>Order #{order.id.slice(0, 8).toUpperCase()}</h1>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ background: STATUS_COLOR[order.status] ?? "#FF7A00", color: "white", padding: "4px 14px", borderRadius: 4, fontSize: 13, fontWeight: 600, textTransform: "uppercase" }}>{order.status.replace("_", " ")}</span>
+          <span style={{ background: STATUS_COLOR[order.status] ?? "#1976d2", color: "white", padding: "4px 14px", borderRadius: 4, fontSize: 13, fontWeight: 600, textTransform: "uppercase" }}>{order.status.replace("_", " ")}</span>
           <span style={{ color: "#666", fontSize: 14 }}>{new Date(order.created_at).toLocaleString()}</span>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function OrderDetailPage() {
         {order.notes && <Row label="Instructions" value={order.notes} />}
         {order.tracking_token && (
           <div style={{ marginTop: 12 }}>
-            <Link href={`/tracking?token=${order.tracking_token}`} style={{ color: "#FF7A00", fontWeight: 600 }}>Track this order →</Link>
+            <Link href={`/tracking?token=${order.tracking_token}`} style={{ color: "#1976d2", fontWeight: 600 }}>Track this order →</Link>
           </div>
         )}
       </div>
@@ -72,7 +72,7 @@ export default function OrderDetailPage() {
           ))}
         <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #e0e0e0", paddingTop: 12 }}>
           <span style={{ fontSize: 17, fontWeight: 700 }}>Total</span>
-          <span style={{ fontSize: 17, fontWeight: 700, color: "#FF7A00" }}>${(order.total_cents / 100).toFixed(2)}</span>
+          <span style={{ fontSize: 17, fontWeight: 700, color: "#1976d2" }}>${(order.total_cents / 100).toFixed(2)}</span>
         </div>
       </div>
     </main>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ridendine-admin-v1';
+const CACHE_NAME = 'home-chef-admin-v1';
 const urlsToCache = [
   '/',
   '/login',

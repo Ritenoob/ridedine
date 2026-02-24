@@ -8,7 +8,7 @@ export default function CartPage() {
   if(items.length===0) return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
+        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
       </nav>
       <div style={{textAlign:"center",padding:80}}>
         <div style={{fontSize:64,marginBottom:16}}>🛒</div>
@@ -22,7 +22,7 @@ export default function CartPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
+        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link">← Continue Shopping</Link>
         </div>

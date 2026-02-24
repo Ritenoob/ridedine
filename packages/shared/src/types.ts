@@ -59,23 +59,6 @@ export interface MenuItem {
 }
 
 /**
- * Dish - Chef's catalog item
- */
-export interface Dish {
-  id: string;
-  chef_id: string;
-  name: string;
-  description?: string;
-  price_cents: number;
-  image_url?: string;
-  available: boolean;
-  cuisine_type?: string;
-  dietary_tags?: string[];
-  created_at: string;
-  updated_at?: string;
-}
-
-/**
  * Order
  */
 export interface Order {
@@ -110,25 +93,6 @@ export interface OrderItem {
 }
 
 /**
- * Driver Profile
- */
-export interface Driver {
-  id: string;
-  profile_id: string;
-  vehicle_type?: 'car' | 'bike' | 'scooter' | 'truck';
-  license_number?: string;
-  is_available: boolean;
-  is_verified: boolean;
-  current_lat?: number;
-  current_lng?: number;
-  last_location_update?: string;
-  total_deliveries: number;
-  rating: number;
-  created_at: string;
-  updated_at?: string;
-}
-
-/**
  * Delivery
  */
 export interface Delivery {
@@ -139,17 +103,6 @@ export interface Delivery {
   pickup_eta?: string;
   dropoff_eta?: string;
   proof_url?: string;
-  driver_lat?: number;
-  driver_lng?: number;
-  driver_last_update?: string;
-  pickup_address?: string;
-  pickup_lat?: number;
-  pickup_lng?: number;
-  dropoff_address?: string;
-  dropoff_lat?: number;
-  dropoff_lng?: number;
-  delivery_fee_cents: number;
-  distance_km?: number;
   created_at: string;
   updated_at?: string;
 }
@@ -180,58 +133,4 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   address?: string;
-}
-
-/**
- * Favorite (chef or dish)
- */
-export interface Favorite {
-  id: string;
-  user_id: string;
-  favoritable_type: 'chef' | 'dish';
-  favoritable_id: string;
-  created_at: string;
-}
-
-/**
- * Saved Delivery Address
- */
-export interface SavedAddress {
-  id: string;
-  user_id: string;
-  label: string; // "Home", "Work", etc.
-  address: string;
-  lat?: number;
-  lng?: number;
-  is_default: boolean;
-  created_at: string;
-  updated_at?: string;
-}
-
-/**
- * Review
- */
-export interface Review {
-  id: string;
-  customer_id: string;
-  chef_id: string;
-  order_id: string;
-  rating: number; // 1-5
-  comment?: string;
-  created_at: string;
-  updated_at?: string;
-}
-
-/**
- * Push Token
- */
-export interface PushToken {
-  id: string;
-  user_id: string;
-  token: string;
-  device_type: 'ios' | 'android' | 'web';
-  device_id?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at?: string;
 }
