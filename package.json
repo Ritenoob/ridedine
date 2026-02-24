@@ -12,8 +12,11 @@
                             "eslint":  "^8.57.0"
                         },
     "scripts":  {
+    "ci": "pnpm -r test && pnpm -r exec tsc --noEmit",
+    "build": "pnpm -r build",
                     "lint":  "pnpm -r eslint .",
                     "typecheck":  "pnpm -r exec tsc --noEmit",
                     "test":  "pnpm -r test"
                 }
 }
+
