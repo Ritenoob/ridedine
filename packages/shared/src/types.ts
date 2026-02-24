@@ -134,3 +134,17 @@ export interface GeoLocation {
   lng: number;
   address?: string;
 }
+
+/**
+ * Review
+ */
+export interface Review {
+  id: string;
+  customer_id: string;
+  chef_id: string;
+  order_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  updated_at?: string;
+}
