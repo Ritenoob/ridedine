@@ -17,5 +17,10 @@
     "lint": "pnpm -r exec eslint .",
     "typecheck": "pnpm -r exec tsc --noEmit",
     "test": "pnpm -r test"
+  },
+  "pnpm": {
+    "overrides": {
+      "eslint": "9.39.3"
+    }
   }
 }
