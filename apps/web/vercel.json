@@ -1,5 +1,5 @@
-{
+﻿{
   "framework": "nextjs",
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm build:shared && pnpm --filter @home-chef/web build"
+  "installCommand": "corepack enable && pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @home-chef/web build"
 }
