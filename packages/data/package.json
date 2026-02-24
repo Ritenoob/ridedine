@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "@home-chef/data",
   "version": "1.0.0",
   "description": "Shared data layer: OrdersRepository and realtime hooks",
@@ -6,7 +6,7 @@
   "types": "src/index.ts",
   "scripts": {
     "lint": "echo 'No linting configured yet'",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "@supabase/supabase-js": ">=2"
@@ -23,3 +23,5 @@
     "react-dom": "18.2.0"
   }
 }
+
+
