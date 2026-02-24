@@ -12,11 +12,14 @@ export enum UserRole {
  * Order Statuses
  */
 export enum OrderStatus {
+  DRAFT = 'draft',
+  SUBMITTED = 'submitted',
   PLACED = 'placed',
   ACCEPTED = 'accepted',
   PREPARING = 'preparing',
   READY = 'ready',
   PICKED_UP = 'picked_up',
+  OUT_FOR_DELIVERY = 'out_for_delivery',
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded',

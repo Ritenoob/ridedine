@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { uploadImage, isValidImageFile, resizeImage } from "@home-chef/shared/src/storage";
+import { uploadImage, isValidImageFile, resizeImage } from "@home-chef/shared";
 
 interface ImageUploadProps {
   onUploadComplete: (path: string, url: string) => void;

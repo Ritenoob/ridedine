@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@home-chef/shared": ["../../packages/shared/src"]
+      "@home-chef/shared": ["../../packages/shared/src"],
+      "@home-chef/ui": ["../../packages/ui/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
