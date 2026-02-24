@@ -54,6 +54,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.0.0
         version: 18.3.7(@types/react@18.2.79)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.4
+        version: 5.1.4(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.31.1)(terser@5.46.0))
       '@vitest/ui':
         specifier: 1.6.1
         version: 1.6.1(vitest@1.6.1)
@@ -150,7 +153,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 1.6.1
-        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0)
+        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)
 
   apps/web:
     dependencies:
@@ -199,7 +202,7 @@ importers:
         version: 1.31.1
       vitest:
         specifier: 1.6.1
-        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0)
+        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)
 
   packages/data:
     dependencies:
@@ -227,7 +230,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.6.1
-        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0)
+        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)
 
   packages/shared:
     dependencies:
@@ -252,7 +255,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 1.6.1
-        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0)
+        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)
 
   packages/ui:
     dependencies:
@@ -277,7 +280,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 1.6.1
-        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0)
+        version: 1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)
 
 packages:
 
@@ -2041,6 +2044,9 @@ packages:
   '@remix-run/web-stream@1.1.0':
     resolution: {integrity: sha512-KRJtwrjRV5Bb+pM7zxcTJkhIqWWSy+MYsIxHK+0m5atcznsf15YwUBWHWulZerV2+vvHH1Lp1DD7pw6qKW8SgA==}
 
+  '@rolldown/pluginutils@1.0.0-rc.3':
+    resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
+
   '@rollup/rollup-android-arm-eabi@4.59.0':
     resolution: {integrity: sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==}
     cpu: [arm]
@@ -2517,6 +2523,12 @@ packages:
     resolution: {integrity: sha512-hHqer2mcdVC0eYnVNbWyi28AlGOPb2vjH3lP3/Bc8Lc8BjhMsDwFMm7WhoP5C1+cfbr/QJ6Er3H/L08wznXxfg==}
     peerDependencies:
       graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+
+  '@vitejs/plugin-react@5.1.4':
+    resolution: {integrity: sha512-VIcFLdRi/VYRU8OL/puL7QXMYafHmqOnwTZY50U1JPlCNj30PxCMx65c494b1K9be9hX83KVt0+gTEwTWLqToA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
   '@vitest/expect@1.6.1':
     resolution: {integrity: sha512-jXL+9+ZNIJKruofqXuuTClf44eSpcHlgj3CiuNihUF3Ioujtmc0zIa3UJOW5RjDK1YLBJZnWBlPuqhYycLioog==}
@@ -5662,6 +5674,10 @@ packages:
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
+    engines: {node: '>=0.10.0'}
+
+  react-refresh@0.18.0:
+    resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
     engines: {node: '>=0.10.0'}
 
   react-shallow-renderer@16.15.0:
@@ -9282,6 +9298,8 @@ snapshots:
     dependencies:
       web-streams-polyfill: 3.3.3
 
+  '@rolldown/pluginutils@1.0.0-rc.3': {}
+
   '@rollup/rollup-android-arm-eabi@4.59.0':
     optional: true
 
@@ -9730,6 +9748,18 @@ snapshots:
       '@urql/core': 2.3.6(graphql@15.8.0)
       graphql: 15.8.0
       wonka: 4.0.15
+
+  '@vitejs/plugin-react@5.1.4(vite@5.4.21(@types/node@20.19.33)(lightningcss@1.31.1)(terser@5.46.0))':
+    dependencies:
+      '@babel/core': 7.29.0
+      '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
+      '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.29.0)
+      '@rolldown/pluginutils': 1.0.0-rc.3
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.18.0
+      vite: 5.4.21(@types/node@20.19.33)(lightningcss@1.31.1)(terser@5.46.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@vitest/expect@1.6.1':
     dependencies:
@@ -13568,6 +13598,8 @@ snapshots:
 
   react-refresh@0.14.2: {}
 
+  react-refresh@0.18.0: {}
+
   react-shallow-renderer@16.15.0(react@18.2.0):
     dependencies:
       object-assign: 4.1.1
@@ -14597,43 +14629,6 @@ snapshots:
       fsevents: 2.3.3
       lightningcss: 1.31.1
       terser: 5.46.0
-
-  vitest@1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@26.1.0)(lightningcss@1.31.1)(terser@5.46.0):
-    dependencies:
-      '@vitest/expect': 1.6.1
-      '@vitest/runner': 1.6.1
-      '@vitest/snapshot': 1.6.1
-      '@vitest/spy': 1.6.1
-      '@vitest/utils': 1.6.1
-      acorn-walk: 8.3.5
-      chai: 4.5.0
-      debug: 4.4.3
-      execa: 8.0.1
-      local-pkg: 0.5.1
-      magic-string: 0.30.21
-      pathe: 1.1.2
-      picocolors: 1.1.1
-      std-env: 3.10.0
-      strip-literal: 2.1.1
-      tinybench: 2.9.0
-      tinypool: 0.8.4
-      vite: 5.4.21(@types/node@20.19.33)(lightningcss@1.31.1)(terser@5.46.0)
-      vite-node: 1.6.1(@types/node@20.19.33)(lightningcss@1.31.1)(terser@5.46.0)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 20.19.33
-      '@vitest/ui': 1.6.1(vitest@1.6.1)
-      happy-dom: 12.10.3
-      jsdom: 26.1.0
-    transitivePeerDependencies:
-      - less
-      - lightningcss
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
 
   vitest@1.6.1(@types/node@20.19.33)(@vitest/ui@1.6.1)(happy-dom@12.10.3)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0):
     dependencies:
