@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      lightningcss:
+        specifier: ^1.21.0
+        version: 1.31.1
 
   apps/admin:
     dependencies:

@@ -1,9 +1,12 @@
 {
-    "name":  "home-chef-delivery",
-    "version":  "1.0.0",
-    "private":  true,
-    "packageManager":  "pnpm@9.0.0",
-    "engines":  {
-                    "node":  "\u003e=20"
-                }
+    "name": "home-chef-delivery",
+    "version": "1.0.0",
+    "private": true,
+    "packageManager": "pnpm@9.0.0",
+    "engines": {
+        "node": ">=20"
+    },
+    "devDependencies": {
+        "lightningcss": "^1.21.0"
+    }
 }
