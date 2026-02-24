@@ -1,0 +1,209 @@
+ The uploaded RidenDine.md is sufficient to generate the editable box-and-flow architecture and the skills/MCP/agent backlog grounded in what’s actually implemented. 
+
+RidenDine
+
+1) Editable box-and-flow architecture (Mermaid)
+A) System architecture (containers + integrations)
+flowchart LR
+  %% Actors
+  CUST[Customer] --> MOB[Mobile App<br/>(React Native + Expo Router)]
+  CHEF[Chef] --> MOB
+  ADMIN[Admin] --> ADM[Admin Web<br/>(Next.js App Router)]
+
+  %% Backend platform
+  MOB -->|Supabase client| SB[(Supabase)]
+  ADM -->|Supabase client / admin auth| SB
+
+  subgraph SBX[Supabase Platform]
+    DB[(Postgres + RLS)]
+    AUTH[Auth]
+    RT[Realtime]
+    ST[Storage (optional)]
+    EF[Edge Functions (Deno/TS)]
+  end
+
+  SB --> DB
+  SB --> AUTH
+  SB --> RT
+  SB --> ST
+  SB --> EF
+
+  %% Payments
+  EF --> STRIPE[Stripe Connect + Checkout]
+
+  %% Data
+  DB --> ORD[orders]
+  DB --> OI[order_items]
+  DB --> DISH[dishes]
+  DB --> CHEFS[chefs]
+  DB --> PROF[profiles]
+  DB --> DELIV[deliveries<br/>(Phase 2)]
+  DB --> DRV[drivers<br/>(Phase 2)]
+
+This reflects the repo’s described monorepo apps (mobile + admin), Supabase backend (Postgres/RLS/Auth/Edge Functions), and Stripe Connect integration. 
+
+RidenDine
+
+ 
+
+RidenDine
+
+B) End-to-end order workflow (what happens when someone orders)
+flowchart TD
+  A[Customer browses dishes] --> B[Add to cart<br/>single-chef enforced]
+  B --> C[Checkout<br/>address + instructions + tip]
+  C --> D[Place order<br/>persist to orders + order_items]
+  D --> E[Chef sees pending orders]
+  E -->|Accept| F[Order status: Accepted]
+  E -->|Reject| G[Order status: Rejected/Cancelled]
+  F --> H[Status: Preparing]
+  H --> I[Status: Ready]
+  I --> J[Status: Delivered]
+  D --> K[Admin can monitor last orders + analytics]
+
+This is the explicit “Placed → Accepted → Preparing → Ready → Delivered” workflow plus reject-at-placed and admin visibility. 
+
+RidenDine
+
+ 
+
+RidenDine
+
+C) Stripe flow (Connect onboarding + checkout + webhook updates)
+sequenceDiagram
+  participant Chef as Chef App
+  participant EF1 as Edge Fn: create_connect_account
+  participant Stripe as Stripe Connect
+  participant DB as Supabase DB (chefs/profiles)
+
+  Chef->>EF1: Request Connect account
+  EF1->>Stripe: Create Express account
+  Stripe-->>EF1: account_id + onboarding_url
+  EF1->>DB: Store account_id on chef
+  EF1-->>Chef: Return onboarding_url
+
+  participant Cust as Customer App
+  participant EF2 as Edge Fn: create_checkout_session
+  participant Checkout as Stripe Checkout
+  participant EF3 as Edge Fn: webhook_stripe
+  participant Orders as Supabase DB (orders)
+
+  Cust->>Orders: Create Order (payment_status=pending)
+  Cust->>EF2: Create checkout session (order metadata)
+  EF2->>Checkout: Create session (15% platform fee + transfer)
+  Checkout-->>Cust: Hosted checkout link
+  Cust->>Checkout: Pay
+  Checkout-->>EF3: Webhook events
+  EF3->>Orders: Update payment_status / payment_intent_id
+
+This matches the 3 implemented Edge Functions and the webhook event handling called out in your project summary. 
+
+RidenDine
+
+2) Skills / MCPs / agents to build around this repo (grounded backlog)
+
+Below are concrete, buildable “skills” that map to what exists (monorepo, Supabase migrations/RLS, Edge Functions, Stripe flows, admin panel, analytics). 
+
+RidenDine
+
+A) Repo intelligence skills (foundation)
+
+Monorepo Mapper
+
+Output: dependency graph (apps/mobile, apps/admin, backend/supabase, packages/shared), entrypoints, env var usage map
+
+Env Var Auditor
+
+Output: required env vars per app + where referenced + missing/unused detection
+
+Release Readiness Checklist Generator
+
+Output: preflight checks for Vercel + EAS + Supabase deploy
+
+B) Supabase skills (core)
+
+Migration + Schema Extractor
+
+Output: ERD (tables + relations) from the 5 migrations and 7 tables listed
+
+RLS Policy Verifier
+
+Output: “role × table × action” matrix + test queries
+
+Seed Data Loader & Sanitizer
+
+Output: seed scripts + anonymization option for demo datasets
+
+Realtime Subscription Planner
+
+Output: which screens should subscribe to what (orders status, chef dashboard metrics)
+
+C) Stripe skills (core)
+
+Connect Onboarding Validator
+
+Checks: account created, stored, onboarding completion detection, payout readiness (account.updated)
+
+Checkout Session Composer
+
+Input: order_id, items, tip, fees → Output: correct Stripe session payload
+
+Webhook Coverage Tester
+
+Simulate: checkout.session.completed, payment_intent.succeeded/failed, charge.refunded, account.updated
+
+Output: expected DB changes + idempotency rules
+
+D) Marketplace workflow skills (product)
+
+Order State Machine Enforcer
+
+Output: allowed transitions + UI button gating + DB constraint recommendations
+
+Single-Chef Cart Rule Validator
+
+Output: tests ensuring cart can’t mix chefs; customer UX handling
+
+Admin Moderation Workflows
+
+Chef approval states: pending/approved/rejected/suspended + audit logging recommendations
+
+E) Phase 2 skills (already scaffolded)
+
+Driver/Delivery Module Activation Plan
+
+Output: what to implement next using drivers + deliveries tables already present
+
+Tracking Token Security
+
+Output: public tracking page threat model + token rotation strategy
+
+3) What you should hand me to make this “edit-ready” for your team
+
+You already provided the project summary. To generate a diagram that matches the code exactly (real file/function names, table columns, RLS rules, env vars), provide one of these:
+
+Option A (best): the repo URL (HTTPS) so I can inspect the actual file tree and produce “source-of-truth” diagrams.
+
+Option B: upload/paste these folders/files:
+
+backend/supabase/migrations/*
+
+backend/supabase/functions/* (Edge Functions)
+
+apps/mobile/* (entry + cart context + order screens)
+
+apps/admin/* (chef approval, analytics)
+
+packages/shared/* (types)
+
+With that, I’ll output:
+
+a cleaned architecture pack (C4 container + key workflow diagrams),
+
+a Mermaid-only version your team can edit in GitHub,
+
+and a skills/MCP tool catalog tied to specific files and workflows (not generic).
+
+Immediate next action
+
+Send the HTTPS GitHub repo link (not SSH). If it’s private, either connect GitHub or upload the folders above. Once I have direct access, I’ll regenerate the diagrams to match the exact implementation details (tables/columns/events/routes) and produce the skills/MCP plan in the same pass.

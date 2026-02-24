@@ -1,9 +1,12 @@
 import * as Location from 'expo-location';
 import { DeliveriesRepository } from '@home-chef/data';
+import { supabase } from './supabase';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 let locationSubscription: Location.LocationSubscription | null = null;
 let currentDeliveryId: string | null = null;
 let currentRepository: DeliveriesRepository | null = null;
+let broadcastChannel: RealtimeChannel | null = null;
 
 /**
  * Request location permission from the user
@@ -32,10 +35,8 @@ export async function startLocationTracking(
   deliveryId: string,
   repository: DeliveriesRepository
 ): Promise<boolean> {
-  // Stop any existing tracking first
   stopLocationTracking();
 
-  // Request permission
   const hasPermission = await requestLocationPermission();
   if (!hasPermission) {
     return false;
@@ -45,12 +46,30 @@ export async function startLocationTracking(
     currentDeliveryId = deliveryId;
     currentRepository = repository;
 
-    // Start watching position
+    broadcastChannel = supabase.channel(`delivery:${deliveryId}`);
+
+    broadcastChannel.on('system', {}, (payload: any) => {
+      if (payload.event === 'error') {
+        console.warn('Broadcast channel error, reconnecting in 5s...', payload);
+        setTimeout(() => {
+          if (broadcastChannel) {
+            broadcastChannel.subscribe();
+          }
+        }, 5000);
+      }
+    });
+
+    await broadcastChannel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Broadcast channel ready for delivery:', deliveryId);
+      }
+    });
+
     locationSubscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 15000, // Update every 15 seconds
-        distanceInterval: 10, // Or when moved 10 meters
+        timeInterval: 15000,
+        distanceInterval: 10,
       },
       async (location) => {
         if (currentDeliveryId && currentRepository) {
@@ -60,6 +79,21 @@ export async function startLocationTracking(
               location.coords.latitude,
               location.coords.longitude
             );
+
+            if (broadcastChannel) {
+              await broadcastChannel.send({
+                type: 'broadcast',
+                event: 'driver_location',
+                payload: {
+                  lat: location.coords.latitude,
+                  lng: location.coords.longitude,
+                  heading: location.coords.heading,
+                  speed: location.coords.speed,
+                  timestamp: new Date().toISOString(),
+                },
+              });
+            }
+
             console.log('Location updated:', location.coords.latitude, location.coords.longitude);
           } catch (error) {
             console.error('Error updating driver location:', error);
@@ -83,6 +117,11 @@ export function stopLocationTracking(): void {
   if (locationSubscription) {
     locationSubscription.remove();
     locationSubscription = null;
+  }
+
+  if (broadcastChannel) {
+    broadcastChannel.unsubscribe();
+    broadcastChannel = null;
   }
 
   currentDeliveryId = null;
