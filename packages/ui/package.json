@@ -1,0 +1,18 @@
+{
+  "name": "@home-chef/ui",
+  "version": "1.0.0",
+  "description": "Shared UI components for RideNDine apps",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "echo 'No linting configured yet'"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
