@@ -85,9 +85,8 @@ BEGIN
     END IF;
 
     -- Get customer delivery address from order
-    -- Assuming customer lat/lng are stored in profiles or orders table
-    -- For now, using placeholder - this should be adapted to actual schema
-    SELECT delivery_lat, delivery_lng, delivery_address
+    -- Customer lat/lng are stored in the orders table
+    SELECT lat, lng, address
     INTO v_customer_lat, v_customer_lng, v_customer_address
     FROM orders
     WHERE id = NEW.id;

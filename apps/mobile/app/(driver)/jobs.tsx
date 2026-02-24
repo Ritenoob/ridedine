@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { DeliveriesRepository } from "@home-chef/data";
 import { getCurrentLocation } from "@/lib/location";
-import { calculateDistance } from "@home-chef/shared/geo";
+import { calculateDistance } from "@home-chef/shared";
 import type { LocationObject } from "expo-location";
 
 interface DeliveryWithDistance {
@@ -134,9 +134,11 @@ export default function DriverJobs() {
           },
         },
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error accepting job:", error);
-      Alert.alert("Error", error.message || "Failed to accept job");
+      const message =
+        error instanceof Error ? error.message : "Failed to accept job";
+      Alert.alert("Error", message);
       setAccepting(null);
     }
   };

@@ -63,8 +63,8 @@ BEGIN
     -- Calculate totals from deliveries table
     SELECT
       COUNT(*),
-      COUNT(*) FILTER (WHERE created_at <= pickup_eta),  -- On-time = delivered before ETA
-      COALESCE(AVG(5.0), 0.00)  -- Placeholder: actual rating would come from ratings table
+      COUNT(*) FILTER (WHERE updated_at <= dropoff_eta),  -- On-time = completed before dropoff ETA
+      0.00  -- Placeholder: no ratings table yet, starts at 0 until ratings are implemented
     INTO v_total_deliveries, v_on_time_deliveries, v_avg_rating
     FROM deliveries
     WHERE driver_id = v_driver_id AND status = 'delivered';

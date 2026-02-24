@@ -19,9 +19,24 @@ const STATUS_STEPS = [
   { key: "delivered", label: "Delivered" },
 ];
 
+interface OrderWithDeliveries {
+  id: string;
+  status: string;
+  customer_name: string;
+  total_cents: number;
+  delivery_method: string;
+  chefs: { profiles: { name: string } };
+  deliveries: Array<{
+    id: string;
+    driver_lat?: number;
+    driver_lng?: number;
+    status?: string;
+  }>;
+}
+
 export default function Tracking() {
   const { trackingToken } = useLocalSearchParams();
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<OrderWithDeliveries | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [driverLocation, setDriverLocation] = useState<{
@@ -30,6 +45,8 @@ export default function Tracking() {
   } | null>(null);
   const broadcastChannel = useRef<RealtimeChannel | null>(null);
   const lastBroadcastUpdate = useRef<number>(Date.now());
+
+  const deliveryId = order?.deliveries?.[0]?.id ?? null;
 
   useEffect(() => {
     if (trackingToken) {
@@ -40,15 +57,14 @@ export default function Tracking() {
   }, [trackingToken]);
 
   useEffect(() => {
-    if (!order?.deliveries?.[0]?.id) return;
+    if (!deliveryId) return;
 
-    const deliveryId = order.deliveries[0].id;
     broadcastChannel.current = supabase.channel(`delivery:${deliveryId}`);
 
     broadcastChannel.current.on(
       "broadcast",
       { event: "driver_location" },
-      (payload: any) => {
+      (payload: { payload: { lat: number; lng: number } }) => {
         lastBroadcastUpdate.current = Date.now();
         setDriverLocation({
           lat: payload.payload.lat,
@@ -57,7 +73,7 @@ export default function Tracking() {
       },
     );
 
-    broadcastChannel.current.on("system", {}, (payload: any) => {
+    broadcastChannel.current.on("system", {}, (payload: { event: string }) => {
       if (payload.event === "error") {
         setTimeout(() => broadcastChannel.current?.subscribe(), 5000);
       }
@@ -73,7 +89,7 @@ export default function Tracking() {
       broadcastChannel.current?.unsubscribe();
       clearInterval(fallback);
     };
-  }, [order?.deliveries?.[0]?.id]);
+  }, [deliveryId]);
 
   const loadOrder = async () => {
     try {
@@ -86,7 +102,8 @@ export default function Tracking() {
             profiles!inner (
               name
             )
-          )
+          ),
+          deliveries (*)
         `,
         )
         .eq("tracking_token", trackingToken)

@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin":
+    Deno.env.get("ALLOWED_ORIGIN") || "http://localhost:3000",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
@@ -90,6 +91,8 @@ async function routeWithGoogle(coords: Coordinate[]): Promise<RouteResponse> {
     polylineQuality: "HIGH_QUALITY",
   });
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   const response = await fetch(
     "https://routes.googleapis.com/directions/v2:computeRoutes",
     {
@@ -101,12 +104,16 @@ async function routeWithGoogle(coords: Coordinate[]): Promise<RouteResponse> {
           "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline",
       },
       body,
+      signal: controller.signal,
     },
   );
+  clearTimeout(timeout);
 
   if (!response.ok) {
     const errorText = await response.text();
-    const error: any = new Error(`Google Maps API error: ${response.status}`);
+    const error = new Error(
+      `Google Maps API error: ${response.status}`,
+    ) as Error & { status: number; body: string };
     error.status = response.status;
     error.body = errorText;
     throw error;
@@ -136,9 +143,14 @@ async function routeWithOsrm(
   const coordString = coords.map((c) => `${c.lng},${c.lat}`).join(";");
   const url = `${base}/route/v1/${profile}/${coordString}?geometries=geojson&overview=full`;
 
-  const response = await fetch(url);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  const response = await fetch(url, { signal: controller.signal });
+  clearTimeout(timeout);
   if (!response.ok) {
-    const error: any = new Error(`OSRM API error: ${response.status}`);
+    const error = new Error(`OSRM API error: ${response.status}`) as Error & {
+      status: number;
+    };
     error.status = response.status;
     throw error;
   }
@@ -167,9 +179,14 @@ async function routeWithMapbox(
     `https://api.mapbox.com/directions/v5/mapbox/${profile}/${coordString}` +
     `?geometries=geojson&overview=full&access_token=${token}`;
 
-  const response = await fetch(url);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  const response = await fetch(url, { signal: controller.signal });
+  clearTimeout(timeout);
   if (!response.ok) {
-    const error: any = new Error(`Mapbox API error: ${response.status}`);
+    const error = new Error(`Mapbox API error: ${response.status}`) as Error & {
+      status: number;
+    };
     error.status = response.status;
     throw error;
   }
@@ -191,6 +208,13 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const { coordinates, provider, profile }: GetRouteRequest =
       await req.json();
@@ -207,38 +231,38 @@ serve(async (req) => {
 
     const routeProfile = profile || "driving";
     let route: RouteResponse | null = null;
-    let lastError: any = null;
+    let lastError: unknown = null;
 
     if (!provider || provider === "google") {
       try {
         route = await routeWithGoogle(coordinates);
         console.log("Route calculated with Google Maps");
-      } catch (err: any) {
+      } catch (err: unknown) {
         lastError = err;
-        if (err.status === 429 || err.status === 403) {
-          console.warn(
-            `Google Maps ${err.status} error, falling back to OSRM:`,
-            err.message,
-          );
-          try {
-            route = await routeWithOsrm(coordinates, routeProfile);
-            console.log("Route calculated with OSRM (Google fallback)");
-          } catch (osrmErr: any) {
-            lastError = osrmErr;
-            console.warn("OSRM also failed, trying Mapbox:", osrmErr.message);
-            const mapboxToken = Deno.env.get("MAPBOX_TOKEN");
-            if (mapboxToken) {
-              try {
-                route = await routeWithMapbox(coordinates, routeProfile);
-                console.log("Route calculated with Mapbox (OSRM fallback)");
-              } catch (mapboxErr: any) {
-                lastError = mapboxErr;
-                console.error("All providers failed:", mapboxErr.message);
-              }
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`Google Maps error, falling back to OSRM: ${message}`);
+        try {
+          route = await routeWithOsrm(coordinates, routeProfile);
+          console.log("Route calculated with OSRM (Google fallback)");
+        } catch (osrmErr: unknown) {
+          lastError = osrmErr;
+          const osrmMessage =
+            osrmErr instanceof Error ? osrmErr.message : String(osrmErr);
+          console.warn("OSRM also failed, trying Mapbox:", osrmMessage);
+          const mapboxToken = Deno.env.get("MAPBOX_TOKEN");
+          if (mapboxToken) {
+            try {
+              route = await routeWithMapbox(coordinates, routeProfile);
+              console.log("Route calculated with Mapbox (OSRM fallback)");
+            } catch (mapboxErr: unknown) {
+              lastError = mapboxErr;
+              const mbMessage =
+                mapboxErr instanceof Error
+                  ? mapboxErr.message
+                  : String(mapboxErr);
+              console.error("All providers failed:", mbMessage);
             }
           }
-        } else {
-          console.error("Google Maps error (not quota/auth):", err.message);
         }
       }
     } else if (provider === "osrm") {
@@ -253,7 +277,9 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           error:
-            lastError?.message || "Failed to calculate route with any provider",
+            lastError instanceof Error
+              ? lastError.message
+              : "Failed to calculate route with any provider",
         }),
         {
           status: 500,
