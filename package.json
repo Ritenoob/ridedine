@@ -16,7 +16,8 @@
                     "build":  "pnpm -r build",
                     "lint":  "pnpm -r exec eslint .",
                     "typecheck":  "pnpm -r exec tsc --noEmit",
-                    "test":  "pnpm -r test"
+                    "test":  "pnpm -r test",
+                    "test:coverage":  "pnpm -r test:coverage"
                 },
     "pnpm":  {
                  "overrides":  {
