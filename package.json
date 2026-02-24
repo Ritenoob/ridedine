@@ -1,22 +1,21 @@
-﻿{
-    "name":  "home-chef-delivery",
-    "version":  "1.0.0",
-    "private":  true,
-    "packageManager":  "pnpm@9.0.0",
-    "engines":  {
-                    "node":  "\u003e=20"
-                },
-    "devDependencies":  {
-                            "lightningcss":  "^1.21.0",
-                            "typescript":  "^5.4.0",
-                            "eslint":  "^8.57.0"
-                        },
-    "scripts":  {
+{
+  "name": "home-chef-delivery",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "lightningcss": "^1.21.0",
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0"
+  },
+  "scripts": {
     "ci": "pnpm -r test && pnpm -r exec tsc --noEmit",
     "build": "pnpm -r build",
-                    "lint":  "pnpm -r eslint .",
-                    "typecheck":  "pnpm -r exec tsc --noEmit",
-                    "test":  "pnpm -r test"
-                }
+    "lint": "pnpm -r exec eslint .",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "test": "pnpm -r test"
+  }
 }
-
