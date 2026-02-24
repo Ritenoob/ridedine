@@ -1,19 +1,33 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DeliveriesRepository } from '../deliveries-repository';
 import { DeliveryStatus } from '../../../shared/src/enums';
 
-// Mock Supabase client
-const mockSupabase = {
+let queryResult: { data: any; error: any } = { data: null, error: null };
+const setQueryResult = (data: any, error: any = null) => {
+  queryResult = { data, error };
+};
+
+const mockSupabase: any = {
+  // Make it behave like a Promise (Supabase builder is PromiseLike)
+  then: (resolve: any, reject: any) => Promise.resolve(queryResult).then(resolve, reject),
+  [Symbol.toStringTag]: 'Promise',
+
   from: vi.fn(() => mockSupabase),
   select: vi.fn(() => mockSupabase),
   insert: vi.fn(() => mockSupabase),
   update: vi.fn(() => mockSupabase),
   eq: vi.fn(() => mockSupabase),
-  single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-  order: vi.fn(() => mockSupabase),
   in: vi.fn(() => mockSupabase),
+  order: vi.fn(() => mockSupabase),
+  limit: vi.fn(() => mockSupabase),
   gte: vi.fn(() => mockSupabase),
   lt: vi.fn(() => mockSupabase),
+
+  // Supabase variants (harmless if unused)
+  maybeSingle: vi.fn(() => Promise.resolve(queryResult)),
+
+  // Default: return current queryResult unless test overrides with mockResolvedValueOnce
+  single: vi.fn(() => Promise.resolve(queryResult)),
 };
 
 describe('DeliveriesRepository', () => {
@@ -21,6 +35,7 @@ describe('DeliveriesRepository', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setQueryResult(null, null);
     repository = new DeliveriesRepository(mockSupabase as any);
   });
 
@@ -63,18 +78,19 @@ describe('DeliveriesRepository', () => {
         { id: 'delivery-2', driver_id: 'driver-1', status: DeliveryStatus.PICKED_UP },
       ];
 
-      mockSupabase.single.mockResolvedValueOnce({
-        data: mockDeliveries,
-        error: null,
-      });
+      setQueryResult(mockDeliveries, null);
 
       const result = await repository.getDriverDeliveries('driver-1');
 
       expect(mockSupabase.from).toHaveBeenCalledWith('deliveries');
       expect(mockSupabase.eq).toHaveBeenCalledWith('driver_id', 'driver-1');
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
     });
 
     it('should filter by status if provided', async () => {
+      setQueryResult([], null);
+
       await repository.getDriverDeliveries('driver-1', [DeliveryStatus.ASSIGNED, DeliveryStatus.PICKED_UP]);
 
       expect(mockSupabase.in).toHaveBeenCalledWith('status', [DeliveryStatus.ASSIGNED, DeliveryStatus.PICKED_UP]);
@@ -106,6 +122,8 @@ describe('DeliveriesRepository', () => {
         DeliveryStatus.EN_ROUTE_TO_DROPOFF,
         DeliveryStatus.ARRIVED_AT_DROPOFF,
       ]);
+      expect(mockSupabase.limit).toHaveBeenCalledWith(1);
+      expect(result).toEqual(mockDelivery);
     });
 
     it('should return null if no active delivery', async () => {
@@ -168,10 +186,7 @@ describe('DeliveriesRepository', () => {
         { delivery_fee_cents: 600, status: DeliveryStatus.DELIVERED },
       ];
 
-      mockSupabase.single.mockResolvedValueOnce({
-        data: mockDeliveries,
-        error: null,
-      });
+      setQueryResult(mockDeliveries, null);
 
       const startDate = '2026-02-01';
       const endDate = '2026-02-28';
@@ -182,6 +197,9 @@ describe('DeliveriesRepository', () => {
       expect(mockSupabase.eq).toHaveBeenCalledWith('status', DeliveryStatus.DELIVERED);
       expect(mockSupabase.gte).toHaveBeenCalledWith('created_at', startDate);
       expect(mockSupabase.lt).toHaveBeenCalledWith('created_at', endDate);
+
+      expect(result.total_cents).toBe(1850);
+      expect(result.delivery_count).toBe(3);
     });
   });
 
