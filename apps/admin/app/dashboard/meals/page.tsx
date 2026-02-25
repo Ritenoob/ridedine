@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Dish {
@@ -90,11 +91,19 @@ export default function MealsPage() {
   };
 
   return (
-    <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ± Meal Management</h1>
-        <p style={{ color: "#666" }}>Manage and feature meals on the platform</p>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="sidebar">
+        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>🍜 RidenDine</Link>
+        <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
+        {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"],["👥","Users","/dashboard/users"],["⚙️","Settings","/dashboard/settings"]].map(([icon,label,href])=>(
+          <Link key={href} href={href} className={`sidebar-link ${href==="/dashboard/meals"?"active":""}`}>{icon} {label}</Link>
+        ))}
       </div>
+      <div style={{ flex: 1, padding: 32 }}>
+        <div style={{ marginBottom: 30 }}>
+          <h1 className="page-title">🍱 Meal Management</h1>
+          <p className="page-subtitle">Manage and feature meals on the platform</p>
+        </div>
 
       {/* Filter Tabs */}
       <div style={{ marginBottom: 30, display: "flex", gap: 10 }}>
@@ -167,7 +176,7 @@ export default function MealsPage() {
                     fontWeight: 600,
                   }}
                 >
-                  â­ FEATURED
+                  ⭐ FEATURED
                 </div>
               )}
 
@@ -218,7 +227,7 @@ export default function MealsPage() {
                     fontSize: 13,
                   }}
                 >
-                  {dish.featured ? "â­ Unfeature" : "â˜† Feature on Homepage"}
+                  {dish.featured ? "⭐ Unfeature" : "☆ Feature on Homepage"}
                 </button>
                 <button
                   onClick={() => toggleAvailability(dish.id, dish.available)}
@@ -233,14 +242,15 @@ export default function MealsPage() {
                     fontSize: 13,
                   }}
                 >
-                  {dish.available ? "âŒ Make Unavailable" : "âœ“ Make Available"}
+                  {dish.available ? "❌ Make Unavailable" : "✓ Make Available"}
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
-    </main>
+      </div>
+    </div>
   );
 }
 

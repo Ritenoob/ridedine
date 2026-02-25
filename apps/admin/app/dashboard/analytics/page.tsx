@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Analytics {
@@ -81,11 +82,19 @@ export default function AnalyticsPage() {
   }, [loadAnalytics]);
 
   return (
-    <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ“Š Platform Analytics</h1>
-        <p style={{ color: "#666" }}>Overview of your marketplace performance</p>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="sidebar">
+        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>🍜 RidenDine</Link>
+        <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
+        {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"],["👥","Users","/dashboard/users"],["⚙️","Settings","/dashboard/settings"]].map(([icon,label,href])=>(
+          <Link key={href} href={href} className={`sidebar-link ${href==="/dashboard"?"active":""}`}>{icon} {label}</Link>
+        ))}
       </div>
+      <div style={{ flex: 1, padding: 32 }}>
+        <div style={{ marginBottom: 30 }}>
+          <h1 className="page-title">📊 Platform Analytics</h1>
+          <p className="page-subtitle">Overview of your marketplace performance</p>
+        </div>
 
       {loading && (
         <div style={{ textAlign: "center", padding: 40 }}>
@@ -108,13 +117,13 @@ export default function AnalyticsPage() {
               <StatCard
                 title="Orders Today"
                 value={analytics.ordersToday}
-                icon="ðŸ“¦"
+                icon="📦"
                 color="#e3f2fd"
               />
               <StatCard
                 title="Revenue Today"
                 value={`$${analytics.revenueToday.toFixed(2)}`}
-                icon="ðŸ’°"
+                icon="💰"
                 color="#e8f5e9"
               />
             </div>
@@ -131,37 +140,37 @@ export default function AnalyticsPage() {
               <StatCard
                 title="Total Orders"
                 value={analytics.totalOrders}
-                icon="ðŸ“Š"
+                icon="📊"
                 color="#f3e5f5"
               />
               <StatCard
                 title="Total Revenue"
                 value={`$${analytics.totalRevenue.toFixed(2)}`}
-                icon="ðŸ’µ"
+                icon="💵"
                 color="#e8f5e9"
               />
               <StatCard
                 title="Active Chefs"
                 value={analytics.activeChefs}
-                icon="ðŸ‘¨â€ðŸ³"
+                icon="👨‍🍳"
                 color="#fff3e0"
               />
               <StatCard
                 title="Total Customers"
                 value={analytics.totalCustomers}
-                icon="ðŸ‘¥"
+                icon="👥"
                 color="#e3f2fd"
               />
               <StatCard
                 title="Active Dishes"
                 value={analytics.activeDishes}
-                icon="ðŸ±"
+                icon="🍱"
                 color="#fce4ec"
               />
               <StatCard
                 title="Pending Chefs"
                 value={analytics.pendingChefs}
-                icon="â³"
+                icon="⏳"
                 color="#fff9c4"
               />
             </div>
@@ -234,7 +243,8 @@ export default function AnalyticsPage() {
           </div>
         </>
       )}
-    </main>
+      </div>
+    </div>
   );
 }
 

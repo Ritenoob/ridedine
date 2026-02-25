@@ -223,7 +223,7 @@ export class DeliveriesRepository {
       .from('deliveries')
       .insert({
         order_id: orderId,
-        status: DeliveryStatus.PENDING,
+        status: DeliveryStatus.ASSIGNED,
         pickup_address: pickupAddress,
         pickup_lat: pickupLat,
         pickup_lng: pickupLng,

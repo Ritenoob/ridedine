@@ -7,6 +7,7 @@ export default function Home() {
         <span className="nav-brand" style={{color:"white",fontSize:"24px"}}>🍜 RidenDine</span>
         <div className="nav-links">
           <Link href="/chefs" className="btn btn-outline" style={{color:"white",borderColor:"white"}}>Browse Chefs</Link>
+          <Link href="/become-chef" className="btn btn-outline" style={{color:"white",borderColor:"white"}}>Become a Chef</Link>
           <Link href="/cart" className="btn" style={{background:"white",color:"#1976d2"}}>🛒 Cart</Link>
         </div>
       </nav>
