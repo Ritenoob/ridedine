@@ -1,6 +1,7 @@
-# Vercel Deployment - Demo Day Summary
+# Vercel Deployment - Demo Day Summary (Snapshot)
 
 **Quick reference for demo execution in the next 6 hours.**
+Note: Historical snapshot for demo planning. Validate against current repo state.
 
 ---
 
@@ -106,8 +107,8 @@ SUPABASE_SERVICE_ROLE_KEY = [use Supabase secrets for Edge Functions only]
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJ... (Edge Functions only, not for web/admin apps)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key (Edge Functions only, not for web/admin apps)
 ```
 
 ---
@@ -188,7 +189,7 @@ GitHub: ridendine-demo
 
 ---
 
-**Deployment Status:** Ready for demo
+**Deployment Status:** Snapshot (validate against current repo)
 **Last Updated:** 2026-02-25
 **Demo Time:** T-6 hours
 
@@ -205,4 +206,4 @@ GitHub: ridendine-demo
 - [ ] Share URLs with audience
 - [ ] Demo starts
 
-**You're ready!**
+**You're ready!** (After validating current deployment)

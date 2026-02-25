@@ -101,13 +101,8 @@ Home Chef Delivery is a 3-sided marketplace connecting Customers, Chefs, and Dri
 - Stripe Connect account_id
 - RLS: Chefs manage own data, public can view approved
 
-#### menus
-- Chef's menu collections
-- Active/inactive toggle
-- RLS: Chefs manage own menus, public views active
-
-#### menu_items
-- Individual dishes with pricing
+#### dishes
+- Chef's menu items (simplified catalog)
 - Available/unavailable toggle
 - Photo URLs, dietary tags
 - RLS: Chefs manage own items, public views available

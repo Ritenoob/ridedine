@@ -43,7 +43,7 @@ Shared packages:
    - **Project Name:** `ridendine-admin` (custom name, must be unique)
    - **Root Directory:** `apps/admin` ← **CRITICAL: Must be set!**
    - **Framework:** Next.js (auto-detected)
-   - **Node.js Version:** 20.x (matches `.nvmrc`)
+   - **Node.js Version:** 20.x (matches `.node-version`)
 
 4. **Click Deploy** (initial build will happen)
 
@@ -111,7 +111,7 @@ curl -i -X POST "https://your-project.supabase.co/rest/v1/rpc/head" \
 |-----|-------|-------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://your-project.supabase.co` | Production, Preview, Development |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ...` | Production, Preview, Development |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` (service role key) | Production only |
+| `SUPABASE_SERVICE_ROLE_KEY` | (do not set in Vercel) | Use Supabase secrets for Edge Functions |
 
 4. **Save & Deploy** (redeploy with new vars)
 
@@ -140,7 +140,7 @@ If you have Stripe configured:
 |-----|-------|-------|
 | `STRIPE_SECRET_KEY` | `sk_live_...` | Production only |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_live_...` | Production, Preview, Development |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Production only |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Supabase secrets (Edge Functions only) |
 
 ### 3.4 Optional: Google Maps (for delivery tracking)
 
@@ -302,7 +302,7 @@ The script will:
 |----------|-------------|--------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Supabase Dashboard → Settings → API → Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public API key | Supabase Dashboard → Settings → API → anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Secret key (admin only) | Supabase Dashboard → Settings → API → service role key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Secret key (Edge Functions only) | Supabase Dashboard → Settings → API → service role key |
 
 ### Optional Variables
 

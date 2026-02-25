@@ -20,7 +20,7 @@ cd /home/nygmaee/Desktop/ridendine-demo-main
 ### 2. Deploy to Vercel (3 minutes)
 
 ```bash
-./deploy-production.sh
+./DEPLOY_VERCEL.sh
 ```
 
 **Expected:** Two URLs returned:
@@ -121,5 +121,5 @@ Before going live:
 
 ---
 
-**Status:** ✅ Ready for deployment
-**Next Action:** Upgrade Vercel → Run `./deploy-production.sh` → Go live!
+**Status:** Snapshot (validate against current repo)
+**Next Action:** Validate current deployment settings, then run `./DEPLOY_VERCEL.sh`

@@ -955,7 +955,7 @@ export function useAnalytics() {
     }
 [Sign JWT]
   ↓ Sign with secret key
-  ↓ JWT: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  ↓ JWT: "<redacted>"
 [Return Tokens]
   ↓ {
       access_token: "jwt...",
@@ -1032,14 +1032,14 @@ const orders = await fetchWithRetry(() =>
 
 ## Summary
 
-This documentation covers the complete data flow for:
-- ✅ Customer order placement and tracking
-- ✅ Chef order management
-- ✅ Driver delivery workflow
-- ✅ Payment processing with Stripe Connect
-- ✅ Real-time GPS tracking via Supabase Realtime
-- ✅ Admin dashboard analytics
-- ✅ JWT authentication with RLS enforcement
+This documentation covers the intended data flow for:
+- Customer order placement and tracking
+- Chef order management
+- Driver delivery workflow
+- Payment processing with Stripe Connect
+- Real-time GPS tracking via Supabase Realtime
+- Admin dashboard analytics
+- JWT authentication with RLS enforcement
 
 All flows use:
 - **Row Level Security (RLS)** for authorization

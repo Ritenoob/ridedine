@@ -1,6 +1,7 @@
-# Demo Fallback Procedures - Quick Reference
+# Demo Fallback Procedures - Quick Reference (Snapshot)
 
 **Print this and keep it handy during demo**
+Note: Historical snapshot for demo planning. Validate against current repo state.
 
 ---
 
@@ -346,7 +347,7 @@ Can I recover in < 2 minutes?
    - Customer: `demo-customer@ridendine.com` / `demo123`
    - Chef: `maria@ridendine.com` / `demo123`
    - Driver: `mike@ridendine.com` / `demo123`
-   - Admin: `admin@ridendine.com` / `admin123`
+   - Admin: use the seeded admin credentials from `scripts/seed.ts`
 
 6. **Stripe test cards:**
    - Success: `4242 4242 4242 4242`

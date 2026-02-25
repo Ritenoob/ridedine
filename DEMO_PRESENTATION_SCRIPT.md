@@ -1,4 +1,6 @@
-# RidenDine Demo Presentation Script
+# RidenDine Demo Presentation Script (Snapshot)
+
+Note: Historical snapshot for demo planning. Validate against current repo state.
 
 **Duration:** 20 minutes
 **Audience:** Investors, stakeholders, potential partners
@@ -305,7 +307,7 @@ Show admin dashboard with order details, payment breakdown, payout records
 > **Maps:** Google Maps with intelligent caching (92% cost reduction)
 > **Hosting:** Vercel for web apps, Expo Application Services for mobile
 >
-> The entire platform was built in 12 weeks by [team size]. We're production-ready and can scale to thousands of concurrent users."
+> The entire platform was built in 12 weeks by [team size]. Validate production readiness and scaling claims against current metrics."
 
 ---
 
@@ -336,7 +338,7 @@ Show admin dashboard with order details, payment breakdown, payout records
 > - Compliance and insurance
 > - Team growth (2 engineers, 1 ops manager)
 >
-> We've validated product-market fit with [X] pilot users and [Y] orders. Now we're ready to scale.
+> We've validated product-market fit with [X] pilot users and [Y] orders. Validate scaling readiness against current metrics.
 >
 > Who has questions?"
 
@@ -359,7 +361,7 @@ Show admin dashboard with order details, payment breakdown, payout records
 
 ### Scalability
 
-> "Supabase and Vercel auto-scale to millions of users. Our caching strategy means Google Maps costs stay flat even as order volume grows. We can serve 10,000 orders/day on the same infrastructure."
+> "Supabase and Vercel auto-scale to millions of users. Our caching strategy means Google Maps costs stay flat even as order volume grows. Validate capacity claims against current benchmarks."
 
 ### Regulatory Challenges
 

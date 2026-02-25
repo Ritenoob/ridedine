@@ -1,10 +1,10 @@
 ﻿# RidenDine Production Deployment Checklist
 
-**Status: Code Ready âœ… | Infrastructure Ready on Payment ðŸ’³**
+**Status: Code Ready ✅ | Infrastructure Ready on Payment 💳**
 
 ---
 
-## ðŸš€ Quick Start (After Vercel Upgrade)
+## 🚀 Quick Start (After Vercel Upgrade)
 
 Once you upgrade your Vercel account, run:
 
@@ -21,9 +21,9 @@ vercel deploy --prod --cwd apps/admin
 
 ---
 
-## ðŸ“‹ Pre-Launch Checklist
+## 📋 Pre-Launch Checklist
 
-### 1. Vercel Account (ðŸ”´ REQUIRED - Action Needed)
+### 1. Vercel Account (🔴 REQUIRED - Action Needed)
 
 - [ ] Upgrade Vercel account to paid tier
 - [ ] Verify deployment limit is removed
@@ -35,7 +35,7 @@ vercel deploy --prod --cwd apps/admin
 
 ---
 
-### 2. Supabase Setup (âœ… READY)
+### 2. Supabase Setup (✅ READY)
 
 **Database URL:** `https://your-project.supabase.co`
 
@@ -44,10 +44,10 @@ vercel deploy --prod --cwd apps/admin
 ```bash
 # Navigate to Supabase SQL Editor: https://supabase.com/dashboard/project/YOUR_PROJECT/sql/new
 
-# Copy and paste the entire contents of:
-cat SETUP_SUPABASE.sql
+# Use the migration files in:
+backend/supabase/migrations/
 
-# Click "Run" to execute
+# Click "Run" to execute each migration in order (see SETUP_SUPABASE.md)
 ```
 
 **Verify Tables Created:**
@@ -55,18 +55,13 @@ cat SETUP_SUPABASE.sql
 SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
 ```
 
-Expected tables:
+Expected tables (core):
 - profiles
 - chefs
-- menus
-- menu_items
+- dishes
 - orders
 - order_items
 - deliveries
-- reviews
-- notifications
-- promo_codes
-- support_tickets
 
 #### 2.2 Enable Email Auth
 
@@ -93,14 +88,14 @@ Or use UI: https://supabase.com/dashboard/project/YOUR_PROJECT/storage/buckets
 
 ---
 
-### 3. Stripe Setup (âš ï¸ Action Required)
+### 3. Stripe Setup (⚠️ Action Required)
 
 **Current Status:** Stripe credentials needed
 
 #### 3.1 Get Stripe Keys
 
 1. Login to Stripe: https://dashboard.stripe.com
-2. Navigate to Developers â†’ API Keys
+2. Navigate to Developers -> API Keys
 3. Get both sets of keys:
    - **Test Keys** (for testing)
    - **Live Keys** (for production)
@@ -204,11 +199,11 @@ If you have a custom domain (e.g., ridendine.com):
 
 #### 6.1 Add Domain to Vercel
 
-1. Go to Vercel Project â†’ Settings â†’ Domains
+1. Go to Vercel Project -> Settings -> Domains
 2. Add domains:
-   - `ridendine.com` â†’ Web App
-   - `www.ridendine.com` â†’ Web App
-   - `admin.ridendine.com` â†’ Admin App
+   - `ridendine.com` -> Web App
+   - `www.ridendine.com` -> Web App
+   - `admin.ridendine.com` -> Admin App
 
 #### 6.2 Update DNS Records
 
@@ -301,7 +296,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## ðŸŽ¯ Production Launch Day Checklist
+## Production Launch Day Checklist
 
 **Pre-Launch (T-1 hour):**
 - [ ] Verify all environment variables set
@@ -325,7 +320,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## ðŸ“± App URLs (After Deployment)
+## App URLs (After Deployment)
 
 **Customer Web App:**
 - Vercel: `https://web-[hash].vercel.app`
@@ -341,7 +336,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## ðŸ†˜ Troubleshooting
+## Troubleshooting
 
 ### "Module not found" errors
 ```bash
@@ -368,7 +363,7 @@ pnpm --filter @home-chef/admin build
 
 ---
 
-## ðŸ“ž Support Contacts
+## Support Contacts
 
 **Vercel Support:** support@vercel.com
 **Supabase Support:** https://supabase.com/dashboard/support
@@ -376,13 +371,13 @@ pnpm --filter @home-chef/admin build
 
 ---
 
-## ðŸŽ‰ What Happens After Upgrade?
+## What Happens After Upgrade?
 
 1. **Immediate:** Deploy web and admin apps (5 minutes)
 2. **In 10 minutes:** First customers can sign up in Hamilton
 3. **In 30 minutes:** First chef can create menu
 4. **In 1 hour:** First order can be placed and paid
-5. **Business is LIVE!** ðŸš€
+5. **Business is LIVE!**
 
 ---
 

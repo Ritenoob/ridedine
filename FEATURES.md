@@ -4,12 +4,12 @@
 
 RidenDine is a premium 3-sided marketplace connecting customers, home chefs, and delivery drivers for authentic home-cooked meal delivery. This document outlines all implemented features and screens.
 
-## 🎯 Implemented Features
+## Implemented Features (Docs Snapshot)
 
-### ✅ Phase 1: Complete - Admin Panel
+### Phase 1: Admin Panel
 
 #### Admin Dashboard (`/dashboard`)
-- **Login Gate**: Password-protected admin access (default: `admin123`)
+- **Login Gate**: Supabase Auth with admin role checks
 - **Dashboard Home**: Navigation cards to all admin sections
 - **Chef Management** (`/dashboard/chefs`):
   - View all chefs with filtering (All, Pending, Approved, Rejected, Suspended)
@@ -36,7 +36,7 @@ RidenDine is a premium 3-sided marketplace connecting customers, home chefs, and
   - Customer-facing order status lookup by tracking token
   - No authentication required
 
-### ✅ Phase 2: Complete - Customer Mobile App
+### Phase 2: Customer Mobile App
 
 #### Authentication (`(auth)/`)
 - **Sign In**: Email/password authentication
@@ -85,7 +85,7 @@ RidenDine is a premium 3-sided marketplace connecting customers, home chefs, and
 - **Profile** (`profile.tsx`):
   - User profile management (stub)
 
-### ✅ Phase 3: Complete - Chef Mobile App
+### Phase 3: Chef Mobile App
 
 #### Chef Dashboard (`(chef)/`)
 - **Dashboard** (`dashboard.tsx`):
@@ -131,7 +131,7 @@ RidenDine is a premium 3-sided marketplace connecting customers, home chefs, and
   - Modal-based forms
   - Empty state with first dish creation CTA
 
-### ✅ Phase 4: Complete - Backend & Database
+### Phase 4: Backend & Database
 
 #### Supabase Database
 **Tables:**
@@ -266,7 +266,6 @@ RidenDine is a premium 3-sided marketplace connecting customers, home chefs, and
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_ADMIN_MASTER_PASSWORD=admin123
 ```
 
 **Mobile** (`.env`):
@@ -276,7 +275,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=
 ```
 
-**Edge Functions** (`.env`):
+**Edge Functions** (Supabase Secrets):
 ```
 STRIPE_SECRET_KEY=
 STRIPE_PUBLISHABLE_KEY=
@@ -402,4 +401,4 @@ APP_BASE_URL=
 **Migrations**: 5
 **Core Features**: Shopping cart, order management, chef dashboard, admin panel, payment webhooks
 
-This is a **functional MVP** with complete order flow from customer browsing → checkout → chef order management → status updates. The foundation is production-ready with proper database design, security, and scalability considerations. Primary gaps are payment UI integration, image uploads, and real-time features.
+This is a **functional MVP** with complete order flow from customer browsing -> checkout -> chef order management -> status updates. Validate production readiness against current CI and monitoring. Primary gaps are payment UI integration, image uploads, and real-time features.

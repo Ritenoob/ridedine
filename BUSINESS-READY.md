@@ -59,7 +59,7 @@ Current blocker: Vercel free tier deployment limit reached
 ### Step 2: Deploy (One Command)
 ```bash
 cd /home/nygmaee/Desktop/ridendine-demo-main
-./deploy-production.sh
+./DEPLOY_VERCEL.sh
 ```
 
 **Time:** 3-5 minutes
@@ -107,7 +107,7 @@ Platform keeps: $8 ($3 commission + $5 delivery fee)
 ## 🎯 What Happens After You Upgrade Vercel
 
 ### Immediate (Minutes 0-5)
-1. Run `./deploy-production.sh`
+1. Run `./DEPLOY_VERCEL.sh`
 2. Both apps deploy to Vercel
 3. URLs provided (e.g., `https://ridendine.vercel.app`)
 
@@ -213,7 +213,7 @@ Everything is built, tested, and documented. The only thing standing between you
 **Next Action:**
 1. Go to https://vercel.com/account/billing
 2. Upgrade to Pro ($20/month)
-3. Run `./deploy-production.sh`
+3. Run `./DEPLOY_VERCEL.sh`
 4. Share your URL with Hamilton!
 
 **Questions?** Read [QUICK-START.md](QUICK-START.md) for the fastest path to deployment.

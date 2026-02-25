@@ -4,7 +4,7 @@
 
 ## Overview
 
-A 3-sided marketplace connecting customers, home chefs, and drivers for home-cooked meal delivery. Production-ready monorepo with web app, mobile app, admin dashboard, and Supabase backend.
+A 3-sided marketplace connecting customers, home chefs, and drivers for home-cooked meal delivery. Validate production readiness against current CI and monitoring.
 
 ## Technology Stack
 
@@ -12,7 +12,7 @@ A 3-sided marketplace connecting customers, home chefs, and drivers for home-coo
 - **Frontend:** Next.js 15 (web/admin), React Native with Expo (mobile)
 - **Backend:** Supabase (PostgreSQL, Auth, Edge Functions, Realtime)
 - **Payments:** Stripe Connect (marketplace split payments)
-- **Package Manager:** pnpm 9.0.0
+- **Package Manager:** pnpm 10.x
 - **Node:** >=20
 - **Testing:** Bun (mobile), Vitest (packages), Deno (Edge Functions)
 

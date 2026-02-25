@@ -1,8 +1,8 @@
-# Production Deployment - Implementation Complete ✅
+# Production Deployment - Implementation Snapshot
 
-This document summarizes all changes made to make the repository production-ready for Vercel deployment.
+This document summarizes historical changes. Validate production readiness against current CI and deployments.
 
-## ✅ All Issues Resolved
+## All Issues Resolved (Snapshot)
 
 ### 1. Build Errors Fixed
 
@@ -46,12 +46,14 @@ This document summarizes all changes made to make the repository production-read
 #### Created vercel.json
 - **File:** `vercel.json` (repo root)
 - **Content:** Basic Vercel configuration with clean URLs enabled
+- Note: This file is not present in the current repo; see `apps/*/vercel.json`.
 
 #### Build Script Updated
 - **File:** `apps/admin/package.json`
 - **Change:** Modified build script to: `"build": "npm run copy-docs && next build"`
 - **Effect:** Copies `/docs` folder to `apps/admin/public/docs` before each build
 - **Result:** GitHub Pages docs accessible at `/docs` route on Vercel domain
+- Note: This script does not exist in the current repo. Treat this as a historical note only.
 
 #### Added .gitignore
 - **File:** `apps/admin/.gitignore`
@@ -87,21 +89,19 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-⚠️ **Do NOT set** `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` in production!
+Do NOT set `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` in production.
 
 ### Step 3: Deploy
 Click "Deploy" and Vercel will:
-- Install dependencies from `apps/admin/package.json`
-- Copy docs from `/docs` to `public/docs`
-- Build Next.js app
+- Install dependencies from the repo root
+- Build the Next.js app
 - Deploy to production
 
 ### Step 4: Verify
 Test these routes:
 - `/` - Admin login page
 - `/dashboard` - Admin dashboard (requires auth)
-- `/docs/` - GitHub Pages documentation
-- `/docs/index.html` - Documentation home
+- `/docs/` - Documentation (if configured)
 
 ## 🧪 Local Testing
 
@@ -109,19 +109,19 @@ To test locally:
 
 ```bash
 cd apps/admin
-npm ci
-npm run build
-npm start
+pnpm install
+pnpm build
+pnpm start
 ```
 
 Then visit:
 - http://localhost:3000 - Admin app
-- http://localhost:3000/docs/ - Documentation
+- http://localhost:3000/docs/ - Documentation (if configured)
 
 ## 🔒 Security
 
 ### CodeQL Scan Results
-✅ **No security vulnerabilities detected**
+See CI results for current security scan status.
 
 ### Environment Variable Handling
 - Placeholders used during build to prevent crashes
@@ -225,7 +225,7 @@ All requirements from the problem statement are now satisfied:
 3. ✅ GitHub Actions CI passes (after merge to main/develop)
 4. ✅ Docs in /docs load through Vercel domain at /docs route
 5. ✅ Build errors fixed at root cause
-6. ✅ Production-ready configuration
+6. Configuration checklist (validate current status)
 7. ✅ Comprehensive documentation provided
 8. ✅ Security scan passed
 

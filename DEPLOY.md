@@ -33,7 +33,7 @@ After project is created:
 
 1. In Supabase Dashboard, go to **SQL Editor**
 2. Click "New query"
-3. Copy and paste the contents of `backend/supabase/migrations/20240101000000_initial_schema.sql`
+3. Follow `SETUP_SUPABASE.md` to apply all migrations (CLI recommended)
 4. Click "Run" (bottom right)
 5. You should see "Success. No rows returned"
 
@@ -49,16 +49,15 @@ After project is created:
 4. Configure:
    - **Framework Preset**: Next.js
    - **Root Directory**: `apps/web`
-   - **Build Command**: `cd ../.. && pnpm install && pnpm --filter @home-chef/web build`
-   - **Output Directory**: Leave as `.next`
-   - **Install Command**: `pnpm install`
+   - **Build Command**: *(leave blank — Vercel Next.js builder handles this)*
+   - **Output Directory**: `.next`
+   - **Install Command**: *(leave blank — Vercel runs pnpm from repo root)*
 
 5. Add Environment Variables (click "Environment Variables"):
    ```
-   NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-   SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
-   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
+    NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
    ```
 
 6. Click "Deploy"
@@ -70,15 +69,14 @@ After project is created:
 3. Configure:
    - **Framework Preset**: Next.js
    - **Root Directory**: `apps/admin`
-   - **Build Command**: `cd ../.. && pnpm install && pnpm --filter @home-chef/admin build`
-   - **Output Directory**: Leave as `.next`
-   - **Install Command**: `pnpm install`
+   - **Build Command**: *(leave blank — Vercel Next.js builder handles this)*
+   - **Output Directory**: `.next`
+   - **Install Command**: *(leave blank — Vercel runs pnpm from repo root)*
 
 4. Add Environment Variables:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-   SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+    NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
    ```
 
 5. Click "Deploy"
@@ -141,8 +139,8 @@ Share the customer app URL with anyone to let them sign up and order!
 ## Troubleshooting
 
 ### Build fails with "Cannot find module"
-- Make sure the build command includes `pnpm install` in the parent directory
-- Build command should be: `cd ../.. && pnpm install && pnpm --filter <app> build`
+- Ensure Vercel Root Directory is set correctly (`apps/web` or `apps/admin`).
+- Leave Install/Build commands blank so Vercel runs `pnpm install` from repo root.
 
 ### "TypeError: Cannot read properties of undefined"
 - Check that all environment variables are set correctly

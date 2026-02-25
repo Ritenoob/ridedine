@@ -46,12 +46,11 @@ vercel link
 
 **Project Configuration (vercel.json):**
 
+Keep per-app `vercel.json` minimal to allow Vercel's Next.js builder to handle install/build.
+
 ```json
 {
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "regions": ["iad1"]
+  "framework": "nextjs"
 }
 ```
 
@@ -62,7 +61,6 @@ vercel link
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<production-anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<production-service-role-key>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 ```
@@ -117,11 +115,7 @@ vercel         # Deploy to preview
 
 **Install Command (vercel.json):**
 
-```json
-{
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile"
-}
-```
+Do not set this in per-app `vercel.json`. Leave install commands blank so Vercel runs pnpm from the repo root.
 
 ## Pattern 5: Monorepo Root Directory Configuration (CRITICAL)
 
@@ -149,8 +143,8 @@ GitHub integration auto-detects monorepo structure:
    - **Name:** admin / web
    - **Root Directory:** apps/admin / apps/web
    - **Framework:** Next.js (auto-detected)
-   - **Build Command:** pnpm build
-   - **Install Command:** pnpm install
+    - **Build Command:** *(leave blank)*
+    - **Install Command:** *(leave blank)*
 5. Deploy both projects
 
 **Free Tier Strategy:**

@@ -148,11 +148,7 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-**Optional (Development/Demo Only):**
-```
-NEXT_PUBLIC_ADMIN_MASTER_PASSWORD=your-secure-password
-```
-⚠️ **WARNING:** Never commit real passwords. Use Vercel environment variables for secrets.
+**Admin Auth:** Supabase Auth is required. Ensure the admin user has `role = 'admin'` in `profiles`.
 
 ### 3. Configure Environment Variables (Web)
 
@@ -166,7 +162,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 **Server-only (never use NEXT_PUBLIC for these):**
 ```
 STRIPE_SECRET_KEY=sk_live_or_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_WEBHOOK_SECRET=whsec_...  # Supabase secrets (Edge Functions only)
 ```
 
 ### 4. Deploy

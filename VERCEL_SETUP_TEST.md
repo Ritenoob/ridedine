@@ -1,6 +1,7 @@
-# Vercel Setup Testing & Verification Report
+# Vercel Setup Testing & Verification Report (Snapshot)
 
-**Run this before the demo to verify your deployment is production-ready.**
+**Run this before the demo to verify your deployment state.**
+Note: Historical snapshot for demo planning. Validate against current repo state.
 
 ---
 
@@ -46,7 +47,7 @@ Run these tests in order, 30 minutes before demo start time.
 ```
 ✓ NEXT_PUBLIC_SUPABASE_URL    [Production, Preview, Development]
 ✓ NEXT_PUBLIC_SUPABASE_ANON_KEY [Production, Preview, Development]
-✓ SUPABASE_SERVICE_ROLE_KEY    [Production only]
+✗ SUPABASE_SERVICE_ROLE_KEY    [do not set in Vercel apps]
 ```
 
 All should show as masked (●●●●●●●●)
@@ -342,7 +343,7 @@ fi
 
 echo ""
 if [ "$ADMIN_STATUS" = "200" ] && [ "$WEB_STATUS" = "200" ]; then
-    echo "✓ All systems ready for demo"
+    echo "✓ All systems verified for demo"
 else
     echo "✗ Some systems not responding correctly"
 fi

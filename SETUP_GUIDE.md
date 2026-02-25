@@ -78,12 +78,7 @@ supabase db diff
 #### Option B: Manual SQL Execution
 
 1. Go to Supabase Dashboard → **SQL Editor**
-2. Run each migration file in order:
-   - `backend/supabase/migrations/20240101000000_initial_schema.sql`
-   - `backend/supabase/migrations/20240102000000_enhanced_schema.sql`
-   - `backend/supabase/migrations/20240103000000_seed_data.sql`
-   - `backend/supabase/migrations/20240104000000_add_missing_features.sql`
-   - `backend/supabase/migrations/20240105000000_add_payment_tracking.sql`
+2. Run each migration file in order (see `SETUP_SUPABASE.md`)
 
 ### 4. Deploy Edge Functions
 
@@ -108,7 +103,7 @@ supabase secrets set STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 
 # Set Supabase service role key
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 supabase secrets set SUPABASE_URL=https://xxxxx.supabase.co
 
 # Set app URL
@@ -324,7 +319,7 @@ The migrations include seeded test data:
 4. **Configure Build Settings** (auto-detected):
    - Framework: Next.js
    - Root Directory: `apps/admin`
-   - Build Command: `pnpm --filter @home-chef/admin build`
+   - Build Command: *(leave blank — Vercel Next.js builder handles this)*
    - Output Directory: `.next`
 
 ### Deploy Mobile App with EAS
@@ -474,7 +469,7 @@ supabase functions logs webhook_stripe --tail
 - `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key (pk_test_...)
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret (whsec_...)
 - `SUPABASE_URL` - Your Supabase project URL
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (for admin operations)
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (Edge Functions only)
 - `APP_BASE_URL` - Your application URL
 
 ## Part 11: Next Steps

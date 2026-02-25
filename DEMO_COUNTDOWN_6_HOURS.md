@@ -1,8 +1,9 @@
-# 6-Hour Demo Countdown Plan
+# 6-Hour Demo Countdown Plan (Snapshot)
 
 **Target:** Demo-ready RidenDine presentation in 6 hours
 **Started:** Now
 **Deadline:** 6 hours from now
+**Note:** Historical snapshot for demo planning. Validate against current repo state.
 
 ---
 

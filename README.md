@@ -1,4 +1,4 @@
-# RideNDine — Home Chef Delivery Marketplace
+# RidenDine — Home Chef Delivery Marketplace
 
 > A comprehensive 3-sided marketplace connecting customers, home chefs, and drivers for home-cooked meal delivery.
 
@@ -7,7 +7,7 @@
 
 ## 🎯 Overview
 
-RideNDine is a production-ready marketplace platform built with modern technologies in a monorepo architecture. It enables:
+RidenDine is a marketplace platform built with modern technologies in a monorepo architecture. Validate production readiness against current CI and monitoring. It enables:
 
 - **Customers** to browse local chefs, order home-cooked meals, and track deliveries
 - **Chefs** to manage menus, accept orders, and receive payments via Stripe Connect
@@ -33,7 +33,7 @@ All new features, migrations, and deployments should follow the patterns and bes
 ### Monorepo Structure
 
 ```
-home-chef-delivery/
+ridendine-demo/
 ├── apps/
 │   ├── mobile/              # React Native (Expo) app
 │   ├── admin/               # Next.js admin dashboard (ridendine-admin)
@@ -79,7 +79,6 @@ cd ridendine-demo
 pnpm install
 
 # Setup environment variables
-cp .env.example .env.local
 cp apps/web/.env.example apps/web/.env.local
 cp apps/admin/.env.example apps/admin/.env.local
 # Edit .env.local files with your Supabase credentials
@@ -109,7 +108,7 @@ pnpm lint
 ### Seeding Demo Data
 
 ```bash
-# Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local
+# Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in a local .env (not committed)
 pnpm seed
 ```
 
@@ -120,7 +119,7 @@ See `scripts/seed.ts` for the exact emails, roles, and passwords that are insert
 
 > **Admin dashboard access**: Admin login uses Supabase Auth (seeded admin user from `pnpm seed`).
 
-## 📱 Mobile App
+## Mobile App
 
 Role-based routing with authentication:
 - `(auth)/` - Sign in/up screens
@@ -130,7 +129,7 @@ Role-based routing with authentication:
 
 **Tech**: Expo Router, Supabase Auth, React Native Maps
 
-## 🎛️ Admin Dashboard
+## Admin Dashboard
 
 Server-rendered Next.js app for platform management:
 - Chef approval workflow (approve, reject, suspend)
@@ -141,7 +140,7 @@ Server-rendered Next.js app for platform management:
 
 **Tech**: Next.js 15 (App Router), Supabase SSR, PWA-enabled
 
-## 💾 Database
+## Database
 
 PostgreSQL with Row Level Security (RLS):
 - `profiles` - User accounts (customer, chef, driver, admin roles)
@@ -152,7 +151,7 @@ PostgreSQL with Row Level Security (RLS):
 
 **Migrations**: Located in `backend/supabase/migrations/`
 
-## 💳 Payments
+## Payments
 
 Stripe Connect for marketplace payments:
 - Platform collects 15% fee
@@ -164,13 +163,13 @@ Stripe Connect for marketplace payments:
 - `create_checkout_session` - Customer payment
 - `webhook_stripe` - Payment webhooks
 
-## 📖 Documentation
+## Documentation
 
 - [Architecture Guide](docs/ARCHITECTURE.md) - System design and components
 - [Environment Variables](docs/ENVIRONMENT.md) - Configuration guide
 - [MVP Plan](docs/MVP_PLAN.md) - Development phases and roadmap
 
-## 🧪 Development
+## Development
 
 ```bash
 # Lint all packages
@@ -186,7 +185,7 @@ pnpm typecheck
 pnpm --filter @home-chef/shared build
 ```
 
-## 🚢 Deployment
+## Deployment
 
 ## Deploying to Vercel
 
@@ -231,26 +230,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 ### Deploy Admin on Vercel (legacy manual steps)
 
-- Create a **Vercel project** with **Root Directory** set to `apps/web`
-- Framework preset: **Next.js**
-- Install Command: `cd ../.. && pnpm install --frozen-lockfile`
-- Build Command: `pnpm build`
-- Node.js Version: **20.x**
-- Set environment variables:
-  ```
-  NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-  SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-  WEBHOOK_SECRET=your-webhook-secret
-  ```
+These steps are deprecated. Follow the Vercel project settings above (leave install/build commands blank).
 
 ### Deploy Web on Vercel (legacy manual steps)
 
-- Create a **separate Vercel project** with **Root Directory** `apps/web`
-- Framework: auto-detect (Next.js)
-- Install Command: `cd ../.. && pnpm install --frozen-lockfile`
-- Build Command: `pnpm build`
-- Node.js Version: **20.x**
+These steps are deprecated. Follow the Vercel project settings above (leave install/build commands blank).
 
 ### Deploy Mobile via EAS
 
@@ -281,6 +265,7 @@ eas submit
    supabase link --project-ref your-project-ref
    supabase db push
    ```
+   Or follow `SETUP_SUPABASE.md` for manual execution.
 
 3. **Deploy Edge Functions**
    ```bash
@@ -288,8 +273,9 @@ eas submit
    ```
 
 4. **Configure Stripe Webhooks**
-   - Set your Stripe keys in Supabase dashboard
+   - Set your Stripe keys in Supabase secrets
    - Configure webhook endpoint: `https://your-project.supabase.co/functions/v1/webhook_stripe`
+   - Note: Next.js webhook routes under `apps/web/app/api/webhooks/*` are removed
 
 
 ## 🔒 Security
@@ -300,29 +286,9 @@ eas submit
 - ✅ Webhook signature verification
 - ✅ Environment-based configuration
 
-## 🎯 MVP Status
+## MVP Status
 
-### Completed ✅
-- [x] Monorepo structure (pnpm workspaces)
-- [x] Shared TypeScript types and schemas
-- [x] Database schema with RLS (6 migrations)
-- [x] Edge Functions (Stripe integration)
-- [x] Mobile app with role routing (customer, chef, driver)
-- [x] Customer web app (browse chefs, cart, checkout, order tracking)
-- [x] Admin dashboard (orders, chefs, meals, analytics, commissions)
-- [x] Commission system with configurable rate
-- [x] Webhook API routes (order-status, payment, commission)
-- [x] Demo seed data (10 chefs, 50 dishes, 5 drivers)
-- [x] Seed script for demo accounts (`pnpm seed`)
-- [x] RideNDine branding (orange/teal color palette)
-- [x] CI/CD workflow
-- [x] PWA support (admin)
-
-### Phase 2 ⏳
-- [ ] Driver delivery flow
-- [ ] Real-time driver tracking
-- [ ] Push notifications
-- [ ] Reviews and ratings
+Refer to `FEATURES.md` for the current feature status.
 - [ ] Promo codes
 
 ## 🤝 Contributing

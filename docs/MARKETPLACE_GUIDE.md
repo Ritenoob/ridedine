@@ -194,7 +194,7 @@ The marketplace includes comprehensive demo data:
 
 The marketplace is built to work standalone on GitHub Pages without a backend:
 
-**Data Layer (`docs/data/demo-data.js`):**
+**Data Layer (demo data file not included in this repo):**
 - All data stored in JavaScript objects
 - Helper functions for search, filter, sort
 - Exposed globally as `window.RideNDineDemoData`
@@ -381,7 +381,7 @@ The marketplace works on:
 - Any static hosting (Netlify, Vercel, etc.)
 - With backend (when available)
 
-See [GITHUB_PAGES_DEPLOYMENT.md](../GITHUB_PAGES_DEPLOYMENT.md) for deployment instructions.
+Deployment instructions for the GitHub Pages demo are not included in this repo.
 
 ## Credits
 

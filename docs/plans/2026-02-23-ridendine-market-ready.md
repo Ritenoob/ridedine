@@ -18,7 +18,7 @@ Worktree: No
 
 ## Summary
 
-**Goal:** Transform RidenDine from a functional MVP scaffold into a fully market-ready 3-sided marketplace (Customers, Chefs, Drivers) with zero errors, comprehensive testing, and production-grade security.
+**Goal:** Transform RidenDine from a functional MVP scaffold into a market-ready 3-sided marketplace (Customers, Chefs, Drivers). Validate readiness against current CI and monitoring.
 
 **Architecture:** Monorepo (pnpm workspaces) with 3 apps (web: Next.js 15, admin: Next.js 15, mobile: React Native/Expo 50), 3 shared packages (shared, data, ui), Supabase backend (PostgreSQL + Auth + Edge Functions + Storage), Stripe Connect payments, deployed to Vercel (web/admin) and EAS (mobile).
 
@@ -67,7 +67,7 @@ Worktree: No
 
 ## Prerequisites
 
-- Node.js >= 20, pnpm >= 9
+- Node.js >= 20, pnpm >= 10
 - Supabase project with service role key access
 - Stripe account with Connect enabled (test mode for development)
 - Expo account for EAS builds
@@ -104,14 +104,14 @@ Worktree: No
   - `apps/web/app/api/create-payment-intent/route.ts` returns 501 — intentionally disabled, needs full Stripe integration
   - `apps/web/app/checkout/page.tsx` creates orders with `payment_status: 'unpaid'` — bypasses payment; also references `session_id` column that doesn't exist in any migration
   - `apps/web/app/checkout/page.tsx` uses guest checkout (`customer_name: "Guest"`) but `customer_id` has NOT NULL constraint in DB — fundamentally broken, must add auth gate
-  - Admin uses `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` env var — security anti-pattern, must be replaced
+- Admin uses `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` env var — security anti-pattern (resolved)
   - Duplicate Supabase client files exist in both `lib/` and `src/lib/` directories in web and admin apps
   - Mobile app uses Expo SDK 50 / React Native 0.73 — check compatibility before adding new native modules
   - Mobile `package.json` is missing `@home-chef/data` dependency — must be added for repository access
   - `SECURITY.md` references Express/in-memory patterns that don't match actual architecture — needs rewrite
   - `packages/shared/src/types.ts` is missing `Dish` interface despite `dishes` table existing in DB
   - **Schema conflicts:** `dishes` vs `menu_items` naming in queries; three different order entry statuses (DRAFT in OrdersRepository, SUBMITTED in web checkout, PLACED in SQL CHECK constraint)
-  - **Dual webhook architecture:** `apps/web/app/api/webhooks/payment/route.ts` has NO Stripe signature verification (uses `x-webhook-secret` with bypass fallback), while `backend/supabase/functions/webhook_stripe/` does proper `constructEvent` verification — must consolidate to Edge Function only
+- **Dual webhook architecture:** `apps/web/app/api/webhooks/payment/route.ts` previously lacked Stripe signature verification. Stripe webhooks are handled by `backend/supabase/functions/webhook_stripe/` and Next.js routes are removed.
 
 - **Domain context:**
   - 3-sided marketplace: Customers order, Chefs cook, Drivers deliver
@@ -139,7 +139,7 @@ Worktree: No
 | 2 | Admin uses hardcoded master password | CRITICAL | `apps/admin/app/ui/AdminGate.tsx`, `.env.example` |
 | 3 | Zero test coverage across entire codebase | CRITICAL | All apps |
 | 4 | Driver module 100% stubbed | CRITICAL | `apps/mobile/app/(driver)/jobs.tsx`, `earnings.tsx` |
-| 5 | Webhook security bypass — no Stripe signature verification | CRITICAL | `apps/web/app/api/webhooks/payment/route.ts` (uses `x-webhook-secret` with fallback bypass) |
+| 5 | Webhook security bypass — no Stripe signature verification | CRITICAL | Supabase Edge Function `webhook_stripe` handles Stripe webhooks (Next.js webhook routes removed) |
 | 6 | `customer_id NOT NULL` vs guest checkout — orders fail in DB | CRITICAL | `apps/web/app/checkout/page.tsx` creates guest orders, `orders` table requires `customer_id` |
 | 7 | `session_id` column referenced but doesn't exist in any migration | HIGH | `apps/web/app/checkout/page.tsx` |
 | 8 | Schema conflict: `dishes` vs `menu_items` table naming | HIGH | Queries reference both names; code uses `dishes`, some references use `menu_items` |
@@ -150,7 +150,7 @@ Worktree: No
 | 13 | No error boundaries | HIGH | `apps/web/`, `apps/admin/` |
 | 14 | Missing `Dish` interface in shared types | HIGH | `packages/shared/src/types.ts` — `dishes` table exists but no TypeScript interface |
 | 15 | Mobile app missing `@home-chef/data` dependency | HIGH | `apps/mobile/package.json` — can't use shared repositories |
-| 16 | Dual webhook architecture — race conditions | MEDIUM | Both `apps/web/app/api/webhooks/payment/` and `backend/supabase/functions/webhook_stripe/` handle same events |
+| 16 | Dual webhook architecture — race conditions | MEDIUM | Edge Function handles Stripe webhooks; Next.js webhook routes removed |
 | 17 | SECURITY.md contradicts actual architecture | MEDIUM | `SECURITY.md` |
 | 18 | Duplicate Supabase client files | MEDIUM | `apps/admin/src/lib/`, `apps/web/src/lib/` |
 | 19 | Heavy `any` types in components | MEDIUM | `apps/web/app/chefs/page.tsx:7`, checkout, orders |
@@ -321,7 +321,7 @@ Worktree: No
 
 ### Task 3: Admin Authentication Overhaul
 
-**Objective:** Replace hardcoded master password (`admin123`) with proper Supabase Auth — admin users authenticate via email/password through Supabase, with role-based access control checking the `profiles.role` column.
+**Objective:** Replace hardcoded master password with proper Supabase Auth — admin users authenticate via email/password through Supabase, with role-based access control checking the `profiles.role` column.
 
 **Dependencies:** Task 1
 
@@ -347,7 +347,7 @@ Worktree: No
 - [ ] Admin login page uses Supabase Auth email/password
 - [ ] AdminGate verifies `profiles.role === 'admin'` from Supabase session
 - [ ] Middleware redirects unauthenticated users to login page
-- [ ] `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` removed from all files
+- [x] `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` removed from all files
 - [ ] Sign-out functionality works and clears session
 - [ ] Non-admin users see "Access Denied" message after login
 - [ ] Tests verify login flow and role-based access
@@ -579,7 +579,7 @@ Worktree: No
 - Create: `packages/shared/src/zod/index.ts` (already exists — enhance with full validation schemas)
 - Modify: `apps/web/app/checkout/page.tsx` (validate delivery address, customer info)
 - Modify: `apps/mobile/app/(chef)/menu.tsx` (validate dish creation form)
-- Delete or redirect: `apps/web/app/api/webhooks/payment/route.ts` (consolidate to Supabase Edge Function)
+- Removed: `apps/web/app/api/webhooks/payment/route.ts` (consolidated to Supabase Edge Function)
 - Create: `apps/web/middleware.ts` (rate limiting, security headers, auth gate for checkout)
 - Create: `backend/supabase/migrations/20240113000000_add_audit_log.sql` (audit_log table)
 - Modify: `SECURITY.md` (already updated in Task 1 — add rate limiting and validation docs)
@@ -593,9 +593,9 @@ Worktree: No
 - Validation on: all form submissions, all API route inputs, all Edge Function inputs
 - Audit logging: log auth events, order state changes, admin actions to `audit_log` table
 - **Webhook consolidation (CRITICAL SECURITY FIX):**
-  - The Next.js webhook at `apps/web/app/api/webhooks/payment/route.ts` uses a custom `x-webhook-secret` header with a bypass fallback (`if (!webhookSecret) return true`) — this is a security hole
+- The Next.js webhook at `apps/web/app/api/webhooks/payment/route.ts` used a custom `x-webhook-secret` header with a bypass fallback — it is now removed
   - The Supabase Edge Function `webhook_stripe` already has proper Stripe signature verification via `constructEvent`
-  - Consolidate ALL Stripe webhooks to the Edge Function. Remove or redirect the Next.js webhook route
+- Consolidate ALL Stripe webhooks to the Edge Function. Remove the Next.js webhook route
   - This eliminates the race condition from dual webhook processing and the security bypass
 - **Web auth gate:** Next.js middleware enforces authentication on `/checkout/*` routes — no more guest checkout creating orders with NULL customer_id
 
@@ -608,7 +608,7 @@ Worktree: No
 - [ ] Invalid form input shows inline error messages
 - [ ] Unhandled errors don't expose stack traces to users
 - [ ] Dual webhook architecture eliminated — only Edge Function handles Stripe webhooks
-- [ ] Next.js webhook route removed or redirects to Edge Function
+- [x] Next.js webhook route removed
 - [ ] Web checkout routes require authentication via middleware
 - [ ] Audit log table created with RLS policies
 
@@ -616,7 +616,7 @@ Worktree: No
 - `pnpm --filter @home-chef/shared test -- --run` — schema validation tests pass
 - `pnpm build` — full build succeeds
 - `curl -I http://localhost:3001` — returns security headers
-- `grep -r "x-webhook-secret" apps/web/` — returns zero results (webhook consolidated)
+- `grep -r "x-webhook-secret" apps/web/` — returns zero results
 - `grep -r "webhookSecret" apps/web/app/api/webhooks/` — returns zero results
 
 ---

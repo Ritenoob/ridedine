@@ -71,7 +71,7 @@ RidenDine uses a modern Supabase-based architecture with built-in security featu
 - **Edge Function webhook:** `backend/supabase/functions/webhook_stripe/index.ts`
   - Proper Stripe signature verification via `stripe.webhooks.constructEvent()`
   - Validates `Stripe-Signature` header before processing events
-- **⚠️ Dual webhook architecture eliminated:** Next.js webhook at `apps/web/app/api/webhooks/payment/` had security bypass (`if (!webhookSecret) return true`) — removed in Task 9
+- **⚠️ Dual webhook architecture eliminated:** Next.js webhook routes are removed; Stripe webhooks are handled by the Supabase Edge Function only.
 
 ✅ **Payment Validation**
 - Server-side order validation before creating Stripe session
@@ -164,7 +164,7 @@ RidenDine uses a modern Supabase-based architecture with built-in security featu
 ### Production Checklist
 
 - [ ] Set `NEXT_PUBLIC_SUPABASE_URL` to production Supabase project
-- [ ] Use production Supabase anon key and service role key
+- [ ] Use production Supabase anon key and service role key (Edge Functions only)
 - [ ] Set Stripe keys to live mode (`sk_live_...`, `pk_live_...`)
 - [ ] Configure Stripe webhook to point to production Edge Function URL
 - [ ] Enable all Supabase RLS policies
@@ -189,7 +189,7 @@ RidenDine uses a modern Supabase-based architecture with built-in security featu
 # Supabase (Production)
 NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<production-anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<production-service-role-key>
+SUPABASE_SERVICE_ROLE_KEY=<production-service-role-key>  # Edge Functions only
 
 # Stripe (Live Mode)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
@@ -202,7 +202,7 @@ NODE_ENV=production
 **Edge Functions (Supabase Dashboard → Settings → Secrets):**
 ```bash
 STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_WEBHOOK_SECRET=whsec_...  # Supabase secrets
 SENDGRID_API_KEY=<sendgrid-key>  # or RESEND_API_KEY
 ```
 

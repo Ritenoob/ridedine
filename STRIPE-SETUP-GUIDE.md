@@ -403,7 +403,7 @@ Reduces fraud and chargebacks:
 1. Go to: https://dashboard.stripe.com/webhooks
 2. Click your webhook
 3. Copy signing secret (starts with `whsec_`)
-4. Update `STRIPE_WEBHOOK_SECRET` in Vercel AND Supabase
+4. Update `STRIPE_WEBHOOK_SECRET` in Supabase secrets (Edge Functions)
 
 ### "Chef onboarding fails"
 

@@ -37,8 +37,8 @@
 - [ ] Verify these exist in **Production** scope:
   - [ ] `NEXT_PUBLIC_SUPABASE_URL`
   - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] All three show as "●●●●●●●●" (masked, indicating they're set)
+  - [ ] (Do not set `SUPABASE_SERVICE_ROLE_KEY` in Vercel apps)
+- [ ] Required variables show as "●●●●●●●●" (masked, indicating they're set)
 
 #### Web App
 - [ ] Go to **ridendine-web → Settings → Environment Variables**

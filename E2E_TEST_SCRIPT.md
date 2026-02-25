@@ -37,7 +37,7 @@ curl https://your-project.supabase.co/rest/v1/chefs \
 | Customer | jane@ridendine.demo | demo123 | Place orders |
 | Chef | maria@ridendine.demo | demo123 | Accept & prepare orders |
 | Driver | mike@ridendine.demo | demo123 | Deliver orders |
-| Admin | admin@ridendine.demo | admin123 | Monitor platform |
+| Admin | use seeded admin from `scripts/seed.ts` | (see seed) | Monitor platform |
 
 ---
 
@@ -508,7 +508,7 @@ SELECT AVG(rating) FROM reviews WHERE chef_id = 'chef-001';
 ### Test 6.1: Real-time Analytics
 
 **Steps:**
-1. Open Admin dashboard (admin@ridendine.demo / admin123)
+1. Open Admin dashboard (use seeded admin credentials from `scripts/seed.ts`)
 2. View dashboard
 
 **Expected Results:**

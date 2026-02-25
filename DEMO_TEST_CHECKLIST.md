@@ -1,8 +1,9 @@
-# RidenDine Demo - Manual Test Checklist
+# RidenDine Demo - Manual Test Checklist (Snapshot)
 
 **Purpose:** Pre-demo dry run checklist for manual verification
 **Duration:** 15-20 minutes
 **When to Use:** Before investor demo, after Vercel deployment
+**Note:** Historical snapshot for demo planning. Validate against current repo state.
 
 ---
 

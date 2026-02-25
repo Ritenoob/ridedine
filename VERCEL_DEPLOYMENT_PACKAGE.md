@@ -149,7 +149,7 @@ One-page summary for demo day execution.
 2. Execute: Run all 7 verification checks (15 min)
 
 **Time spent: 20 minutes**
-**Output: Confidence that deployment is production-ready**
+**Output: Confidence that deployment is ready (validate current deployment)**
 
 ---
 
@@ -215,10 +215,7 @@ NEXT_PUBLIC_SUPABASE_URL = [from Supabase dashboard]
 NEXT_PUBLIC_SUPABASE_ANON_KEY = [from Supabase dashboard]
 ```
 
-**Admin only:**
-```
-SUPABASE_SERVICE_ROLE_KEY = [from Supabase dashboard]
-```
+**Note:** Do not set `SUPABASE_SERVICE_ROLE_KEY` in Vercel for web/admin apps. Use Supabase secrets for Edge Functions.
 
 **Set in ALL scopes:** Production, Preview, Development
 
@@ -230,7 +227,7 @@ SUPABASE_SERVICE_ROLE_KEY = [from Supabase dashboard]
 4. Copy:
    - Project URL (e.g., `https://xxxxx.supabase.co`)
    - `anon` key (labeled "Anon public")
-   - Service Role Key (for admin app only)
+   - Service role key is only for Supabase secrets (Edge Functions)
 
 ### Deployment URLs
 

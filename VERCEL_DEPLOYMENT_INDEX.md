@@ -54,7 +54,7 @@
    ↓
 2. Run all 7 verification tests (15 min)
    ↓
-3. Confirm apps are production-ready
+3. Confirm apps are ready (validate current deployment)
    ↓
 4. Have rollback plan ready
 ```
@@ -151,10 +151,7 @@ NEXT_PUBLIC_SUPABASE_URL = [from Supabase dashboard]
 NEXT_PUBLIC_SUPABASE_ANON_KEY = [from Supabase dashboard]
 ```
 
-**Additional for Admin Only:**
-```
-SUPABASE_SERVICE_ROLE_KEY = [from Supabase dashboard]
-```
+**Note:** Do not set `SUPABASE_SERVICE_ROLE_KEY` in Vercel for web/admin apps. Use Supabase secrets for Edge Functions only.
 
 **CRITICAL:** Set in ALL THREE scopes
 - ✅ Production
@@ -169,7 +166,6 @@ SUPABASE_SERVICE_ROLE_KEY = [from Supabase dashboard]
 4. Copy:
    - Project URL
    - Anon key
-   - Service Role Key
 
 ---
 

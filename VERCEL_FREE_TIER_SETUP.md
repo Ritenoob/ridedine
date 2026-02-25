@@ -31,8 +31,8 @@ Vercel will detect multiple apps. Configure the first one:
 - **Project Name:** ridendine-admin
 - **Root Directory:** `apps/admin` ← CRITICAL for monorepo
 - **Framework Preset:** Next.js (auto-detected)
-- **Build Command:** `pnpm build` (auto-detected)
-- **Install Command:** `pnpm install` (auto-detected)
+- **Build Command:** *(leave blank — Vercel Next.js builder handles this)*
+- **Install Command:** *(leave blank — Vercel runs pnpm from repo root)*
 - **Output Directory:** `.next` (default)
 
 **Environment Variables** (click "Add" for each):
@@ -54,8 +54,8 @@ After admin deploys, go back to https://vercel.com/new and repeat:
 - **Project Name:** ridendine-web
 - **Root Directory:** `apps/web` ← CRITICAL for monorepo
 - **Framework Preset:** Next.js (auto-detected)
-- **Build Command:** `pnpm build`
-- **Install Command:** `pnpm install`
+- **Build Command:** *(leave blank — Vercel Next.js builder handles this)*
+- **Install Command:** *(leave blank — Vercel runs pnpm from repo root)*
 - **Output Directory:** `.next`
 
 **Environment Variables:**

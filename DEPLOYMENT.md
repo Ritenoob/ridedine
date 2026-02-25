@@ -11,7 +11,7 @@ This is a pnpm workspace monorepo containing:
 | Web (customer site) | `apps/web` | `ridendine-web` | Next.js customer-facing app |
 | Admin dashboard | `apps/admin` | `ridendine-admin` | Next.js admin panel |
 | Mobile (Expo) | `apps/mobile` | Not deployed via Vercel | React Native / Expo app |
-| Shared types | `packages/shared` | â€” | TypeScript types and schemas |
+| Shared types | `packages/shared` | — | TypeScript types and schemas |
 
 ---
 
@@ -51,21 +51,19 @@ pnpm --filter @home-chef/admin dev
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | âœ… | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | âœ… | Your Supabase anon/public key |
+| `NEXT_PUBLIC_SUPABASE_URL` | required | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | required | Your Supabase anon/public key |
 
 ### Web App Only (`apps/web`)
 
 | Variable | Required | Notes |
 |----------|----------|-------|
-| `STRIPE_SECRET_KEY` | âš ï¸ Optional | Server-only. Never use `NEXT_PUBLIC_` prefix |
-| `STRIPE_WEBHOOK_SECRET` | âš ï¸ Optional | Server-only stripe webhook secret |
+| `STRIPE_SECRET_KEY` | optional | Server-only. Never use `NEXT_PUBLIC_` prefix |
+| `STRIPE_WEBHOOK_SECRET` | optional | Supabase secrets (Edge Functions only) |
 
 ### Admin App Only (`apps/admin`)
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` | âš ï¸ Optional | Demo/dev password override for admin gate |
+No additional environment variables required beyond Supabase public keys.
 
 > **Security rule:** Never put secret keys (Stripe, Supabase service role) in `NEXT_PUBLIC_` variables.
 > They would be exposed in the browser bundle.
@@ -76,16 +74,16 @@ pnpm --filter @home-chef/admin dev
 
 ### Create Two Vercel Projects
 
-Import the GitHub repo **twice** â€” once for each app:
+Import the GitHub repo **twice** — once for each app:
 
 #### ridendine-admin (admin dashboard)
 
 | Setting | Value |
 |---------|-------|
-| Root Directory | `apps/admin` â† **must be set** |
+| Root Directory | `apps/admin` ← **must be set** |
 | Framework | Next.js (auto-detected via `apps/admin/vercel.json`) |
 | Install Command | *(leave blank)* |
-| Build Command | *(leave blank â€” Vercel's Next.js builder handles this)* |
+| Build Command | *(leave blank — Vercel's Next.js builder handles this)* |
 | Output Directory | `.next` |
 | Node.js Version | `20.x` |
 
@@ -99,10 +97,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
 
 | Setting | Value |
 |---------|-------|
-| Root Directory | `apps/web` â† **must be set** |
+| Root Directory | `apps/web` ← **must be set** |
 | Framework | Next.js (auto-detected via `apps/web/vercel.json`) |
 | Install Command | *(leave blank)* |
-| Build Command | *(leave blank â€” Vercel's Next.js builder handles this)* |
+| Build Command | *(leave blank — Vercel's Next.js builder handles this)* |
 | Output Directory | `.next` |
 | Node.js Version | `20.x` |
 
@@ -119,7 +117,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
 > - Install: detects `pnpm-lock.yaml` at repo root and runs `pnpm install` from repo root
 > - Build: uses `@vercel/next` which properly invokes `next build`
 >
-> There is **no root-level `vercel.json`** â€” it was removed to prevent the admin Vercel project
+> There is **no root-level `vercel.json`** — it was removed to prevent the admin Vercel project
 > from accidentally using the web app's build command.
 
 ---
@@ -129,7 +127,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
 ### Hosted Supabase
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Copy your project URL and anon key from **Settings â†’ API**
+2. Copy your project URL and anon key from **Settings → API**
 3. Add them as environment variables in both Vercel projects
 
 ### Local Development
@@ -161,13 +159,13 @@ npx supabase db push
 
 The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and on every PR:
 
-1. **Install** â€” `pnpm install --frozen-lockfile`
-2. **Build shared** â€” `pnpm --filter @home-chef/shared build`
-3. **Build web** â€” `pnpm --filter @home-chef/web build`
-4. **Build admin** â€” `pnpm --filter @home-chef/admin build`
-5. **Lint web** â€” `pnpm --filter @home-chef/web lint`
-6. **Lint admin** â€” `pnpm --filter @home-chef/admin lint`
-7. **Test admin** â€” `pnpm --filter @home-chef/admin test`
+1. **Install** — `pnpm install --frozen-lockfile`
+2. **Build shared** — `pnpm --filter @home-chef/shared build`
+3. **Build web** — `pnpm --filter @home-chef/web build`
+4. **Build admin** — `pnpm --filter @home-chef/admin build`
+5. **Lint web** — `pnpm --filter @home-chef/web lint`
+6. **Lint admin** — `pnpm --filter @home-chef/admin lint`
+7. **Test admin** — `pnpm --filter @home-chef/admin test`
 
 The mobile app (`apps/mobile`) is intentionally excluded from CI to avoid blocking web/admin deployments.
 
@@ -177,11 +175,11 @@ The mobile app (`apps/mobile`) is intentionally excluded from CI to avoid blocki
 
 Set up branch protection on `main`:
 
-- âœ… Require status checks before merging
+- Require status checks before merging
   - Required check: **`build` (CI)**
-- âœ… Require branches to be up to date before merging
-- âœ… Require pull request reviews before merging (recommended: 1 reviewer)
-- âœ… Dismiss stale pull request approvals when new commits are pushed
+- Require branches to be up to date before merging
+- Require pull request reviews before merging (recommended: 1 reviewer)
+- Dismiss stale pull request approvals when new commits are pushed
 
 ---
 
@@ -234,18 +232,18 @@ When the `ridendine-admin` Vercel project ran, it read this root `vercel.json` a
 
 **Final Fix Applied:**
 1. Removed the root-level `vercel.json`
-2. Added per-app `vercel.json` files with only `{ "framework": "nextjs" }` â€” no command overrides
+2. Added per-app `vercel.json` files with only `{ "framework": "nextjs" }` — no command overrides
 3. Vercel's built-in `@vercel/next` framework builder handles install and build automatically
-4. Fixed Node.js version parity: CI now uses Node 20 (matching `.nvmrc` and Vercel's 20.x setting)
+4. Fixed Node.js version parity: CI now uses Node 20 (matching `.node-version` and Vercel's 20.x setting)
 
 ---
 
 ## Preventing Future Failures
 
 1. **Never add a root-level `vercel.json`** with app-specific build commands in a two-project monorepo.
-2. **Keep per-app `vercel.json` minimal** â€” only `{ "framework": "nextjs" }`. Never add `installCommand` or `buildCommand` overrides; Vercel's framework builder handles these correctly.
-3. **Never set `installCommand` in a subdirectory's `vercel.json`** â€” it runs from that subdirectory, not the repo root.
-4. **Node.js version must match** across local dev (`.nvmrc = 20`), CI (`node-version: 20`), and Vercel (`20.x`).
+2. **Keep per-app `vercel.json` minimal** — only `{ "framework": "nextjs" }`. Never add `installCommand` or `buildCommand` overrides; Vercel's framework builder handles these correctly.
+3. **Never set `installCommand` in a subdirectory's `vercel.json`** — it runs from that subdirectory, not the repo root.
+4. **Node.js version must match** across local dev (`.node-version = 20.11.1`), CI (`node-version: 20`), and Vercel (`20.x`).
 5. **Set Root Directory correctly** in each Vercel project (`apps/admin` or `apps/web`).
 6. **Env vars** must be set in ALL Vercel environments (Production, Preview, Development).
 
@@ -255,7 +253,7 @@ When the `ridendine-admin` Vercel project ran, it read this root `vercel.json` a
 
 1. Clone the repo
 2. Run `pnpm install` from the repo root
-3. Copy `.env.example` â†’ `apps/web/.env.local` and `apps/admin/.env.local`
+3. Copy `.env.example` -> `apps/web/.env.local` and `apps/admin/.env.local`
 4. Fill in Supabase credentials
 5. Run `pnpm --filter @home-chef/web dev` and `pnpm --filter @home-chef/admin dev`
 

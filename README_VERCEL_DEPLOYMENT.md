@@ -47,7 +47,7 @@ In each Vercel project:
 
 1. Settings → Environment Variables
 2. Add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. For admin app ALSO add: `SUPABASE_SERVICE_ROLE_KEY`
+3. Do NOT add `SUPABASE_SERVICE_ROLE_KEY` in Vercel (Edge Functions use Supabase secrets)
 4. **CRITICAL:** Set in ALL THREE scopes (Production, Preview, Development)
 
 ### Step 4: Verify Deployments (5 minutes)
@@ -74,9 +74,6 @@ In each Vercel project:
 - `NEXT_PUBLIC_SUPABASE_URL` = Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = Supabase anon key
 
-**For ADMIN only:**
-- `SUPABASE_SERVICE_ROLE_KEY` = Supabase service role key
-
 **REMEMBER:** Set these in ALL THREE scopes (Production, Preview, Development)
 
 ### Supabase Credentials Source
@@ -85,7 +82,7 @@ Get from: https://supabase.com/dashboard → Settings → API
 
 - **Project URL:** Copy exactly as shown (starts with `https://`)
 - **Anon Key:** Look for "Anon public" or "anon" key
-- **Service Role Key:** Look for "Service role" key (secret, only for admin)
+- **Service Role Key:** Used only for Supabase secrets (Edge Functions), not Vercel apps
 
 ---
 
