@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Compatibility wrapper for older imports:
  *   import { createClient } from "@/lib/supabase"
  * or similar.
