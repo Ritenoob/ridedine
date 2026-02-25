@@ -54,7 +54,7 @@ home-chef-delivery/
 
 - **Mobile**: React Native + Expo + expo-router
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Edge Functions)
-- **Admin**: Next.js 14 (App Router) + React
+- **Admin**: Next.js 15 (App Router) + React
 - **Payments**: Stripe Connect (marketplace payments)
 - **Maps**: Google Maps API
 - **Deployment**: Vercel (admin + web), EAS (mobile), Supabase Cloud (backend)
@@ -63,8 +63,8 @@ home-chef-delivery/
 
 ### Prerequisites
 
-- Node.js >= 20.0.0 (see `.nvmrc`)
-- pnpm >= 9.0.0 (`corepack enable && corepack prepare pnpm@9.0.0 --activate`)
+- Node.js >= 20.0.0 (see `.node-version`)
+- pnpm >= 10.0.0 (`corepack enable && corepack prepare pnpm@10.0.0 --activate`)
 - Supabase account
 - Stripe account (for payments)
 
@@ -115,23 +115,10 @@ pnpm seed
 
 ## 👤 Demo Accounts
 
-After running `pnpm seed`, the following demo accounts are available:
+Demo accounts are created by the seed script if configured.
+See `scripts/seed.ts` for the exact emails, roles, and passwords that are inserted.
 
-| Role | Email | Password |
-|------|-------|----------|
-| **Customer** | `customer@ridendine.demo` | `demo1234` |
-| **Chef** | `chef@ridendine.demo` | `demo1234` |
-| **Driver** | `driver@ridendine.demo` | `demo1234` |
-| **Admin** | `admin@ridendine.demo` | `demo1234` |
-
-**Seeded demo data includes:**
-- 10 chefs with diverse cuisines (Mexican, Chinese, Indian, Korean, American, Mediterranean, Italian, Soul Food)
-- 50 dishes across all chefs ($5.99–$19.99)
-- 5 drivers with ratings and delivery history
-- Demo orders in all statuses (placed → accepted → preparing → delivered)
-- Platform commission rate set to 15%
-
-> **Admin dashboard access**: The admin panel at `/` uses a password gate. Default password: `admin123` (or set `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` env var).
+> **Admin dashboard access**: Admin login uses Supabase Auth (seeded admin user from `pnpm seed`).
 
 ## 📱 Mobile App
 
@@ -162,11 +149,8 @@ PostgreSQL with Row Level Security (RLS):
 - `dishes` - Simplified menu items
 - `orders` / `order_items` - Order processing with tracking tokens
 - `drivers` - Driver profiles
-- `commission_records` - Per-order commission tracking
-- `payouts` - Chef payout logs
-- `platform_settings` - Admin-configurable settings (commission rate)
 
-**Migrations**: Located in `backend/supabase/migrations/` (6 migrations + seed data)
+**Migrations**: Located in `backend/supabase/migrations/`
 
 ## 💳 Payments
 
@@ -190,17 +174,16 @@ Stripe Connect for marketplace payments:
 
 ```bash
 # Lint all packages
-npm run lint
+pnpm lint
 
 # Build all packages
-npm run build
+pnpm build
 
 # Type check
-cd apps/mobile && npx tsc --noEmit
-cd apps/admin && npx tsc --noEmit
+pnpm typecheck
 
 # Build shared package
-npm run build --workspace=packages/shared
+pnpm --filter @home-chef/shared build
 ```
 
 ## 🚢 Deployment
@@ -216,8 +199,8 @@ linked to a subdirectory. Use the settings below when creating each project.
 |---|---|
 | **Root Directory** | `apps/web` |
 | **Framework Preset** | Next.js |
-| **Install Command** | `cd ../.. && pnpm install --frozen-lockfile` |
-| **Build Command** | `pnpm build` |
+| **Install Command** | *(leave blank)* |
+| **Build Command** | *(leave blank)* |
 | **Node.js Version** | 20.x |
 
 Required environment variables:
@@ -233,8 +216,8 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
 |---|---|
 | **Root Directory** | `apps/admin` |
 | **Framework Preset** | Next.js |
-| **Install Command** | `cd ../.. && pnpm install --frozen-lockfile` |
-| **Build Command** | `pnpm build` |
+| **Install Command** | *(leave blank)* |
+| **Build Command** | *(leave blank)* |
 | **Node.js Version** | 20.x |
 
 Required environment variables:

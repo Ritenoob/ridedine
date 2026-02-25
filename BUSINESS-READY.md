@@ -194,7 +194,7 @@ Platform keeps: $8 ($3 commission + $5 delivery fee)
 
 1. **Check logs:**
    - Vercel: https://vercel.com/dashboard
-   - Supabase: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/logs
+   - Supabase: https://supabase.com/dashboard/project/YOUR_PROJECT/logs
 
 2. **Common issues:**
    - See [DEPLOYMENT-CHECKLIST.md](DEPLOYMENT-CHECKLIST.md) troubleshooting section

@@ -37,12 +37,12 @@ vercel deploy --prod --cwd apps/admin
 
 ### 2. Supabase Setup (âœ… READY)
 
-**Database URL:** `https://exzccczfixfoscgdxebbz.supabase.co`
+**Database URL:** `https://your-project.supabase.co`
 
 #### 2.1 Execute Database Schema (One-Time Setup)
 
 ```bash
-# Navigate to Supabase SQL Editor: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/sql/new
+# Navigate to Supabase SQL Editor: https://supabase.com/dashboard/project/YOUR_PROJECT/sql/new
 
 # Copy and paste the entire contents of:
 cat SETUP_SUPABASE.sql
@@ -70,7 +70,7 @@ Expected tables:
 
 #### 2.2 Enable Email Auth
 
-1. Go to: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/auth/providers
+1. Go to: https://supabase.com/dashboard/project/YOUR_PROJECT/auth/providers
 2. Enable "Email" provider
 3. **Disable email confirmation** for easier testing (optional)
 4. Set redirect URLs:
@@ -89,7 +89,7 @@ INSERT INTO storage.buckets (id, name, public) VALUES
   ('delivery-proof', 'delivery-proof', true);
 ```
 
-Or use UI: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/storage/buckets
+Or use UI: https://supabase.com/dashboard/project/YOUR_PROJECT/storage/buckets
 
 ---
 
@@ -121,7 +121,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
 #### 3.3 Set Up Webhooks
 
-**Webhook Endpoint:** `https://exzccczfixfoscgdxebbz.supabase.co/functions/v1/webhook_stripe`
+**Webhook Endpoint:** `https://your-project.supabase.co/functions/v1/webhook_stripe`
 
 Events to subscribe to:
 - `checkout.session.completed`
@@ -137,13 +137,15 @@ Events to subscribe to:
 
 #### 4.1 Vercel Web App Environment Variables
 
-Set these in Vercel Dashboard â†’ Project â†’ Settings â†’ Environment Variables:
+Set these in Vercel Dashboard -> Project -> Settings -> Environment Variables:
 
 ```bash
-# Supabase (ALREADY SET âœ…)
-NEXT_PUBLIC_SUPABASE_URL=https://exzccczfixfoscgdxebbz.supabase.co
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
-SUPABASE_SERVICE_ROLE_KEY=<YOUR_SUPABASE_SERVICE_ROLE_KEY>
+
+# Do NOT set SUPABASE_SERVICE_ROLE_KEY in Vercel for web/admin apps.
+# Use Supabase secrets for Edge Functions instead.
 
 # Stripe (NEEDS VALUES - see section 3.1)
 STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE
@@ -170,7 +172,7 @@ supabase secrets set STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE
 supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE
 ```
 
-Or via UI: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/settings/functions
+Or via UI: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/functions
 
 ---
 
@@ -183,7 +185,7 @@ cd /home/nygmaee/Desktop/ridendine-demo-main/backend/supabase
 supabase login
 
 # Link to your project
-supabase link --project-ref exzccczfixfoscgdxebbz
+supabase link --project-ref YOUR_PROJECT_REF
 
 # Deploy all functions
 supabase functions deploy create_connect_account
@@ -192,7 +194,7 @@ supabase functions deploy webhook_stripe
 ```
 
 **Verify Functions:**
-https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/functions
+https://supabase.com/dashboard/project/YOUR_PROJECT/functions
 
 ---
 
@@ -352,7 +354,7 @@ pnpm --filter @home-chef/admin build
 
 ### "Supabase connection failed"
 - Verify `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
-- Check Supabase project is not paused: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz
+- Check Supabase project is not paused: https://supabase.com/dashboard/project/YOUR_PROJECT
 
 ### "Stripe payment fails"
 - Verify `STRIPE_SECRET_KEY` is set in both Vercel and Supabase
@@ -360,7 +362,7 @@ pnpm --filter @home-chef/admin build
 - Ensure webhook secret matches `STRIPE_WEBHOOK_SECRET`
 
 ### "Orders not appearing"
-- Check Supabase logs: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/logs/postgres-logs
+- Check Supabase logs: https://supabase.com/dashboard/project/YOUR_PROJECT/logs/postgres-logs
 - Verify RLS policies allow inserts
 - Check browser console for errors
 

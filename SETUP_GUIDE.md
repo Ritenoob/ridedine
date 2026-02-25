@@ -6,8 +6,8 @@ Complete guide to set up and run the RidenDine marketplace locally and deploy to
 
 Before you begin, ensure you have:
 
-- **Node.js** >= 18.0.0
-- **npm** >= 9.0.0
+- **Node.js** >= 20.0.0
+- **pnpm** >= 10.0.0
 - **Git**
 - **Supabase account** (free tier works)
 - **Stripe account** (test mode works)
@@ -25,7 +25,7 @@ cd ridendine-demo
 ### 2. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 This installs dependencies for all workspaces (admin, mobile, shared packages).
@@ -171,28 +171,27 @@ Edit `apps/admin/.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
-NEXT_PUBLIC_ADMIN_MASTER_PASSWORD=admin123
 ```
 
 ### 3. Run Development Server
 
 ```bash
 # From root directory
-npm run dev:admin
+pnpm --filter @home-chef/admin dev
 
 # Or from apps/admin
 cd apps/admin
-npm run dev
+pnpm dev
 ```
 
 Visit http://localhost:3000
 
-**Default login**: Password is `admin123`
+**Admin login**: Use the admin email/password seeded in Supabase (see `README.md`).
 
 ### 4. Build for Production
 
 ```bash
-npm run build:admin
+pnpm --filter @home-chef/admin build
 ```
 
 ## Part 5: Mobile App Setup
@@ -218,11 +217,11 @@ EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyxxx... # Optional for now
 
 ```bash
 # From root directory
-npm run dev:mobile
+pnpm --filter @home-chef/mobile start
 
 # Or from apps/mobile
 cd apps/mobile
-npm run start
+pnpm start
 ```
 
 This opens Expo Dev Tools. You can:
@@ -272,8 +271,7 @@ The migrations include seeded test data:
    ```
 
 3. **Create Admin Account**:
-   - Use admin login page with password `admin123`
-   - Or change password in environment variable
+    - Sign in using the seeded admin account created by the seed script
 
 ### 2. Test Customer Flow
 
@@ -322,12 +320,11 @@ The migrations include seeded test data:
 3. **Set Environment Variables** in Vercel Dashboard:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD`
 
 4. **Configure Build Settings** (auto-detected):
    - Framework: Next.js
    - Root Directory: `apps/admin`
-   - Build Command: `npm run build`
+   - Build Command: `pnpm --filter @home-chef/admin build`
    - Output Directory: `.next`
 
 ### Deploy Mobile App with EAS
@@ -465,7 +462,7 @@ supabase functions logs webhook_stripe --tail
 ### Admin Dashboard (`.env.local`)
 - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon/public key
-- `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` - Admin login password (default: admin123)
+- Admin access is controlled by Supabase Auth and the `profiles.role` column
 
 ### Mobile App (`.env`)
 - `EXPO_PUBLIC_SUPABASE_URL` - Your Supabase project URL
@@ -523,16 +520,16 @@ Before going to production:
 
 ```bash
 # Install everything
-npm install
+pnpm install
 
 # Run admin dashboard
-npm run dev:admin
+pnpm --filter @home-chef/admin dev
 
 # Run mobile app
-npm run dev:mobile
+pnpm --filter @home-chef/mobile start
 
 # Build everything
-npm run build
+pnpm build
 
 # Deploy Edge Functions
 cd backend/supabase && supabase functions deploy

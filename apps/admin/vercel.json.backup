@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && cd apps/admin && pnpm build",
+  "framework": "nextjs"
+}

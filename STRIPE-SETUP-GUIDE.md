@@ -119,7 +119,7 @@ Webhooks notify your app when payments succeed, fail, or are refunded.
 
 **For Supabase Edge Functions:**
 ```
-https://exzccczfixfoscgdxebbz.supabase.co/functions/v1/webhook_stripe
+https://your-project.supabase.co/functions/v1/webhook_stripe
 ```
 
 ### 3.2 Select Events to Listen For
@@ -477,7 +477,7 @@ MINIMUM_ORDER_CENTS=1000
 ### Webhook URL
 
 ```
-https://exzccczfixfoscgdxebbz.supabase.co/functions/v1/webhook_stripe
+https://your-project.supabase.co/functions/v1/webhook_stripe
 ```
 
 ### Required Webhook Events

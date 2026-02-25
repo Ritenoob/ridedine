@@ -17,8 +17,8 @@ This is a pnpm workspace monorepo containing:
 
 ## Prerequisites
 
-- **Node.js 20.x** (see `.nvmrc`)
-- **pnpm 9.x** â€” `corepack enable && corepack prepare pnpm@9 --activate`
+- **Node.js 20.x** (see `.node-version`)
+- **pnpm 10.x** — `corepack enable && corepack prepare pnpm@10 --activate`
 - **Supabase project** (hosted or local via `supabase start`)
 - **Vercel account** with two projects: `ridendine-web` and `ridendine-admin`
 - **GitHub repository** connected to both Vercel projects

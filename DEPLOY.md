@@ -33,7 +33,7 @@ After project is created:
 
 1. In Supabase Dashboard, go to **SQL Editor**
 2. Click "New query"
-3. Copy and paste the contents of `supabase/migrations/00000000000000_init.sql`
+3. Copy and paste the contents of `backend/supabase/migrations/20240101000000_initial_schema.sql`
 4. Click "Run" (bottom right)
 5. You should see "Success. No rows returned"
 

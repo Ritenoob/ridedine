@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. **Install Node.js 18+**
+1. **Install Node.js 20+**
    ```bash
    node --version  # Should be >= 18.0.0
    ```
@@ -24,7 +24,7 @@
 ```bash
 git clone https://github.com/SeanCFAFinlay/ridendine-demo.git
 cd ridendine-demo
-npm install
+pnpm install
 ```
 
 ### 2. Setup Supabase
@@ -59,8 +59,7 @@ cp .env.example .env.local
 ### 4. Build Shared Package
 
 ```bash
-cd packages/shared
-npm run build
+pnpm --filter @home-chef/shared build
 ```
 
 ### 5. Start Development Servers
@@ -76,8 +75,7 @@ npm start
 
 **Option B: Admin Dashboard**
 ```bash
-cd apps/admin
-npm run dev
+pnpm --filter @home-chef/admin dev
 # Open http://localhost:3000
 ```
 
@@ -132,11 +130,11 @@ npm run build
 
 ```bash
 # Install in specific workspace
-npm install <package> --workspace=apps/mobile
+pnpm add <package> --filter @home-chef/mobile
 
 # Run script in workspace
-npm run <script> --workspace=apps/admin
+pnpm --filter @home-chef/admin <script>
 
 # Clean all node_modules
-npm run clean
+pnpm run clean
 ```
