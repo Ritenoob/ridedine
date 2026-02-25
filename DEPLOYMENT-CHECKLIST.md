@@ -387,3 +387,4 @@ pnpm --filter @home-chef/admin build
 **Last Updated:** February 24, 2026
 **Status:** Ready for Vercel upgrade and launch
 
+
