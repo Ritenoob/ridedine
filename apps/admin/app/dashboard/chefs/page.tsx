@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface Chef {
@@ -68,14 +69,22 @@ export default function ChefsPage() {
   };
 
   return (
-    <main style={{ padding: 40, maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ marginBottom: 30 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 10 }}>ðŸ‘¨â€ðŸ³ Chef Management</h1>
-        <p style={{ color: "#666" }}>Approve and manage chef applications</p>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="sidebar">
+        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>🍜 RidenDine</Link>
+        <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
+        {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"],["👥","Users","/dashboard/users"],["⚙️","Settings","/dashboard/settings"]].map(([icon,label,href])=>(
+          <Link key={href} href={href} className={`sidebar-link ${href==="/dashboard/chefs"?"active":""}`}>{icon} {label}</Link>
+        ))}
       </div>
+      <div style={{ flex: 1, padding: 32 }}>
+        <div style={{ marginBottom: 30 }}>
+          <h1 className="page-title">🧑‍🍳 Chef Management</h1>
+          <p className="page-subtitle">Approve and manage chef applications</p>
+        </div>
 
-      {/* Filter Tabs */}
-      <div style={{ marginBottom: 30, display: "flex", gap: 10 }}>
+        {/* Filter Tabs */}
+        <div style={{ marginBottom: 30, display: "flex", gap: 10 }}>
         {["all", "pending", "approved", "rejected", "suspended"].map((status) => (
           <button
             key={status}
@@ -94,17 +103,17 @@ export default function ChefsPage() {
             {status}
           </button>
         ))}
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div style={{ textAlign: "center", padding: 40 }}>
-          <p>Loading chefs...</p>
         </div>
-      )}
+
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <p>Loading chefs...</p>
+          </div>
+        )}
 
       {/* Chef List */}
-      {!loading && chefs.length === 0 && (
+        {!loading && chefs.length === 0 && (
         <div style={{ 
           textAlign: "center", 
           padding: 60, 
@@ -117,7 +126,7 @@ export default function ChefsPage() {
         </div>
       )}
 
-      {!loading && chefs.length > 0 && (
+        {!loading && chefs.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
           {chefs.map((chef) => (
             <div
@@ -173,7 +182,7 @@ export default function ChefsPage() {
                         fontWeight: 600,
                       }}
                     >
-                      âœ“ Approve
+                      ✓ Approve
                     </button>
                     <button
                       onClick={() => updateChefStatus(chef.id, "rejected")}
@@ -187,7 +196,7 @@ export default function ChefsPage() {
                         fontWeight: 600,
                       }}
                     >
-                      âœ— Reject
+                      ✗ Reject
                     </button>
                   </div>
                 )}
@@ -227,7 +236,8 @@ export default function ChefsPage() {
           ))}
         </div>
       )}
-    </main>
+      </div>
+    </div>
   );
 }
 
