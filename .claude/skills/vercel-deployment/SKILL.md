@@ -3,10 +3,12 @@ name: vercel-deployment
 description: |
   Master Vercel deployment for RidenDine web and admin Next.js apps. Use when: (1) deploying
   to production, (2) configuring environment variables, (3) setting up preview deployments,
-  (4) debugging build failures, (5) configuring domains. Key insight: Vercel auto-deploys on
-  git push, environment variables set via dashboard, separate projects for web and admin.
+  (4) debugging build failures, (5) configuring domains, (6) seeing "No Next.js version detected"
+  error in Vercel builds, (7) setting up monorepo with separate projects on free tier. Key insight:
+  Vercel monorepos require Root Directory configuration via dashboard (not vercel.json), GitHub
+  integration auto-detects monorepo structure, free tier allows multiple projects.
 author: Claude Code
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Vercel Deployment
@@ -121,7 +123,56 @@ vercel         # Deploy to preview
 }
 ```
 
+## Pattern 5: Monorepo Root Directory Configuration (CRITICAL)
+
+**Problem: "No Next.js version detected" error**
+
+When deploying from a monorepo subdirectory, Vercel looks for `next` in the repository root's `package.json`. It cannot be configured via `vercel.json` alone.
+
+**Solution: Set Root Directory via Dashboard**
+
+1. Deploy once (will fail with "No Next.js version detected")
+2. Go to Vercel Dashboard → Project → Settings → General
+3. Find "Root Directory" section → Click "Edit"
+4. Set to subdirectory path: `apps/admin` or `apps/web`
+5. Click "Save"
+6. Redeploy from Deployments tab
+
+**Alternative: GitHub Integration (Recommended for Free Tier)**
+
+GitHub integration auto-detects monorepo structure:
+
+1. Go to https://vercel.com/new
+2. Import GitHub repository
+3. Vercel shows "Multiple apps detected"
+4. Configure each app:
+   - **Name:** admin / web
+   - **Root Directory:** apps/admin / apps/web
+   - **Framework:** Next.js (auto-detected)
+   - **Build Command:** pnpm build
+   - **Install Command:** pnpm install
+5. Deploy both projects
+
+**Free Tier Strategy:**
+
+- ✅ **Separate projects** (admin + web) - Recommended
+  - 2 projects = 2 separate domains
+  - Independent deployments
+  - Easier environment variable management
+  - Both deployments count toward free tier quota
+
+- ❌ **Single project with routing** - NOT recommended
+  - Complex routing configuration
+  - Harder to manage separate domains
+  - No benefit on free tier
+
 ## Debugging Build Failures
+
+**Issue: "No Next.js version detected"**
+
+**Cause:** Root Directory not configured for monorepo
+
+**Fix:** Set Root Directory to subdirectory path via Vercel dashboard (see Pattern 5)
 
 **Issue: Module not found**
 
