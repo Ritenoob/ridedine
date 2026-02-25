@@ -85,7 +85,7 @@ export default function AdminOrdersPage() {
                   <td><span className={`badge badge-${order.status}`}>{order.status}</span></td>
                   <td><span className={`badge badge-${order.payment_status}`}>{order.payment_status}</span></td>
                   <td>
-                    <select defaultValue={order.status} onChange={e => updateStatus(order.id, e.target.value)}
+                    <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
                       style={{ padding: "6px 10px", borderRadius: 6, border: "1.5px solid var(--border)", fontSize: 13, cursor: "pointer" }}>
                       {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
