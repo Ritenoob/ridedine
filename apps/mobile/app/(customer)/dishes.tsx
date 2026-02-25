@@ -62,7 +62,7 @@ export default function Dishes() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color="#FF7A00" />
         <Text style={styles.loadingText}>Loading dishes...</Text>
       </View>
     );
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   checkoutButtonText: {
-    color: '#1976d2',
+    color: '#FF7A00',
     fontWeight: '600',
   },
   dishCard: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: '#FF7A00',
   },
   description: {
     color: '#666',
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     padding: 10,
     borderRadius: 4,
     alignItems: 'center',

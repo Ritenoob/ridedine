@@ -197,7 +197,7 @@ export default function ChefMenu() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color="#FF7A00" />
         <Text style={styles.loadingText}>Loading menu...</Text>
       </View>
     );
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   addButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 6,
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   dishPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: '#FF7A00',
     marginBottom: 8,
   },
   availabilityBadge: {
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     padding: 10,
     borderRadius: 6,
     alignItems: 'center',
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   emptyButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     padding: 14,
     borderRadius: 6,
     alignItems: 'center',

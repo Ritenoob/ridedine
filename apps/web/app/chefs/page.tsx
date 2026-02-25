@@ -23,7 +23,7 @@ export default function ChefsPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand">🍜 RidenDine</Link>
+        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link active">Chefs</Link>
           <Link href="/orders" className="nav-link">My Orders</Link>
@@ -32,7 +32,7 @@ export default function ChefsPage() {
       </nav>
       <div className="page">
         <div className="page-header">
-          <h1 className="page-title">Our Home Chefs</h1>
+          <h1 className="page-title">Our Chefs</h1>
           <p className="page-subtitle">Authentic meals made by talented home cooks in your community</p>
         </div>
         <div style={{marginBottom:24}}>

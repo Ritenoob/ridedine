@@ -67,7 +67,7 @@ export default function Orders() {
       case 'placed':
         return '#ff9800';
       default:
-        return '#1976d2';
+        return '#FF7A00';
     }
   };
 
@@ -78,7 +78,7 @@ export default function Orders() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color="#FF7A00" />
         <Text style={styles.loadingText}>Loading orders...</Text>
       </View>
     );
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   orderAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: '#FF7A00',
   },
   orderFooter: {
     flexDirection: 'row',
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   trackingText: {
     fontSize: 14,
-    color: '#1976d2',
+    color: '#FF7A00',
     fontWeight: '600',
   },
   emptyContainer: {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   browseButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: '#FF7A00',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,

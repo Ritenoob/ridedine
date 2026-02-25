@@ -1,4 +1,4 @@
-# Home Chef Delivery Marketplace
+# RideNDine — Home Chef Delivery Marketplace
 
 > A comprehensive 3-sided marketplace connecting customers, home chefs, and drivers for home-cooked meal delivery.
 
@@ -7,12 +7,12 @@
 
 ## 🎯 Overview
 
-Home Chef Delivery is a production-ready marketplace platform built with modern technologies in a monorepo architecture. It enables:
+RideNDine is a production-ready marketplace platform built with modern technologies in a monorepo architecture. It enables:
 
 - **Customers** to browse local chefs, order home-cooked meals, and track deliveries
 - **Chefs** to manage menus, accept orders, and receive payments via Stripe Connect
 - **Drivers** to accept delivery jobs and navigate to customers (Phase 2)
-- **Admins** to approve chefs, manage orders, and monitor platform metrics
+- **Admins** to approve chefs, manage orders, track commissions, and monitor platform metrics
 
 
 ## 📐 Architecture Model
@@ -36,15 +36,16 @@ All new features, migrations, and deployments should follow the patterns and bes
 home-chef-delivery/
 ├── apps/
 │   ├── mobile/              # React Native (Expo) app
-│   ├── admin/               # Next.js admin dashboard
-│   └── web/                 # Customer-facing Next.js web app
+│   ├── admin/               # Next.js admin dashboard (ridendine-admin)
+│   └── web/                 # Customer-facing Next.js web app (ridendine-web)
 ├── backend/
 │   └── supabase/            # Database, Auth, Edge Functions
-│       ├── migrations/      # SQL migrations
-│       └── functions/       # Serverless Edge Functions
+│       ├── migrations/      # SQL migrations (schema + seed data + commission system)
+│       └── functions/       # Serverless Edge Functions (Stripe)
 ├── packages/
-│   ├── shared/              # TypeScript types, schemas, enums
-│   └── ui/                  # Shared UI components (optional)
+│   └── shared/              # TypeScript types, schemas, enums
+├── scripts/
+│   └── seed.ts              # Demo data seeder (creates accounts + sample data)
 ├── docs/                    # Documentation
 └── .github/workflows/       # CI/CD
 ```
@@ -63,10 +64,9 @@ home-chef-delivery/
 ### Prerequisites
 
 - Node.js >= 20.0.0 (see `.nvmrc`)
-- npm >= 9.0.0
+- pnpm >= 9.0.0 (`corepack enable && corepack prepare pnpm@9.0.0 --activate`)
 - Supabase account
 - Stripe account (for payments)
-- Expo account (for mobile deployment)
 
 ### Installation
 
@@ -75,33 +75,63 @@ home-chef-delivery/
 git clone https://github.com/SeanCFAFinlay/ridendine-demo.git
 cd ridendine-demo
 
-# Install all dependencies (monorepo with npm workspaces)
-npm ci
+# Install all dependencies (pnpm monorepo)
+pnpm install
 
 # Setup environment variables
+cp .env.example .env.local
+cp apps/web/.env.example apps/web/.env.local
 cp apps/admin/.env.example apps/admin/.env.local
-# Edit apps/admin/.env.local with your Supabase credentials
+# Edit .env.local files with your Supabase credentials
 ```
 
 ### Running Locally
 
 ```bash
-# Run admin dashboard (Next.js)
-npm run dev:admin
+# Build shared types (required first)
+pnpm build:shared
+
+# Run customer web app (ridendine-web)
+pnpm --filter @home-chef/web dev
+# Opens at http://localhost:3001
+
+# Run admin dashboard (ridendine-admin)
+pnpm --filter @home-chef/admin dev
 # Opens at http://localhost:3000
 
-# Build admin app
-npm run build:admin
+# Build all apps
+pnpm build
 
-# Build web app
-npm run build:web
-
-# Lint all workspaces
-npm run lint
-
-# Test all workspaces
-npm run test
+# Lint all apps
+pnpm lint
 ```
+
+### Seeding Demo Data
+
+```bash
+# Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local
+pnpm seed
+```
+
+## 👤 Demo Accounts
+
+After running `pnpm seed`, the following demo accounts are available:
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Customer** | `customer@ridendine.demo` | `demo1234` |
+| **Chef** | `chef@ridendine.demo` | `demo1234` |
+| **Driver** | `driver@ridendine.demo` | `demo1234` |
+| **Admin** | `admin@ridendine.demo` | `demo1234` |
+
+**Seeded demo data includes:**
+- 10 chefs with diverse cuisines (Mexican, Chinese, Indian, Korean, American, Mediterranean, Italian, Soul Food)
+- 50 dishes across all chefs ($5.99–$19.99)
+- 5 drivers with ratings and delivery history
+- Demo orders in all statuses (placed → accepted → preparing → delivered)
+- Platform commission rate set to 15%
+
+> **Admin dashboard access**: The admin panel at `/` uses a password gate. Default password: `admin123` (or set `NEXT_PUBLIC_ADMIN_MASTER_PASSWORD` env var).
 
 ## 📱 Mobile App
 
@@ -116,23 +146,27 @@ Role-based routing with authentication:
 ## 🎛️ Admin Dashboard
 
 Server-rendered Next.js app for platform management:
-- Chef approval workflow
-- Order monitoring
-- Analytics and metrics
-- Dispute resolution
+- Chef approval workflow (approve, reject, suspend)
+- Order monitoring with real-time updates
+- Meal/dish management (feature, toggle availability)
+- **Commission tracking** (view records, configure rate, CSV export)
+- Analytics and metrics (orders, revenue, active chefs, customers)
 
-**Tech**: Next.js 14 (App Router), Supabase SSR
+**Tech**: Next.js 15 (App Router), Supabase SSR, PWA-enabled
 
 ## 💾 Database
 
 PostgreSQL with Row Level Security (RLS):
-- `profiles` - User accounts
+- `profiles` - User accounts (customer, chef, driver, admin roles)
 - `chefs` - Chef profiles and verification
-- `menus` / `menu_items` - Menu management
-- `orders` / `order_items` - Order processing
-- `deliveries` - Delivery tracking
+- `dishes` - Simplified menu items
+- `orders` / `order_items` - Order processing with tracking tokens
+- `drivers` - Driver profiles
+- `commission_records` - Per-order commission tracking
+- `payouts` - Chef payout logs
+- `platform_settings` - Admin-configurable settings (commission rate)
 
-**Migrations**: Located in `backend/supabase/migrations/`
+**Migrations**: Located in `backend/supabase/migrations/` (6 migrations + seed data)
 
 ## 💳 Payments
 
@@ -214,7 +248,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 ### Deploy Admin on Vercel (legacy manual steps)
 
-- Create a **Vercel project** with **Root Directory** set to `apps/admin`
+- Create a **Vercel project** with **Root Directory** set to `apps/web`
 - Framework preset: **Next.js**
 - Install Command: `cd ../.. && pnpm install --frozen-lockfile`
 - Build Command: `pnpm build`
@@ -223,6 +257,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
   ```
   NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+  SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+  WEBHOOK_SECRET=your-webhook-secret
   ```
 
 ### Deploy Web on Vercel (legacy manual steps)
@@ -284,25 +320,27 @@ eas submit
 ## 🎯 MVP Status
 
 ### Completed ✅
-- [x] Monorepo structure
+- [x] Monorepo structure (pnpm workspaces)
 - [x] Shared TypeScript types and schemas
-- [x] Database schema with RLS
+- [x] Database schema with RLS (6 migrations)
 - [x] Edge Functions (Stripe integration)
-- [x] Mobile app scaffold with role routing
-- [x] Admin dashboard scaffold
+- [x] Mobile app with role routing (customer, chef, driver)
+- [x] Customer web app (browse chefs, cart, checkout, order tracking)
+- [x] Admin dashboard (orders, chefs, meals, analytics, commissions)
+- [x] Commission system with configurable rate
+- [x] Webhook API routes (order-status, payment, commission)
+- [x] Demo seed data (10 chefs, 50 dishes, 5 drivers)
+- [x] Seed script for demo accounts (`pnpm seed`)
+- [x] RideNDine branding (orange/teal color palette)
 - [x] CI/CD workflow
-
-### In Progress 🚧
-- [ ] Customer order flow
-- [ ] Chef menu management
-- [ ] Payment processing
-- [ ] Order status updates
+- [x] PWA support (admin)
 
 ### Phase 2 ⏳
-- [ ] Driver functionality
-- [ ] Real-time tracking
+- [ ] Driver delivery flow
+- [ ] Real-time driver tracking
 - [ ] Push notifications
 - [ ] Reviews and ratings
+- [ ] Promo codes
 
 ## 🤝 Contributing
 
@@ -329,5 +367,3 @@ Built with:
 ---
 
 **Note**: This is an MVP implementation. For production deployment, implement additional security measures, testing, monitoring, and compliance requirements.
-# RidenDine - Live Production
-
