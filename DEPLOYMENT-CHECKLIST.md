@@ -1,10 +1,10 @@
-# RidenDine Production Deployment Checklist
+﻿# RidenDine Production Deployment Checklist
 
-**Status: Code Ready ✅ | Infrastructure Ready on Payment 💳**
+**Status: Code Ready âœ… | Infrastructure Ready on Payment ðŸ’³**
 
 ---
 
-## 🚀 Quick Start (After Vercel Upgrade)
+## ðŸš€ Quick Start (After Vercel Upgrade)
 
 Once you upgrade your Vercel account, run:
 
@@ -21,9 +21,9 @@ vercel deploy --prod --cwd apps/admin
 
 ---
 
-## 📋 Pre-Launch Checklist
+## ðŸ“‹ Pre-Launch Checklist
 
-### 1. Vercel Account (🔴 REQUIRED - Action Needed)
+### 1. Vercel Account (ðŸ”´ REQUIRED - Action Needed)
 
 - [ ] Upgrade Vercel account to paid tier
 - [ ] Verify deployment limit is removed
@@ -35,7 +35,7 @@ vercel deploy --prod --cwd apps/admin
 
 ---
 
-### 2. Supabase Setup (✅ READY)
+### 2. Supabase Setup (âœ… READY)
 
 **Database URL:** `https://exzccczfixfoscgdxebbz.supabase.co`
 
@@ -93,14 +93,14 @@ Or use UI: https://supabase.com/dashboard/project/exzccczfixfoscgdxebbz/storage/
 
 ---
 
-### 3. Stripe Setup (⚠️ Action Required)
+### 3. Stripe Setup (âš ï¸ Action Required)
 
 **Current Status:** Stripe credentials needed
 
 #### 3.1 Get Stripe Keys
 
 1. Login to Stripe: https://dashboard.stripe.com
-2. Navigate to Developers → API Keys
+2. Navigate to Developers â†’ API Keys
 3. Get both sets of keys:
    - **Test Keys** (for testing)
    - **Live Keys** (for production)
@@ -137,13 +137,13 @@ Events to subscribe to:
 
 #### 4.1 Vercel Web App Environment Variables
 
-Set these in Vercel Dashboard → Project → Settings → Environment Variables:
+Set these in Vercel Dashboard â†’ Project â†’ Settings â†’ Environment Variables:
 
 ```bash
-# Supabase (ALREADY SET ✅)
+# Supabase (ALREADY SET âœ…)
 NEXT_PUBLIC_SUPABASE_URL=https://exzccczfixfoscgdxebbz.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4emNjemZpeGZvc2NnZHhlYmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzgyMjgsImV4cCI6MjA4NjUxNDIyOH0.SvXKuBeao4i5FheRsnQyGPPsF815Isyl1ommkkiDdaM
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4emNjemZpeGZvc2NnZHhlYmJ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDkzODIyOCwiZXhwIjoyMDg2NTE0MjI4fQ.fVbQy52NqtZz8XZYJHFbXkPou82Wd2qJ_PyJoccMMcw
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
+SUPABASE_SERVICE_ROLE_KEY=<YOUR_SUPABASE_SERVICE_ROLE_KEY>
 
 # Stripe (NEEDS VALUES - see section 3.1)
 STRIPE_SECRET_KEY=sk_live_YOUR_KEY_HERE
@@ -202,11 +202,11 @@ If you have a custom domain (e.g., ridendine.com):
 
 #### 6.1 Add Domain to Vercel
 
-1. Go to Vercel Project → Settings → Domains
+1. Go to Vercel Project â†’ Settings â†’ Domains
 2. Add domains:
-   - `ridendine.com` → Web App
-   - `www.ridendine.com` → Web App
-   - `admin.ridendine.com` → Admin App
+   - `ridendine.com` â†’ Web App
+   - `www.ridendine.com` â†’ Web App
+   - `admin.ridendine.com` â†’ Admin App
 
 #### 6.2 Update DNS Records
 
@@ -299,7 +299,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## 🎯 Production Launch Day Checklist
+## ðŸŽ¯ Production Launch Day Checklist
 
 **Pre-Launch (T-1 hour):**
 - [ ] Verify all environment variables set
@@ -323,7 +323,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## 📱 App URLs (After Deployment)
+## ðŸ“± App URLs (After Deployment)
 
 **Customer Web App:**
 - Vercel: `https://web-[hash].vercel.app`
@@ -339,7 +339,7 @@ Use free service like UptimeRobot:
 
 ---
 
-## 🆘 Troubleshooting
+## ðŸ†˜ Troubleshooting
 
 ### "Module not found" errors
 ```bash
@@ -366,7 +366,7 @@ pnpm --filter @home-chef/admin build
 
 ---
 
-## 📞 Support Contacts
+## ðŸ“ž Support Contacts
 
 **Vercel Support:** support@vercel.com
 **Supabase Support:** https://supabase.com/dashboard/support
@@ -374,15 +374,16 @@ pnpm --filter @home-chef/admin build
 
 ---
 
-## 🎉 What Happens After Upgrade?
+## ðŸŽ‰ What Happens After Upgrade?
 
 1. **Immediate:** Deploy web and admin apps (5 minutes)
 2. **In 10 minutes:** First customers can sign up in Hamilton
 3. **In 30 minutes:** First chef can create menu
 4. **In 1 hour:** First order can be placed and paid
-5. **Business is LIVE!** 🚀
+5. **Business is LIVE!** ðŸš€
 
 ---
 
 **Last Updated:** February 24, 2026
 **Status:** Ready for Vercel upgrade and launch
+

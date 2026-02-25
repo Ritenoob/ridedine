@@ -21,17 +21,17 @@ export function computeTotals(items: OrderLineItem[], deliveryFee = 0) {
  * Allowed status transitions
  */
 const TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
-  "draft": ["submitted", "cancelled"],
-  "submitted": ["accepted", "cancelled"],
-  "placed": ["accepted", "cancelled"],
-  "accepted": ["preparing", "cancelled"],
-  "preparing": ["ready", "out_for_delivery", "cancelled"],
-  "ready": ["picked_up", "out_for_delivery", "cancelled"],
-  "picked_up": ["out_for_delivery", "delivered"],
-  "out_for_delivery": ["delivered"],
-  "delivered": [],
-  "cancelled": [],
-  "refunded": [],
+  [OrderStatus.DRAFT]: [OrderStatus.SUBMITTED, OrderStatus.CANCELLED],
+  [OrderStatus.SUBMITTED]: [OrderStatus.ACCEPTED, OrderStatus.CANCELLED],
+  [OrderStatus.PLACED]: [OrderStatus.ACCEPTED, OrderStatus.CANCELLED],
+  [OrderStatus.ACCEPTED]: [OrderStatus.PREPARING, OrderStatus.CANCELLED],
+  [OrderStatus.PREPARING]: [OrderStatus.READY, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.CANCELLED],
+  [OrderStatus.READY]: [OrderStatus.PICKED_UP, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.CANCELLED],
+  [OrderStatus.PICKED_UP]: [OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED],
+  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED],
+  [OrderStatus.DELIVERED]: [],
+  [OrderStatus.CANCELLED]: [],
+  [OrderStatus.REFUNDED]: [],
 };
 
 /**
@@ -47,4 +47,5 @@ export function canTransitionStatus(from: OrderStatus, to: OrderStatus): boolean
 export function nextStatuses(status: OrderStatus): OrderStatus[] {
   return TRANSITIONS[status] ?? [];
 }
+
 
