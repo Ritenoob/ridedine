@@ -3,11 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "runArgs": [
-    "--name",
-    "ridendine-demo-fix"
-  ],
-  "workspaceFolder": "/workspaces/ridendine-demo-fix",
+  "workspaceFolder": "/workspaces/ridendine-demo-FIX",
   "customizations": {
     "vscode": {
       "extensions": [

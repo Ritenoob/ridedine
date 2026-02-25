@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@home-chef/data",
   "version": "1.0.0",
   "description": "Shared data layer: OrdersRepository and realtime hooks",
