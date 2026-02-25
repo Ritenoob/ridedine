@@ -45,7 +45,7 @@ export default function BecomeChefPage() {
         <div style={{ fontSize: 72, marginBottom: 16 }}>🎉</div>
         <h1 className="page-title">Application Submitted!</h1>
         <p className="page-subtitle" style={{ marginBottom: 24 }}>
-          Your chef application is now under review. We'll notify you at <strong>{form.email}</strong> once approved.
+          Your chef application is now under review. We&apos;ll notify you at <strong>{form.email}</strong> once approved.
         </p>
         <Link href="/" className="btn btn-primary btn-lg">Back to Home</Link>
       </div>
