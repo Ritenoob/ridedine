@@ -5,6 +5,7 @@ import {
   ChefStatus,
   DeliveryStatus,
   PaymentStatus,
+  RecipientType,
 } from "./enums";
 
 /**
@@ -194,6 +195,53 @@ export interface Review {
   order_id: string;
   rating: number;
   comment?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+/**
+ * Driver Profile
+ */
+export interface Driver {
+  id: string;
+  profile_id: string;
+  vehicle_type?: string;
+  license_number?: string;
+  is_available: boolean;
+  is_verified: boolean;
+  current_lat?: number;
+  current_lng?: number;
+  total_deliveries: number;
+  rating: number;
+  connect_account_id?: string;
+  payout_enabled: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+/**
+ * Payment Transfer (multi-party payment distribution tracking)
+ */
+export interface PaymentTransfer {
+  id: string;
+  order_id: string;
+  recipient_type: RecipientType;
+  recipient_id: string;
+  stripe_transfer_id?: string;
+  amount_cents: number;
+  status: "pending" | "succeeded" | "failed" | "skipped";
+  failure_reason?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+/**
+ * CoCo Partner Configuration
+ */
+export interface CocoConfig {
+  id: string;
+  stripe_account_id?: string;
+  payout_enabled: boolean;
   created_at: string;
   updated_at?: string;
 }
