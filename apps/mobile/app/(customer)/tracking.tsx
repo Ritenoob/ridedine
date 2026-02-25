@@ -1,53 +1,120 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { supabase } from "../../lib/supabase";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 const STATUS_STEPS = [
-  { key: 'placed', label: 'Order Placed' },
-  { key: 'accepted', label: 'Accepted by Chef' },
-  { key: 'preparing', label: 'Preparing' },
-  { key: 'ready', label: 'Ready for Pickup' },
-  { key: 'picked_up', label: 'Picked Up' },
-  { key: 'delivered', label: 'Delivered' },
+  { key: "placed", label: "Order Placed" },
+  { key: "accepted", label: "Accepted by Chef" },
+  { key: "preparing", label: "Preparing" },
+  { key: "ready", label: "Ready for Pickup" },
+  { key: "picked_up", label: "Picked Up" },
+  { key: "delivered", label: "Delivered" },
 ];
+
+interface OrderWithDeliveries {
+  id: string;
+  status: string;
+  customer_name: string;
+  total_cents: number;
+  delivery_method: string;
+  chefs: { profiles: { name: string } };
+  deliveries: Array<{
+    id: string;
+    driver_lat?: number;
+    driver_lng?: number;
+    status?: string;
+  }>;
+}
 
 export default function Tracking() {
   const { trackingToken } = useLocalSearchParams();
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<OrderWithDeliveries | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [driverLocation, setDriverLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const broadcastChannel = useRef<RealtimeChannel | null>(null);
+  const lastBroadcastUpdate = useRef<number>(Date.now());
+
+  const deliveryId = order?.deliveries?.[0]?.id ?? null;
 
   useEffect(() => {
     if (trackingToken) {
       loadOrder();
-      // Poll every 10 seconds
       const interval = setInterval(loadOrder, 10000);
       return () => clearInterval(interval);
     }
   }, [trackingToken]);
 
+  useEffect(() => {
+    if (!deliveryId) return;
+
+    broadcastChannel.current = supabase.channel(`delivery:${deliveryId}`);
+
+    broadcastChannel.current.on(
+      "broadcast",
+      { event: "driver_location" },
+      (payload: { payload: { lat: number; lng: number } }) => {
+        lastBroadcastUpdate.current = Date.now();
+        setDriverLocation({
+          lat: payload.payload.lat,
+          lng: payload.payload.lng,
+        });
+      },
+    );
+
+    broadcastChannel.current.on("system", {}, (payload: { event: string }) => {
+      if (payload.event === "error") {
+        setTimeout(() => broadcastChannel.current?.subscribe(), 5000);
+      }
+    });
+
+    broadcastChannel.current.subscribe();
+
+    const fallback = setInterval(() => {
+      if (Date.now() - lastBroadcastUpdate.current > 60000) loadOrder();
+    }, 10000);
+
+    return () => {
+      broadcastChannel.current?.unsubscribe();
+      clearInterval(fallback);
+    };
+  }, [deliveryId]);
+
   const loadOrder = async () => {
     try {
       const { data, error: queryError } = await supabase
-        .from('orders')
-        .select(`
+        .from("orders")
+        .select(
+          `
           *,
           chefs!inner (
             profiles!inner (
               name
             )
-          )
-        `)
-        .eq('tracking_token', trackingToken)
+          ),
+          deliveries (*)
+        `,
+        )
+        .eq("tracking_token", trackingToken)
         .single();
 
       if (queryError) throw queryError;
       setOrder(data);
-      setError('');
+      setError("");
     } catch (err) {
-      console.error('Error loading order:', err);
-      setError('Order not found');
+      console.error("Error loading order:", err);
+      setError("Order not found");
     } finally {
       setLoading(false);
     }
@@ -55,7 +122,7 @@ export default function Tracking() {
 
   const getCurrentStepIndex = () => {
     if (!order) return -1;
-    return STATUS_STEPS.findIndex(step => step.key === order.status);
+    return STATUS_STEPS.findIndex((step) => step.key === order.status);
   };
 
   if (loading) {
@@ -89,30 +156,48 @@ export default function Tracking() {
           <View style={styles.infoCard}>
             <Text style={styles.label}>Customer</Text>
             <Text style={styles.value}>{order.customer_name}</Text>
-            
+
             <Text style={styles.label}>Chef</Text>
             <Text style={styles.value}>{order.chefs?.profiles?.name}</Text>
-            
+
             <Text style={styles.label}>Total</Text>
-            <Text style={styles.value}>${(order.total_cents / 100).toFixed(2)}</Text>
-            
+            <Text style={styles.value}>
+              ${(order.total_cents / 100).toFixed(2)}
+            </Text>
+
             <Text style={styles.label}>Delivery Method</Text>
             <Text style={styles.value}>{order.delivery_method}</Text>
           </View>
+
+          {driverLocation && (
+            <View style={styles.driverLocationCard}>
+              <Text style={styles.driverLocationTitle}>Driver Location</Text>
+              <Text style={styles.driverLocationCoords}>
+                {driverLocation.lat.toFixed(4)}, {driverLocation.lng.toFixed(4)}
+              </Text>
+              <Text style={styles.driverLocationLive}>
+                Live tracking active
+              </Text>
+            </View>
+          )}
 
           <View style={styles.timeline}>
             <Text style={styles.timelineTitle}>Order Status</Text>
             {STATUS_STEPS.map((step, index) => (
               <View key={step.key} style={styles.timelineItem}>
-                <View style={[
-                  styles.timelineDot,
-                  index <= currentStepIndex && styles.timelineDotActive
-                ]} />
+                <View
+                  style={[
+                    styles.timelineDot,
+                    index <= currentStepIndex && styles.timelineDotActive,
+                  ]}
+                />
                 <View style={styles.timelineContent}>
-                  <Text style={[
-                    styles.timelineLabel,
-                    index <= currentStepIndex && styles.timelineLabelActive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.timelineLabel,
+                      index <= currentStepIndex && styles.timelineLabelActive,
+                    ]}
+                  >
                     {step.label}
                   </Text>
                   {index === currentStepIndex && (
@@ -120,10 +205,12 @@ export default function Tracking() {
                   )}
                 </View>
                 {index < STATUS_STEPS.length - 1 && (
-                  <View style={[
-                    styles.timelineLine,
-                    index < currentStepIndex && styles.timelineLineActive
-                  ]} />
+                  <View
+                    style={[
+                      styles.timelineLine,
+                      index < currentStepIndex && styles.timelineLineActive,
+                    ]}
+                  />
                 )}
               </View>
             ))}
@@ -137,102 +224,128 @@ export default function Tracking() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   errorText: {
     fontSize: 16,
-    color: '#d32f2f',
+    color: "#d32f2f",
   },
   header: {
     padding: 20,
-    backgroundColor: '#1976d2',
+    backgroundColor: "#1976d2",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginBottom: 5,
   },
   trackingToken: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
   },
   infoCard: {
     margin: 20,
     padding: 15,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
   },
   label: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 10,
     marginBottom: 2,
   },
   value: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   timeline: {
     margin: 20,
   },
   timelineTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   timelineItem: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 30,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
   timelineDot: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
     marginRight: 15,
   },
   timelineDotActive: {
-    backgroundColor: '#1976d2',
+    backgroundColor: "#1976d2",
   },
   timelineLine: {
-    position: 'absolute',
+    position: "absolute",
     left: 9,
     top: 20,
     width: 2,
     height: 40,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
   },
   timelineLineActive: {
-    backgroundColor: '#1976d2',
+    backgroundColor: "#1976d2",
   },
   timelineContent: {
     flex: 1,
   },
   timelineLabel: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   timelineLabelActive: {
-    color: '#000',
-    fontWeight: '600',
+    color: "#000",
+    fontWeight: "600",
   },
   currentLabel: {
     fontSize: 12,
-    color: '#1976d2',
+    color: "#1976d2",
     marginTop: 4,
-    fontWeight: '600',
+    fontWeight: "600",
+  },
+  driverLocationCard: {
+    margin: 20,
+    marginBottom: 0,
+    padding: 15,
+    backgroundColor: "#e3f2fd",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#1976d2",
+  },
+  driverLocationTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1976d2",
+    marginBottom: 5,
+  },
+  driverLocationCoords: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+  },
+  driverLocationLive: {
+    fontSize: 12,
+    color: "#4caf50",
+    marginTop: 5,
+    fontWeight: "600",
   },
 });
