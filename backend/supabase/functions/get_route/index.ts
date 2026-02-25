@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin":
@@ -216,6 +217,11 @@ serve(async (req) => {
   }
 
   try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
     const { coordinates, provider, profile }: GetRouteRequest =
       await req.json();
 
@@ -228,6 +234,39 @@ serve(async (req) => {
         },
       );
     }
+
+    const origin = coordinates[0];
+    const destination = coordinates[coordinates.length - 1];
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+    const { data: cached, error: cacheError } = await supabase
+      .from("route_cache")
+      .select("*")
+      .eq("origin_lat", origin.lat)
+      .eq("origin_lng", origin.lng)
+      .eq("dest_lat", destination.lat)
+      .eq("dest_lng", destination.lng)
+      .gte("created_at", fiveMinutesAgo)
+      .single();
+
+    if (cached && !cacheError) {
+      console.log("Route cache HIT");
+      return new Response(
+        JSON.stringify({
+          provider: cached.provider,
+          distanceMeters: cached.distance_meters,
+          durationSeconds: cached.duration_seconds,
+          geometry: cached.polyline,
+          cached: true,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        },
+      );
+    }
+
+    console.log("Route cache MISS");
 
     const routeProfile = profile || "driving";
     let route: RouteResponse | null = null;
@@ -288,7 +327,22 @@ serve(async (req) => {
       );
     }
 
-    return new Response(JSON.stringify(route), {
+    const { error: insertError } = await supabase.from("route_cache").insert({
+      origin_lat: origin.lat,
+      origin_lng: origin.lng,
+      dest_lat: destination.lat,
+      dest_lng: destination.lng,
+      provider: route.provider,
+      distance_meters: route.distanceMeters,
+      duration_seconds: route.durationSeconds,
+      polyline: route.geometry,
+    });
+
+    if (insertError) {
+      console.error("Failed to cache route:", insertError);
+    }
+
+    return new Response(JSON.stringify({ ...route, cached: false }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
