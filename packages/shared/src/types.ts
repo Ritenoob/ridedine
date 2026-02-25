@@ -1,4 +1,11 @@
-import { UserRole, OrderStatus, DeliveryMethod, ChefStatus, DeliveryStatus, PaymentStatus } from './enums';
+import {
+  UserRole,
+  OrderStatus,
+  DeliveryMethod,
+  ChefStatus,
+  DeliveryStatus,
+  PaymentStatus,
+} from "./enums";
 
 /**
  * Base User Profile
@@ -121,9 +128,9 @@ export interface CartItem {
  * Availability Window
  */
 export interface AvailabilityWindow {
-  day: number; // 0 = Sunday, 6 = Saturday
-  start_time: string; // HH:MM format
-  end_time: string; // HH:MM format
+  day: number;
+  start_time: string;
+  end_time: string;
 }
 
 /**
@@ -133,6 +140,48 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   address?: string;
+}
+
+/**
+ * Favorite
+ */
+export interface Favorite {
+  id: string;
+  user_id: string;
+  favoritable_type: "chef" | "dish";
+  favoritable_id: string;
+  created_at: string;
+}
+
+/**
+ * Dish (Menu Item alias used by customer-facing screens)
+ */
+export interface Dish {
+  id: string;
+  menu_id: string;
+  name: string;
+  description?: string;
+  price_cents: number;
+  is_available: boolean;
+  image_url?: string;
+  photo_url?: string;
+  dietary_tags?: string[];
+  created_at: string;
+}
+
+/**
+ * Saved Address
+ */
+export interface SavedAddress {
+  id: string;
+  user_id: string;
+  label?: string;
+  address: string;
+  lat: number;
+  lng: number;
+  is_default: boolean;
+  created_at: string;
+  updated_at?: string;
 }
 
 /**
