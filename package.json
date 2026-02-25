@@ -15,7 +15,7 @@
     "ci": "pnpm -r test && pnpm -r exec tsc --noEmit",
     "build": "pnpm -r build",
     "lint": "pnpm -r exec eslint .",
-    "typecheck": "pnpm -r exec tsc --noEmit",
+    "typecheck": "pnpm --filter=!@home-chef/mobile -r exec tsc --noEmit",
     "test": "pnpm -r test"
   },
   "pnpm": {

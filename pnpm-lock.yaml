@@ -218,6 +218,9 @@ importers:
 
   packages/data:
     dependencies:
+      '@home-chef/shared':
+        specifier: workspace:^
+        version: link:../shared
       '@supabase/supabase-js':
         specifier: '>=2'
         version: 2.97.0
