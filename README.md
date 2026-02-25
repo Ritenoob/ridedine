@@ -205,10 +205,53 @@ npm run build --workspace=packages/shared
 
 ## 🚢 Deployment
 
-### Deploy Web (ridendine-web) on Vercel
+## Deploying to Vercel
+
+This monorepo uses pnpm workspaces. Each Next.js app is deployed as a separate Vercel project
+linked to a subdirectory. Use the settings below when creating each project.
+
+### ridendine-web (`apps/web`)
+
+| Setting | Value |
+|---|---|
+| **Root Directory** | `apps/web` |
+| **Framework Preset** | Next.js |
+| **Install Command** | `cd ../.. && pnpm install --frozen-lockfile` |
+| **Build Command** | `pnpm build` |
+| **Node.js Version** | 20.x |
+
+Required environment variables:
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
+```
+
+### ridendine-admin (`apps/admin`)
+
+| Setting | Value |
+|---|---|
+| **Root Directory** | `apps/admin` |
+| **Framework Preset** | Next.js |
+| **Install Command** | `cd ../.. && pnpm install --frozen-lockfile` |
+| **Build Command** | `pnpm build` |
+| **Node.js Version** | 20.x |
+
+Required environment variables:
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+> **Tip:** You can also use `scripts/vercel-deploy.ps1` to link and deploy both apps via the
+> Vercel CLI in one step (see below).
+
+### Deploy Admin on Vercel (legacy manual steps)
 
 - Create a **Vercel project** with **Root Directory** set to `apps/web`
 - Framework preset: **Next.js**
+- Install Command: `cd ../.. && pnpm install --frozen-lockfile`
+- Build Command: `pnpm build`
 - Node.js Version: **20.x**
 - Set environment variables:
   ```
@@ -218,20 +261,13 @@ npm run build --workspace=packages/shared
   WEBHOOK_SECRET=your-webhook-secret
   ```
 
-### Deploy Admin (ridendine-admin) on Vercel
+### Deploy Web on Vercel (legacy manual steps)
 
-- Create a **separate Vercel project** with **Root Directory** set to `apps/admin`
-- Framework preset: **Next.js**
+- Create a **separate Vercel project** with **Root Directory** `apps/web`
+- Framework: auto-detect (Next.js)
+- Install Command: `cd ../.. && pnpm install --frozen-lockfile`
+- Build Command: `pnpm build`
 - Node.js Version: **20.x**
-- Set environment variables:
-  ```
-  NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url   # SAME as web
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key  # SAME as web
-  SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-  NEXT_PUBLIC_ADMIN_MASTER_PASSWORD=your-admin-password
-  ```
-
-> **Important**: Both apps must point to the **same** Supabase project URL and anon key so they share the same database, auth, and real-time channels.
 
 ### Deploy Mobile via EAS
 

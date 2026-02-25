@@ -1,5 +1,29 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Favorite, SavedAddress } from '@home-chef/shared';
+
+export interface Favorite {
+  id: string;
+  user_id: string;
+  favoritable_type: 'chef' | 'dish';
+  favoritable_id: string;
+  created_at: string;
+}
+
+export interface SavedAddress {
+  id: string;
+  user_id: string;
+  label?: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  lat?: number;
+  lng?: number;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export class FavoritesRepository {
   constructor(private supabase: SupabaseClient) {}
