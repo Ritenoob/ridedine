@@ -1,4 +1,4 @@
-import { OrderStatus } from './enums';
+﻿import { OrderStatus } from './enums';
 
 /**
  * Order item for computing totals
@@ -35,7 +35,7 @@ const TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
 };
 
 /**
- * Returns true when transitioning from → to is a valid operation.
+ * Returns true when transitioning from â†’ to is a valid operation.
  */
 export function canTransitionStatus(from: OrderStatus, to: OrderStatus): boolean {
   return (TRANSITIONS[from] ?? []).includes(to);
@@ -47,3 +47,5 @@ export function canTransitionStatus(from: OrderStatus, to: OrderStatus): boolean
 export function nextStatuses(status: OrderStatus): OrderStatus[] {
   return TRANSITIONS[status] ?? [];
 }
+
+
