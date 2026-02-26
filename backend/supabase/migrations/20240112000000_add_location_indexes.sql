@@ -3,7 +3,7 @@
 -- Purpose: Optimize location-based queries for chef discovery and delivery tracking
 
 -- Add indexes on latitude/longitude columns for fast distance queries
-CREATE INDEX IF NOT EXISTS idx_chefs_location ON chefs(current_lat, current_lng) WHERE current_lat IS NOT NULL AND current_lng IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_chefs_location ON chefs(lat, lng) WHERE lat IS NOT NULL AND lng IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_drivers_location ON drivers(current_lat, current_lng) WHERE current_lat IS NOT NULL AND current_lng IS NOT NULL;
 
 -- Add indexes on delivery location columns

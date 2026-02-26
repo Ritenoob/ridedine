@@ -1,23 +1,13 @@
--- Create drivers table (if not exists) with availability tracking
-CREATE TABLE IF NOT EXISTS drivers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  vehicle_type TEXT CHECK (vehicle_type IN ('car', 'bike', 'scooter', 'truck')),
-  license_number TEXT,
-  is_available BOOLEAN NOT NULL DEFAULT false,
-  is_verified BOOLEAN NOT NULL DEFAULT false,
-  current_lat DOUBLE PRECISION,
-  current_lng DOUBLE PRECISION,
-  last_location_update TIMESTAMPTZ,
-  total_deliveries INT NOT NULL DEFAULT 0,
-  rating DECIMAL(3,2) DEFAULT 0.00,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ
-);
+-- Add columns to existing drivers table for availability tracking
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS is_available BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS current_lat DOUBLE PRECISION;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS current_lng DOUBLE PRECISION;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS last_location_update TIMESTAMPTZ;
 
 -- Create index for location queries
-CREATE INDEX idx_drivers_location ON drivers(current_lat, current_lng) WHERE is_available = true;
-CREATE INDEX idx_drivers_available ON drivers(is_available) WHERE is_available = true;
+CREATE INDEX IF NOT EXISTS idx_drivers_location ON drivers(current_lat, current_lng) WHERE is_available = true;
+CREATE INDEX IF NOT EXISTS idx_drivers_available ON drivers(is_available) WHERE is_available = true;
 
 -- Enhance deliveries table with driver tracking fields
 ALTER TABLE deliveries

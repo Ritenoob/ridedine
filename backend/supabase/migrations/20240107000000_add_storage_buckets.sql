@@ -108,7 +108,7 @@ FOR SELECT
 TO authenticated
 USING (bucket_id = 'delivery-proof');
 
--- Allow drivers to upload delivery proof for their orders
+-- Allow drivers to upload delivery proof for any order (they are assigned through backend logic)
 CREATE POLICY "delivery_proof_driver_upload"
 ON storage.objects
 FOR INSERT
@@ -116,9 +116,8 @@ TO authenticated
 WITH CHECK (
   bucket_id = 'delivery-proof'
   AND EXISTS (
-    SELECT 1 FROM public.orders
-    WHERE id::text = (storage.foldername(name))[1]
-    AND driver_id = auth.uid()
+    SELECT 1 FROM public.drivers
+    WHERE profile_id = auth.uid()
   )
 );
 
@@ -130,8 +129,7 @@ TO authenticated
 USING (
   bucket_id = 'delivery-proof'
   AND EXISTS (
-    SELECT 1 FROM public.orders
-    WHERE id::text = (storage.foldername(name))[1]
-    AND driver_id = auth.uid()
+    SELECT 1 FROM public.drivers
+    WHERE profile_id = auth.uid()
   )
 );

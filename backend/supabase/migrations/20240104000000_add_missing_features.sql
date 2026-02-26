@@ -11,11 +11,13 @@ CREATE INDEX IF NOT EXISTS idx_dishes_featured ON dishes(featured);
 ALTER TABLE order_items ADD COLUMN IF NOT EXISTS dish_id UUID REFERENCES dishes(id);
 
 -- Allow customers to create orders
-CREATE POLICY IF NOT EXISTS "Customers can create orders" ON orders
+DROP POLICY IF EXISTS "Customers can create orders" ON orders;
+CREATE POLICY "Customers can create orders" ON orders
   FOR INSERT WITH CHECK (customer_id = auth.uid());
 
 -- Allow customers to insert order items for their orders
-CREATE POLICY IF NOT EXISTS "Customers can create order items" ON order_items
+DROP POLICY IF EXISTS "Customers can create order items" ON order_items;
+CREATE POLICY "Customers can create order items" ON order_items
   FOR INSERT WITH CHECK (
     order_id IN (SELECT id FROM orders WHERE customer_id = auth.uid())
   );
