@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { PlaceholderPage } from "@home-chef/ui";
 
@@ -7,7 +8,7 @@ export default function SettingsPage() {
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <div className="sidebar">
         <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>
-          <img src="/logo.svg" alt="RideNDine" style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
+          <Image src="/logo.svg" alt="RideNDine" width={130} height={32} style={{ verticalAlign: "middle" }} />
         </Link>
         <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
         {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"],["👥","Users","/dashboard/users"],["⚙️","Settings","/dashboard/settings"]].map(([icon,label,href])=>(

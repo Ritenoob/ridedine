@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSupabaseClient } from "../../../../lib/supabaseClient";
@@ -119,7 +120,7 @@ export default function PaymentCancelPage() {
     <div>
       <nav className="nav">
         <Link href="/" className="nav-brand">
-          <img src="/logo.svg" alt="RideNDine" style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
+          <Image src="/logo.svg" alt="RideNDine" width={130} height={32} style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
         </Link>
       </nav>
 

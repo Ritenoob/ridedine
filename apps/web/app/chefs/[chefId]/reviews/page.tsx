@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { getSupabaseClient } from "../../../../lib/supabaseClient";
 import StarRating from "../../../../components/StarRating";
@@ -22,35 +23,35 @@ export default function ChefReviewsPage() {
   const [avgRating, setAvgRating] = useState(0);
 
   useEffect(() => {
+    const loadReviews = async () => {
+      const sb = getSupabaseClient();
+
+      // Load chef info
+      const { data: chef } = await sb
+        .from("chefs")
+        .select("rating, profiles(name)")
+        .eq("id", chefId)
+        .single();
+
+      if (chef) {
+        const profiles = chef.profiles as { name?: string | null } | null;
+        setChefName(profiles?.name || "Chef");
+        setAvgRating(chef.rating || 0);
+      }
+
+      // Load reviews
+      const { data: reviewsData } = await sb
+        .from("reviews")
+        .select("*, profiles(name)")
+        .eq("chef_id", chefId)
+        .order("created_at", { ascending: false });
+
+      setReviews(reviewsData || []);
+      setLoading(false);
+    };
+
     loadReviews();
   }, [chefId]);
-
-  const loadReviews = async () => {
-    const sb = getSupabaseClient();
-
-    // Load chef info
-    const { data: chef } = await sb
-      .from("chefs")
-      .select("rating, profiles(name)")
-      .eq("id", chefId)
-      .single();
-
-    if (chef) {
-      const profiles = chef.profiles as { name?: string | null } | null;
-      setChefName(profiles?.name || "Chef");
-      setAvgRating(chef.rating || 0);
-    }
-
-    // Load reviews
-    const { data: reviewsData } = await sb
-      .from("reviews")
-      .select("*, profiles(name)")
-      .eq("chef_id", chefId)
-      .order("created_at", { ascending: false });
-
-    setReviews(reviewsData || []);
-    setLoading(false);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -64,10 +65,12 @@ export default function ChefReviewsPage() {
     <div>
       <nav className="nav">
         <Link href="/" className="nav-brand">
-          <img
+          <Image
             src="/logo.svg"
             alt="RideNDine"
-            style={{ height: 32, width: "auto", verticalAlign: "middle" }}
+            width={130}
+            height={32}
+            style={{ verticalAlign: "middle" }}
           />
         </Link>
         <div className="nav-links">

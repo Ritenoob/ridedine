@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PlaceholderPage, PageTemplate } from "@home-chef/ui";
 
 export default function AboutPage() {
@@ -6,7 +7,7 @@ export default function AboutPage() {
     <div>
       <nav className="nav">
         <Link href="/" className="nav-brand">
-          <img src="/logo.svg" alt="RideNDine" style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
+          <Image src="/logo.svg" alt="RideNDine" width={130} height={32} style={{ verticalAlign: "middle" }} />
         </Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link">Chefs</Link>

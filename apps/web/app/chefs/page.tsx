@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSupabaseClient } from "../../lib/supabaseClient";
 
 type ChefRow = {
@@ -31,7 +32,7 @@ export default function ChefsPage() {
   return (
     <div>
       <nav className="nav">
-        <Link href="/" className="nav-brand"><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
+        <Link href="/" className="nav-brand"><Image src="/logo.svg" alt="RideNDine" width={130} height={32} style={{verticalAlign:"middle"}} /></Link>
         <div className="nav-links">
           <Link href="/chefs" className="nav-link active">Chefs</Link>
           <Link href="/orders" className="nav-link">My Orders</Link>

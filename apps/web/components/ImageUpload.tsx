@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState, useRef } from "react";
 import { uploadImage, isValidImageFile, resizeImage } from "@home-chef/shared";
 
@@ -127,12 +128,12 @@ export default function ImageUpload({
 
       {previewUrl ? (
         <div style={{ position: 'relative' }}>
-          <img
+          <Image
             src={previewUrl}
             alt="Preview"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{
-              width: '100%',
-              maxHeight: 300,
               objectFit: 'cover',
               borderRadius: 8,
               border: '1px solid var(--border)',

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -233,7 +234,7 @@ export default function LiveTrackingPage() {
       newChannels.forEach((ch) => supabase.removeChannel(ch));
       clearInterval(interval);
     };
-  }, [supabase, drivers.length]);
+  }, [supabase, drivers]);
 
   const stats = useMemo(() => {
     const total = drivers.length;
@@ -249,10 +250,12 @@ export default function LiveTrackingPage() {
       {/* Sidebar */}
       <div className="sidebar">
         <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>
-          <img
+          <Image
             src="/logo.svg"
             alt="RideNDine"
-            style={{ height: 32, width: "auto", verticalAlign: "middle" }}
+            width={130}
+            height={32}
+            style={{ verticalAlign: "middle" }}
           />
         </Link>
         <div

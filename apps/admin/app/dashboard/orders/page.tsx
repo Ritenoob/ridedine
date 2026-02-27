@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
@@ -52,7 +53,7 @@ export default function AdminOrdersPage() {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <div className="sidebar">
-        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}><img src="/logo.svg" alt="RideNDine" style={{height:32,width:"auto",verticalAlign:"middle"}} /></Link>
+        <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}><Image src="/logo.svg" alt="RideNDine" width={130} height={32} style={{verticalAlign:"middle"}} /></Link>
         <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>
         {[["📊","Dashboard","/dashboard"],["📦","Orders","/dashboard/orders"],["🧑‍🍳","Chefs","/dashboard/chefs"],["🍽","Meals","/dashboard/meals"],["💰","Commissions","/dashboard/commissions"]].map(([icon,label,href])=>(
           <Link key={href} href={href} className={`sidebar-link ${href==="/dashboard/orders"?"active":""}`}>{icon} {label}</Link>
