@@ -2,7 +2,6 @@
 import type React from "react";
 import Link from "next/link";
 import { useState } from "react";
-import { getSupabaseClient } from "../../lib/supabaseClient";
 
 const CUISINE_OPTIONS = ["Italian","Mexican","Indian","Chinese","Japanese","Thai","Mediterranean","American","Middle Eastern","Other"];
 
@@ -20,20 +19,26 @@ export default function BecomeChefPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); setLoading(true);
-    const sb = getSupabaseClient();
-    // Create auth user
-    const { data: authData, error: authErr } = await sb.auth.signUp({ email: form.email, password: form.password });
-    if (authErr) { setError(authErr.message); setLoading(false); return; }
-    const userId = authData.user?.id;
-    if (!userId) { setError("Sign-up failed. Please try again."); setLoading(false); return; }
-    // Create profile
-    await sb.from("profiles").upsert({ id: userId, name: form.name, email: form.email, role: "chef" });
-    // Create chef application
-    const { error: chefErr } = await sb.from("chefs").insert({
-      id: userId, bio: form.bio, cuisine_types: form.cuisines, address: form.address, status: "pending",
-    });
-    if (chefErr) { setError(chefErr.message); setLoading(false); return; }
-    setStep("success");
+
+    try {
+      const res = await fetch("/api/chef-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setError(data.error || "Registration failed");
+        setLoading(false);
+        return;
+      }
+
+      setStep("success");
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
     setLoading(false);
   };
 
