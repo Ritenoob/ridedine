@@ -6,11 +6,33 @@ import { getSupabaseClient } from "../../../lib/supabaseClient";
 
 const STATUS_COLOR: Record<string, string> = { delivered: "#4caf50", cancelled: "#f44336", refunded: "#f44336", placed: "#ff9800" };
 
+type OrderRow = {
+  id: string;
+  status: string;
+  created_at: string;
+  address?: string | null;
+  notes?: string | null;
+  tracking_token?: string | null;
+  subtotal_cents?: number | null;
+  delivery_fee_cents?: number | null;
+  platform_fee_cents?: number | null;
+  tip_cents?: number | null;
+  total_cents: number;
+  chefs?: { profiles?: { name?: string | null } | null } | null;
+};
+
+type OrderItemRow = {
+  id: string;
+  quantity: number;
+  price_cents?: number | null;
+  dishes?: { name?: string | null } | null;
+};
+
 export default function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const searchParams = useSearchParams();
-  const [order, setOrder] = useState<any>(null);
-  const [items, setItems] = useState<any[]>([]);
+  const [order, setOrder] = useState<OrderRow | null>(null);
+  const [items, setItems] = useState<OrderItemRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +40,7 @@ export default function OrderDetailPage() {
     Promise.all([
       sb.from("orders").select("*, chefs(profiles(name))").eq("id", orderId).single(),
       sb.from("order_items").select("*, dishes(name)").eq("order_id", orderId),
-    ]).then(([{ data: o }, { data: i }]) => { setOrder(o); setItems(i ?? []); setLoading(false); });
+    ]).then(([{ data: o }, { data: i }]) => { setOrder(o as OrderRow | null); setItems((i as OrderItemRow[]) ?? []); setLoading(false); });
   }, [orderId]);
 
   if (loading) return <main style={{ padding: 32 }}><p>Loading...</p></main>;
@@ -64,10 +86,16 @@ export default function OrderDetailPage() {
       ))}
 
       <div style={{ marginTop: 20, background: "#f8f9fa", borderRadius: 8, padding: 16 }}>
-        {[["Subtotal", order.subtotal_cents], ["Delivery Fee", order.delivery_fee_cents], ["Platform Fee", order.platform_fee_cents], order.tip_cents > 0 ? ["Tip", order.tip_cents] : null]
-          .filter(Boolean).map(([l, c]: any) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, color: "#666" }}>
-              <span>{l}</span><span style={{ fontWeight: 600 }}>${(c / 100).toFixed(2)}</span>
+        {([
+          ["Subtotal", order.subtotal_cents],
+          ["Delivery Fee", order.delivery_fee_cents],
+          ["Platform Fee", order.platform_fee_cents],
+          (order.tip_cents ?? 0) > 0 ? ["Tip", order.tip_cents] : null,
+        ] as Array<[string, number | null | undefined] | null>)
+          .filter((row): row is [string, number | null | undefined] => Boolean(row))
+          .map(([l, c]) => (
+            <div key={l as string} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, color: "#666" }}>
+              <span>{l as string}</span><span style={{ fontWeight: 600 }}>${(((c as number) ?? 0) / 100).toFixed(2)}</span>
             </div>
           ))}
         <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #e0e0e0", paddingTop: 12 }}>

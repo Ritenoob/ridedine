@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { SupabaseClient, RealtimeChannel } from "@supabase/supabase-js";
 
 export interface SubscribeOrdersOptions {
@@ -22,6 +22,11 @@ export function useSubscribeOrders(
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
+  const channelKey = useMemo(
+    () => `orders:${JSON.stringify(options)}`,
+    [options.cookId, options.customerId, options.sessionId]
+  );
+
   useEffect(() => {
     if (!supabase) return;
 
@@ -34,7 +39,7 @@ export function useSubscribeOrders(
       if (!supabase) return;
       const filter = buildFilter(options);
       channel = supabase
-        .channel(`orders:${JSON.stringify(options)}`)
+        .channel(channelKey)
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "orders", ...(filter ? { filter } : {}) },
@@ -63,8 +68,7 @@ export function useSubscribeOrders(
       if (retryTimeout) clearTimeout(retryTimeout);
       if (channel && supabase) supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, options.cookId, options.sessionId, options.customerId]);
+  }, [supabase, channelKey, options.cookId, options.sessionId, options.customerId]);
 }
 
 function buildFilter(options: SubscribeOrdersOptions): string | undefined {

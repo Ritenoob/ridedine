@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { uploadImage, isValidImageFile, resizeImage } from "@home-chef/shared";
 
 interface ImageUploadProps {
@@ -9,7 +9,18 @@ interface ImageUploadProps {
   currentImageUrl?: string;
   bucketName: string;
   storagePath: string;
-  supabaseClient: any;
+  supabaseClient: {
+    storage: {
+      from: (bucket: string) => {
+        upload: (
+          path: string,
+          file: File,
+          options?: { cacheControl?: string; upsert?: boolean }
+        ) => Promise<{ data: { path: string } | null; error: Error | null }>;
+        getPublicUrl: (path: string) => { data: { publicUrl: string } };
+      };
+    };
+  };
   className?: string;
 }
 
@@ -85,9 +96,10 @@ export default function ImageUpload({
       setProgress(100);
 
       onUploadComplete(data.path, urlData.publicUrl);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Upload error:', err);
-      onError?.(err.message || 'Failed to upload image');
+      const message = err instanceof Error ? err.message : 'Failed to upload image';
+      onError?.(message);
       setPreviewUrl(currentImageUrl || null);
     } finally {
       setUploading(false);

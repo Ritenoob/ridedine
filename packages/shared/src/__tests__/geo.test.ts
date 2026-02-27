@@ -88,8 +88,8 @@ describe('geo utilities', () => {
     });
 
     it('should reject null/undefined', () => {
-      expect(isValidCoordinate(null as any, 0)).toBe(false);
-      expect(isValidCoordinate(0, undefined as any)).toBe(false);
+      expect(isValidCoordinate(null as unknown as number, 0)).toBe(false);
+      expect(isValidCoordinate(0, undefined as unknown as number)).toBe(false);
       expect(isValidCoordinate(NaN, 0)).toBe(false);
     });
   });

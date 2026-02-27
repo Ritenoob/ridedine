@@ -3,15 +3,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabaseClient } from "../../lib/supabaseClient";
 
+type ChefRow = {
+  id: string;
+  bio?: string | null;
+  rating?: number | null;
+  cuisine_types?: string[] | null;
+  profiles?: { name?: string | null } | null;
+};
+
 export default function ChefsPage() {
-  const [chefs, setChefs] = useState<any[]>([]);
+  const [chefs, setChefs] = useState<ChefRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     const sb = getSupabaseClient();
     sb.from("chefs").select("*, profiles(name,email)").eq("status","approved")
-      .then(({data})=>{ setChefs(data||[]); setLoading(false); });
+      .then(({data})=>{ setChefs((data as ChefRow[]) || []); setLoading(false); });
   }, []);
 
   const filtered = chefs.filter(c => {

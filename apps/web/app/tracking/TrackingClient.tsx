@@ -5,13 +5,15 @@ import Link from "next/link";
 import { getSupabaseClient } from "../../lib/supabaseClient";
 
 const STATUSES = ["pending","accepted","preparing","ready","picked_up","delivered"];
-const LABELS: any = {pending:"Order Placed",accepted:"Accepted",preparing:"Being Prepared",ready:"Ready for Pickup",picked_up:"Out for Delivery",delivered:"Delivered!"};
-const ICONS: any = {pending:"📋",accepted:"✅",preparing:"👨‍🍳",ready:"📦",picked_up:"🚗",delivered:"🎉"};
+const LABELS: Record<string, string> = {pending:"Order Placed",accepted:"Accepted",preparing:"Being Prepared",ready:"Ready for Pickup",picked_up:"Out for Delivery",delivered:"Delivered!"};
+const ICONS: Record<string, string> = {pending:"📋",accepted:"✅",preparing:"👨‍🍳",ready:"📦",picked_up:"🚗",delivered:"🎉"};
+
+type OrderRow = { status: string; chefs?: { profiles?: { name?: string | null } | null } | null };
 
 export default function TrackingClient() {
   const params = useSearchParams();
   const token = params.get("token");
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<OrderRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [tokenInput, setTokenInput] = useState("");
 
@@ -19,10 +21,10 @@ export default function TrackingClient() {
     const supabase = getSupabaseClient();
     if(!token){ setLoading(false); return; }
     supabase.from("orders").select("*, chefs(*, profiles(name))").eq("tracking_token",token).single()
-      .then(({data})=>{ setOrder(data); setLoading(false); });
+      .then(({data})=>{ setOrder(data as OrderRow | null); setLoading(false); });
     const channel = supabase.channel(`track-${token}`)
       .on("postgres_changes",{event:"UPDATE",schema:"public",table:"orders",filter:`tracking_token=eq.${token}`},
-        payload=>setOrder((prev:any)=>({...prev,...payload.new})))
+        payload=>setOrder((prev)=>({...(prev ?? {}),...(payload.new as OrderRow)})))
       .subscribe();
     return ()=>{ supabase.removeChannel(channel); };
   },[token]);

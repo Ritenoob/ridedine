@@ -12,6 +12,20 @@ const mockGt = vi.fn();
 const mockLte = vi.fn();
 const mockGte = vi.fn();
 
+type SupabaseQuery = {
+  select: (...args: unknown[]) => SupabaseQuery;
+  insert: (...args: unknown[]) => SupabaseQuery;
+  update: (...args: unknown[]) => SupabaseQuery;
+  delete: (...args: unknown[]) => SupabaseQuery;
+  eq: (...args: unknown[]) => SupabaseQuery;
+  single: (...args: unknown[]) => Promise<{ data: unknown; error: unknown }>;
+  order: (...args: unknown[]) => Promise<{ data: unknown; error: unknown }>;
+  gt: (...args: unknown[]) => SupabaseQuery;
+  gte: (...args: unknown[]) => SupabaseQuery;
+  lte: (...args: unknown[]) => SupabaseQuery;
+  then: (resolve: (value: { data: unknown; error: unknown }) => void) => void;
+};
+
 const mockSupabase = {
   from: vi.fn(() => ({
     select: mockSelect,
@@ -28,47 +42,47 @@ beforeEach(() => {
   mockOrder.mockResolvedValue({ data: null, error: null });
   mockGt.mockReturnValue({
     order: mockOrder,
-  });
+  } as unknown as SupabaseQuery);
   mockLte.mockReturnValue({
     order: mockOrder,
-  });
+  } as unknown as SupabaseQuery);
   mockGte.mockReturnValue({
     lte: mockLte,
     order: mockOrder,
-  });
+  } as unknown as SupabaseQuery);
   mockEq.mockReturnValue({
     eq: mockEq,
     single: mockSingle,
     order: mockOrder,
     gt: mockGt,
     gte: mockGte,
-  });
+  } as unknown as SupabaseQuery);
   mockSelect.mockReturnValue({
     eq: mockEq,
     order: mockOrder,
     single: mockSingle,
     gt: mockGt,
     gte: mockGte,
-  });
+  } as unknown as SupabaseQuery);
 
   // Setup chain: insert -> select -> single -> resolved value
   mockSingle.mockResolvedValue({ data: null, error: null });
   mockInsert.mockReturnValue({
     select: mockSelect,
-    then: (resolve: any) => resolve({ data: null, error: null }),
-  });
+    then: (resolve: (value: { data: unknown; error: unknown }) => void) => resolve({ data: null, error: null }),
+  } as unknown as SupabaseQuery);
 
   // Setup chain: update -> eq -> resolved value
-  mockUpdate.mockReturnValue({ eq: mockEq });
+  mockUpdate.mockReturnValue({ eq: mockEq } as unknown as SupabaseQuery);
 
   // Setup chain: delete -> eq -> resolved value
-  mockDelete.mockReturnValue({ eq: mockEq });
+  mockDelete.mockReturnValue({ eq: mockEq } as unknown as SupabaseQuery);
 });
 
 describe('ReviewsRepository', () => {
   it('should have a method to get chef reviews', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     expect(repo.getChefReviews).toBeDefined();
     expect(typeof repo.getChefReviews).toBe('function');
@@ -76,7 +90,7 @@ describe('ReviewsRepository', () => {
 
   it('should have a method to get order review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     expect(repo.getOrderReview).toBeDefined();
     expect(typeof repo.getOrderReview).toBe('function');
@@ -84,7 +98,7 @@ describe('ReviewsRepository', () => {
 
   it('should have a method to create review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     expect(repo.createReview).toBeDefined();
     expect(typeof repo.createReview).toBe('function');
@@ -92,7 +106,7 @@ describe('ReviewsRepository', () => {
 
   it('should have a method to update review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     expect(repo.updateReview).toBeDefined();
     expect(typeof repo.updateReview).toBe('function');
@@ -100,7 +114,7 @@ describe('ReviewsRepository', () => {
 
   it('should have a method to delete review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     expect(repo.deleteReview).toBeDefined();
     expect(typeof repo.deleteReview).toBe('function');
@@ -131,7 +145,7 @@ describe('ReviewsRepository', () => {
     mockOrder.mockResolvedValue({ data: mockReviews, error: null });
 
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     const result = await repo.getChefReviews('chef-123');
 
@@ -155,7 +169,7 @@ describe('ReviewsRepository', () => {
     mockOrder.mockResolvedValue({ data: mockReviews, error: null });
 
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     const result = await repo.getChefReviews('chef-123', { minRating: 4 });
 
@@ -177,7 +191,7 @@ describe('ReviewsRepository', () => {
     mockSingle.mockResolvedValue({ data: mockReview, error: null });
 
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     const result = await repo.getOrderReview('order-1');
 
@@ -189,7 +203,7 @@ describe('ReviewsRepository', () => {
     mockSingle.mockResolvedValue({ data: null, error: null });
 
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     const result = await repo.getOrderReview('order-1');
 
@@ -210,7 +224,7 @@ describe('ReviewsRepository', () => {
     mockSingle.mockResolvedValue({ data: mockReview, error: null });
 
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     const result = await repo.createReview({
       customer_id: 'user-1',
@@ -234,7 +248,7 @@ describe('ReviewsRepository', () => {
 
   it('should update review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     mockEq.mockResolvedValue({ data: null, error: null });
 
@@ -253,7 +267,7 @@ describe('ReviewsRepository', () => {
 
   it('should delete review', async () => {
     const ReviewsRepository = (await import('../reviews-repository')).ReviewsRepository;
-    const repo = new ReviewsRepository(mockSupabase as any);
+    const repo = new ReviewsRepository(mockSupabase as unknown as ConstructorParameters<typeof ReviewsRepository>[0]);
 
     mockEq.mockResolvedValue({ data: null, error: null });
 

@@ -7,7 +7,6 @@ export default function UsersPage() {
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <div className="sidebar">
         <Link href="/" className="nav-brand" style={{ marginBottom: 24 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="RideNDine" style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
         </Link>
         <div style={{ fontSize: 11, textTransform: "uppercase", color: "var(--text-secondary)", fontWeight: 600, padding: "0 14px", marginBottom: 8 }}>Menu</div>

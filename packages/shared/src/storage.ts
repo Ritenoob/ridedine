@@ -137,7 +137,17 @@ export async function resizeImage(
  * Upload image to Supabase Storage
  */
 export async function uploadImage(
-  supabaseClient: any,
+  supabaseClient: {
+    storage: {
+      from: (bucket: string) => {
+        upload: (
+          path: string,
+          file: File,
+          options?: { cacheControl?: string; upsert?: boolean }
+        ) => Promise<{ data: { path: string } | null; error: Error | null }>;
+      };
+    };
+  },
   bucket: string,
   path: string,
   file: File

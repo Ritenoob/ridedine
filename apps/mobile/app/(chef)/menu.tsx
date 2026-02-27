@@ -148,8 +148,9 @@ export default function ChefMenu() {
 
       setModalVisible(false);
       loadMenu();
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to save dish');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to save dish';
+      Alert.alert('Error', message);
     }
   };
 
@@ -162,8 +163,9 @@ export default function ChefMenu() {
 
       if (error) throw error;
       loadMenu();
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update dish');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update dish';
+      Alert.alert('Error', message);
     }
   };
 
@@ -185,8 +187,9 @@ export default function ChefMenu() {
 
               if (error) throw error;
               loadMenu();
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete dish');
+            } catch (error: unknown) {
+              const message = error instanceof Error ? error.message : 'Failed to delete dish';
+              Alert.alert('Error', message);
             }
           },
         },

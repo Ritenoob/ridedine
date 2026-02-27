@@ -185,7 +185,7 @@ export function setupNotificationListeners(
 export async function scheduleLocalNotification(
   title: string,
   body: string,
-  data?: Record<string, any>
+  data?: Record<string, unknown>
 ): Promise<string> {
   const id = await Notifications.scheduleNotificationAsync({
     content: {

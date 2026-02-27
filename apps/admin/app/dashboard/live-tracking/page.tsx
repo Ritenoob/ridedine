@@ -35,7 +35,7 @@ const LiveTrackingMap = dynamic(() => import("./LiveTrackingMap"), {
   ),
 });
 
-interface Driver {
+type Driver = {
   id: string;
   profile_id: string;
   vehicle_type: string | null;
@@ -64,7 +64,32 @@ interface Driver {
       total_cents: number;
     };
   } | null;
-}
+};
+
+type DriverRow = {
+  id: string;
+  profile_id: string;
+  vehicle_type: string | null;
+  vehicle_plate: string | null;
+  phone: string | null;
+  status: string;
+  current_lat: number | null;
+  current_lng: number | null;
+  last_location_update: string | null;
+  profiles: { name: string; email: string } | { name: string; email: string }[] | null;
+};
+
+type DeliveryRow = {
+  id: string;
+  status: string;
+  pickup_address: string;
+  dropoff_address: string;
+  pickup_lat: number;
+  pickup_lng: number;
+  dropoff_lat: number;
+  dropoff_lng: number;
+  orders: { id: string; customer_name: string; total_cents: number }[] | null;
+};
 
 export default function LiveTrackingPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -101,7 +126,7 @@ export default function LiveTrackingPage() {
       if (error) throw error;
 
       const driversWithDeliveries = await Promise.all(
-        (data || []).map(async (driver: any) => {
+        (data as DriverRow[] | null || []).map(async (driver) => {
           const { data: delivery } = await supabase
             .from("deliveries")
             .select(
@@ -134,20 +159,21 @@ export default function LiveTrackingPage() {
             .limit(1)
             .maybeSingle();
 
+          const normalizedDelivery = delivery as DeliveryRow | null;
           return {
             ...driver,
             profiles: Array.isArray(driver.profiles)
               ? driver.profiles[0]
               : driver.profiles,
-            active_delivery: delivery
+            active_delivery: normalizedDelivery
               ? {
-                  ...delivery,
-                  order: Array.isArray(delivery.orders)
-                    ? delivery.orders[0]
-                    : delivery.orders,
+                  ...normalizedDelivery,
+                  order: Array.isArray(normalizedDelivery.orders)
+                    ? normalizedDelivery.orders[0]
+                    : normalizedDelivery.orders,
                 }
               : null,
-          };
+          } as Driver;
         }),
       );
 

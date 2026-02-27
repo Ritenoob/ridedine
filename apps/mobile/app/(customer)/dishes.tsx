@@ -4,8 +4,17 @@ import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
 import { useCart } from '@/lib/context/CartContext';
 
+type DishRow = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  cuisine_type?: string | null;
+  chefs: { id: string; profiles: { name: string } };
+};
+
 export default function Dishes() {
-  const [dishes, setDishes] = useState<any[]>([]);
+  const [dishes, setDishes] = useState<DishRow[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { items, addItem, getTotalItems, getTotalPrice, getChefId } = useCart();
@@ -41,7 +50,7 @@ export default function Dishes() {
     }
   };
 
-  const handleAddToCart = (dish: any) => {
+  const handleAddToCart = (dish: DishRow) => {
     const cartChefId = getChefId();
     
     // Check if adding from a different chef

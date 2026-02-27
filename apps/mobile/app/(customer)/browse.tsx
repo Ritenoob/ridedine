@@ -2,8 +2,15 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+type ChefRow = {
+  id: string;
+  bio?: string | null;
+  cuisine_types?: string[] | null;
+  profiles?: { name?: string | null } | null;
+};
+
 export default function Browse() {
-  const [chefs, setChefs] = useState<any[]>([]);
+  const [chefs, setChefs] = useState<ChefRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -108,9 +108,10 @@ export default function Checkout() {
           },
         ]
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error placing order:', error);
-      Alert.alert('Error', error.message || 'Failed to place order. Please try again.');
+      const message = error instanceof Error ? error.message : 'Failed to place order. Please try again.';
+      Alert.alert('Error', message);
     } finally {
       setLoading(false);
     }

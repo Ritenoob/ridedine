@@ -48,7 +48,7 @@ export async function startLocationTracking(
 
     broadcastChannel = supabase.channel(`delivery:${deliveryId}`);
 
-    broadcastChannel.on('system', {}, (payload: any) => {
+    broadcastChannel.on('system', {}, (payload: { event?: string }) => {
       if (payload.event === 'error') {
         console.warn('Broadcast channel error, reconnecting in 5s...', payload);
         setTimeout(() => {
@@ -71,7 +71,7 @@ export async function startLocationTracking(
         timeInterval: 15000,
         distanceInterval: 10,
       },
-      async (location) => {
+      async (location: Location.LocationObject) => {
         if (currentDeliveryId && currentRepository) {
           try {
             await currentRepository.updateDriverLocation(

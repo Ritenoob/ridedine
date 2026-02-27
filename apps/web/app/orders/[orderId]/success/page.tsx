@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSupabaseClient } from "../../../../lib/supabaseClient";
 
@@ -17,7 +17,6 @@ interface Order {
 
 export default function PaymentSuccessPage() {
   const params = useParams();
-  const router = useRouter();
   const orderId = params.orderId as string;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);

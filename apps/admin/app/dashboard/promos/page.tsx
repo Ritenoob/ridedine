@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 
+type Promo = {
+  id: string;
+  code: string;
+  discount: number;
+};
+
 export default function PromosPage() {
   const [promoCode, setPromoCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState("");
-  const [promos] = useState<any[]>([]);
+  const [promos] = useState<Promo[]>([]);
 
   const handleCreate = () => {
     alert("Promo code creation will be implemented with database schema updates.");
@@ -111,7 +117,7 @@ export default function PromosPage() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-            {promos.map((promo: any) => (
+            {promos.map((promo) => (
               <div
                 key={promo.id}
                 style={{

@@ -88,9 +88,10 @@ export default function PaymentCancelPage() {
         // Redirect to Stripe Checkout
         window.location.href = session_url;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Retry payment error:", error);
-      alert(error.message || "Failed to retry payment");
+      const message = error instanceof Error ? error.message : "Failed to retry payment";
+      alert(message);
       setRetrying(false);
     }
   };

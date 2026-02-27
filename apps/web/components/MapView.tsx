@@ -1,7 +1,9 @@
 'use client';
 
+/* global google */
 import { GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api';
-import { useState, useCallback } from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 
 interface MapViewProps {
   center: {
@@ -35,15 +37,11 @@ export function MapView({
   width = '100%',
   className = '',
 }: MapViewProps) {
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-
   const onLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
+    void map;
   }, []);
 
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
+  const onUnmount = useCallback(() => {}, []);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 

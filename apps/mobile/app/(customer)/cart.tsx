@@ -4,7 +4,7 @@ import { useCart } from '@/lib/context/CartContext';
 
 export default function Cart() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, getTotalItems, getTotalPrice, clearCart } = useCart();
+  const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCart();
 
   const handleCheckout = () => {
     if (items.length === 0) {

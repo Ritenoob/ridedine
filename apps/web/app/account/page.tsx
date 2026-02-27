@@ -1,11 +1,22 @@
 "use client";
+import type React from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabaseClient } from "../../lib/supabaseClient";
 
+type ProfileRow = {
+  name?: string | null;
+  role?: string | null;
+};
+
+type UserRow = {
+  id: string;
+  email?: string | null;
+};
+
 export default function AccountPage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<UserRow | null>(null);
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,9 +28,9 @@ export default function AccountPage() {
     const sb = getSupabaseClient();
     sb.auth.getSession().then(async ({ data }) => {
       if (!data.session) { setLoading(false); return; }
-      setUser(data.session.user);
+      setUser(data.session.user as UserRow);
       const { data: p } = await sb.from("profiles").select("*").eq("id", data.session.user.id).single();
-      setProfile(p);
+      setProfile(p as ProfileRow | null);
       setLoading(false);
     });
   }, []);
@@ -30,10 +41,10 @@ export default function AccountPage() {
     const fn = isSignUp ? sb.auth.signUp({ email, password }) : sb.auth.signInWithPassword({ email, password });
     const { data, error: authErr } = await fn;
     if (authErr) { setError(authErr.message); setAuthLoading(false); return; }
-    setUser(data.user);
+    setUser(data.user as UserRow | null);
     if (data.user) {
       const { data: p } = await sb.from("profiles").select("*").eq("id", data.user.id).single();
-      setProfile(p);
+      setProfile(p as ProfileRow | null);
     }
     setAuthLoading(false);
   };

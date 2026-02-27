@@ -37,7 +37,8 @@ export default function ReviewScreen() {
       .single();
 
     if (data) {
-      setChefName((data.profiles as any)?.name || 'Chef');
+      const profiles = data.profiles as { name?: string | null } | null;
+      setChefName(profiles?.name || 'Chef');
     }
   };
 

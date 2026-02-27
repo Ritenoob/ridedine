@@ -102,8 +102,9 @@ export default function ChefOrders() {
       
       Alert.alert('Success', `Order updated to ${newStatus}`);
       loadOrders();
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update order');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update order';
+      Alert.alert('Error', message);
     }
   };
 

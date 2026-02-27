@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getSupabaseClient } from "../../../../lib/supabaseClient";
 import StarRating from "../../../../components/StarRating";
-import type { Review, Profile } from "@home-chef/shared";
+import type { Review } from "@home-chef/shared";
 
 interface ReviewWithProfile extends Review {
   profiles?: {
@@ -36,7 +36,8 @@ export default function ChefReviewsPage() {
       .single();
 
     if (chef) {
-      setChefName((chef.profiles as any)?.name || "Chef");
+      const profiles = chef.profiles as { name?: string | null } | null;
+      setChefName(profiles?.name || "Chef");
       setAvgRating(chef.rating || 0);
     }
 

@@ -23,7 +23,6 @@ export function HeaderBar({ title, subtitle }: HeaderBarProps) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.svg" alt="RideNDine" style={{ height: 36, width: "auto" }} />
         {subtitle && (
           <span

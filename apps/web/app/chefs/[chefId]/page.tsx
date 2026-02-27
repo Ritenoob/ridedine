@@ -5,10 +5,28 @@ import Link from "next/link";
 import { getSupabaseClient } from "../../../lib/supabaseClient";
 import { useCart } from "../../../lib/CartContext";
 
+type ChefRow = {
+  id: string;
+  bio?: string | null;
+  address?: string | null;
+  rating?: number | null;
+  cuisine_types?: string[] | null;
+  profiles?: { name?: string | null } | null;
+};
+
+type DishRow = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  cuisine_type?: string | null;
+  dietary_tags?: string[] | null;
+};
+
 export default function ChefPage() {
   const { chefId } = useParams();
-  const [chef, setChef] = useState<any>(null);
-  const [dishes, setDishes] = useState<any[]>([]);
+  const [chef, setChef] = useState<ChefRow | null>(null);
+  const [dishes, setDishes] = useState<DishRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState<string|null>(null);
   const { addItem, totalItems, total } = useCart();
@@ -19,11 +37,11 @@ export default function ChefPage() {
       supabase.from("chefs").select("*, profiles(name)").eq("id", chefId).single(),
       supabase.from("dishes").select("*").eq("chef_id", chefId).eq("available", true)
     ]).then(([{data:c},{data:d}])=>{
-      setChef(c); setDishes(d||[]); setLoading(false);
+      setChef(c as ChefRow | null); setDishes((d as DishRow[]) || []); setLoading(false);
     });
   },[chefId]);
 
-  const handleAdd = (dish: any) => {
+  const handleAdd = (dish: DishRow) => {
     addItem({
       id: dish.id,
       name: dish.name,
@@ -35,7 +53,7 @@ export default function ChefPage() {
     setTimeout(()=>setAdded(null), 1500);
   };
 
-  const grouped = dishes.reduce((acc:any, d:any) => {
+  const grouped = dishes.reduce((acc: Record<string, DishRow[]>, d) => {
     const key = d.cuisine_type || "Other";
     if(!acc[key]) acc[key] = [];
     acc[key].push(d);
@@ -74,11 +92,11 @@ export default function ChefPage() {
       </div>
 
       <div className="page">
-        {Object.entries(grouped).map(([category, categoryDishes]:any) => (
+        {Object.entries(grouped).map(([category, categoryDishes]) => (
           <div key={category} style={{marginBottom:40}}>
             <h2 style={{fontSize:20,fontWeight:700,marginBottom:16,paddingBottom:8,borderBottom:"2px solid var(--primary)",display:"inline-block"}}>{category}</h2>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {categoryDishes.map((dish:any) => (
+              {categoryDishes.map((dish) => (
                 <div key={dish.id} className="card">
                   <div className="dish-card">
                     <div className="dish-info">

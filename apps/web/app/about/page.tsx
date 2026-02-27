@@ -6,7 +6,6 @@ export default function AboutPage() {
     <div>
       <nav className="nav">
         <Link href="/" className="nav-brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="RideNDine" style={{ height: 32, width: "auto", verticalAlign: "middle" }} />
         </Link>
         <div className="nav-links">

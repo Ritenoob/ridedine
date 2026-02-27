@@ -1,12 +1,4 @@
-import {
-  UserRole,
-  OrderStatus,
-  DeliveryMethod,
-  ChefStatus,
-  DeliveryStatus,
-  PaymentStatus,
-  RecipientType,
-} from "./enums";
+import { UserRole, OrderStatus, DeliveryMethod, ChefStatus, DeliveryStatus, RecipientType } from "./enums";
 
 /**
  * Base User Profile

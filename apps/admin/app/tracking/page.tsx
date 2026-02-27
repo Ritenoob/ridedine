@@ -47,9 +47,9 @@ export default function TrackingPage() {
       } else {
         setResult(data as OrderTracking);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       setResult(null);
-      setError(e?.message ?? "Failed to load order");
+      setError(e instanceof Error ? e.message : "Failed to load order");
     } finally {
       setLoading(false);
     }

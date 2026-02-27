@@ -3,10 +3,25 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
+type ProfileRow = {
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
+
+type DriverRow = {
+  id: string;
+  total_deliveries: number;
+  rating: number;
+  vehicle_type?: string | null;
+  is_verified: boolean;
+  is_available: boolean;
+};
+
 export default function DriverProfile() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
-  const [driver, setDriver] = useState<any>(null);
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
+  const [driver, setDriver] = useState<DriverRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
@@ -56,9 +71,10 @@ export default function DriverProfile() {
       if (error) throw error;
 
       setDriver({ ...driver, is_available: value });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating availability:', error);
-      Alert.alert('Error', error.message || 'Failed to update availability');
+      const message = error instanceof Error ? error.message : 'Failed to update availability';
+      Alert.alert('Error', message);
     } finally {
       setUpdatingAvailability(false);
     }
@@ -68,8 +84,9 @@ export default function DriverProfile() {
     try {
       await supabase.auth.signOut();
       router.replace('/(auth)/signin');
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to sign out');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to sign out';
+      Alert.alert('Error', message);
     }
   };
 

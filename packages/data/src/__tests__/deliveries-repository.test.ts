@@ -2,32 +2,53 @@
 import { DeliveriesRepository } from '../deliveries-repository';
 import { DeliveryStatus } from '../../../shared/src/enums';
 
-let queryResult: { data: any; error: any } = { data: null, error: null };
-const setQueryResult = (data: any, error: any = null) => {
+let queryResult: { data: unknown; error: unknown } = { data: null, error: null };
+const setQueryResult = (data: unknown, error: unknown = null) => {
   queryResult = { data, error };
 };
 
-const mockSupabase: any = {
+type QueryResult = { data: unknown; error: unknown };
+type PromiseLikeQuery = {
+  then: (resolve: (value: QueryResult) => void, reject: (reason?: unknown) => void) => Promise<void>;
+  [Symbol.toStringTag]: string;
+};
+
+type SupabaseQuery = PromiseLikeQuery & {
+  from: (...args: unknown[]) => SupabaseQuery;
+  select: (...args: unknown[]) => SupabaseQuery;
+  insert: (...args: unknown[]) => SupabaseQuery;
+  update: (...args: unknown[]) => SupabaseQuery;
+  eq: (...args: unknown[]) => SupabaseQuery;
+  in: (...args: unknown[]) => SupabaseQuery;
+  order: (...args: unknown[]) => SupabaseQuery;
+  limit: (...args: unknown[]) => SupabaseQuery;
+  gte: (...args: unknown[]) => SupabaseQuery;
+  lt: (...args: unknown[]) => SupabaseQuery;
+  maybeSingle: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+};
+
+const mockSupabase: SupabaseQuery = {
   // Make it behave like a Promise (Supabase builder is PromiseLike)
-  then: (resolve: any, reject: any) => Promise.resolve(queryResult).then(resolve, reject),
+  then: (resolve, reject) => Promise.resolve(queryResult as QueryResult).then(resolve, reject),
   [Symbol.toStringTag]: 'Promise',
 
-  from: vi.fn(() => mockSupabase),
-  select: vi.fn(() => mockSupabase),
-  insert: vi.fn(() => mockSupabase),
-  update: vi.fn(() => mockSupabase),
-  eq: vi.fn(() => mockSupabase),
-  in: vi.fn(() => mockSupabase),
-  order: vi.fn(() => mockSupabase),
-  limit: vi.fn(() => mockSupabase),
-  gte: vi.fn(() => mockSupabase),
-  lt: vi.fn(() => mockSupabase),
+  from: vi.fn(() => mockSupabase) as SupabaseQuery['from'],
+  select: vi.fn(() => mockSupabase) as SupabaseQuery['select'],
+  insert: vi.fn(() => mockSupabase) as SupabaseQuery['insert'],
+  update: vi.fn(() => mockSupabase) as SupabaseQuery['update'],
+  eq: vi.fn(() => mockSupabase) as SupabaseQuery['eq'],
+  in: vi.fn(() => mockSupabase) as SupabaseQuery['in'],
+  order: vi.fn(() => mockSupabase) as SupabaseQuery['order'],
+  limit: vi.fn(() => mockSupabase) as SupabaseQuery['limit'],
+  gte: vi.fn(() => mockSupabase) as SupabaseQuery['gte'],
+  lt: vi.fn(() => mockSupabase) as SupabaseQuery['lt'],
 
   // Supabase variants (harmless if unused)
-  maybeSingle: vi.fn(() => Promise.resolve(queryResult)),
+  maybeSingle: vi.fn(() => Promise.resolve(queryResult)) as SupabaseQuery['maybeSingle'],
 
   // Default: return current queryResult unless test overrides with mockResolvedValueOnce
-  single: vi.fn(() => Promise.resolve(queryResult)),
+  single: vi.fn(() => Promise.resolve(queryResult)) as SupabaseQuery['single'],
 };
 
 describe('DeliveriesRepository', () => {
@@ -36,7 +57,7 @@ describe('DeliveriesRepository', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setQueryResult(null, null);
-    repository = new DeliveriesRepository(mockSupabase as any);
+    repository = new DeliveriesRepository(mockSupabase as unknown as ConstructorParameters<typeof DeliveriesRepository>[0]);
   });
 
   describe('getDelivery', () => {

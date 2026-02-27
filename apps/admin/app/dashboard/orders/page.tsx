@@ -4,10 +4,21 @@ import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 const STATUSES = ["pending","accepted","preparing","ready","picked_up","delivered","cancelled"];
 
+type OrderRow = {
+  id: string;
+  tracking_token?: string | null;
+  customer_name?: string | null;
+  customer_email?: string | null;
+  total_cents?: number | null;
+  status?: string | null;
+  payment_status?: string | null;
+  chefs?: { profiles?: { name?: string | null } } | null;
+};
+
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newOrder, setNewOrder] = useState<any>(null);
+  const [newOrder, setNewOrder] = useState<OrderRow | null>(null);
   const supabase = useMemo(() => supabaseBrowser(), []);
 
   const fetchOrders = useCallback(async () => {
@@ -22,12 +33,12 @@ export default function AdminOrdersPage() {
     // Real-time: new orders
     const channel = supabase.channel("admin-orders")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, payload => {
-        setNewOrder(payload.new);
-        setOrders(prev => [payload.new, ...prev]);
+        setNewOrder(payload.new as OrderRow);
+        setOrders(prev => [payload.new as OrderRow, ...prev]);
         setTimeout(() => setNewOrder(null), 5000);
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, payload => {
-        setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o));
+        setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...(payload.new as OrderRow) } : o));
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -85,7 +96,7 @@ export default function AdminOrdersPage() {
                   <td><span className={`badge badge-${order.status}`}>{order.status}</span></td>
                   <td><span className={`badge badge-${order.payment_status}`}>{order.payment_status}</span></td>
                   <td>
-                    <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
+                    <select value={order.status ?? "pending"} onChange={e => updateStatus(order.id, e.target.value)}
                       style={{ padding: "6px 10px", borderRadius: 6, border: "1.5px solid var(--border)", fontSize: 13, cursor: "pointer" }}>
                       {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>

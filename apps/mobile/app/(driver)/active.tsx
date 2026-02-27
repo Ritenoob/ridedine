@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase';
 import { DeliveriesRepository } from '@home-chef/data';
 import { DeliveryStatus } from '@home-chef/shared';
 import { startLocationTracking, stopLocationTracking } from '@/lib/location';
-import { ImageUpload } from '@/components/ImageUpload';
 import MapView, { Marker } from 'react-native-maps';
 
 const STATUS_STEPS = [
@@ -17,8 +16,22 @@ const STATUS_STEPS = [
   { key: DeliveryStatus.DELIVERED, label: 'Delivered' },
 ];
 
+type DeliveryOrder = {
+  id: string;
+  order_id: string;
+  status: DeliveryStatus;
+  pickup_address?: string | null;
+  dropoff_address?: string | null;
+  pickup_lat?: number | null;
+  pickup_lng?: number | null;
+  dropoff_lat?: number | null;
+  dropoff_lng?: number | null;
+  delivery_fee_cents?: number | null;
+  order?: { customer_name?: string | null; total_cents?: number | null } | null;
+};
+
 export default function DriverActive() {
-  const [delivery, setDelivery] = useState<any>(null);
+  const [delivery, setDelivery] = useState<DeliveryOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [showProofUpload, setShowProofUpload] = useState(false);
@@ -100,27 +113,12 @@ export default function DriverActive() {
       } else {
         setDelivery({ ...delivery, status: newStatus });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating status:', error);
-      Alert.alert('Error', error.message || 'Failed to update status');
+      const message = error instanceof Error ? error.message : 'Failed to update status';
+      Alert.alert('Error', message);
     } finally {
       setUpdating(false);
-    }
-  };
-
-  const handleProofUploaded = async (url: string) => {
-    if (!delivery) return;
-
-    try {
-      const repository = new DeliveriesRepository(supabase);
-      await repository.uploadProofPhoto(delivery.id, url);
-
-      Alert.alert('Success', 'Delivery completed!');
-      setShowProofUpload(false);
-      loadActiveDelivery();
-    } catch (error: any) {
-      console.error('Error uploading proof:', error);
-      Alert.alert('Error', error.message || 'Failed to upload proof');
     }
   };
 
@@ -165,11 +163,12 @@ export default function DriverActive() {
         <Text style={styles.subtitle}>
           Take a photo to confirm delivery completion
         </Text>
-        <ImageUpload
-          bucket="delivery-proof"
-          path={`${delivery.id}`}
-          onUploadComplete={handleProofUploaded}
-        />
+        <View style={styles.uploadPlaceholder}>
+          <Text style={styles.uploadPlaceholderTitle}>Proof upload unavailable</Text>
+          <Text style={styles.uploadPlaceholderText}>
+            Image upload component is not configured for mobile.
+          </Text>
+        </View>
       </View>
     );
   }
@@ -179,10 +178,10 @@ export default function DriverActive() {
 
   // Show map when we have location data
   const showMap =
-    delivery.pickup_lat &&
-    delivery.pickup_lng &&
-    delivery.dropoff_lat &&
-    delivery.dropoff_lng;
+    delivery.pickup_lat != null &&
+    delivery.pickup_lng != null &&
+    delivery.dropoff_lat != null &&
+    delivery.dropoff_lng != null;
 
   return (
     <ScrollView style={styles.container}>
@@ -194,8 +193,8 @@ export default function DriverActive() {
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: delivery.pickup_lat,
-              longitude: delivery.pickup_lng,
+              latitude: delivery.pickup_lat ?? 0,
+              longitude: delivery.pickup_lng ?? 0,
               latitudeDelta: 0.05,
               longitudeDelta: 0.05,
             }}
@@ -203,22 +202,22 @@ export default function DriverActive() {
             {/* Pickup location */}
             <Marker
               coordinate={{
-                latitude: delivery.pickup_lat,
-                longitude: delivery.pickup_lng,
-              }}
-              title="Pickup"
-              description={delivery.pickup_address}
+                  latitude: delivery.pickup_lat ?? 0,
+                  longitude: delivery.pickup_lng ?? 0,
+                }}
+                title="Pickup"
+                description={delivery.pickup_address ?? undefined}
               pinColor="green"
             />
 
             {/* Dropoff location */}
             <Marker
               coordinate={{
-                latitude: delivery.dropoff_lat,
-                longitude: delivery.dropoff_lng,
-              }}
-              title="Dropoff"
-              description={delivery.dropoff_address}
+                  latitude: delivery.dropoff_lat ?? 0,
+                  longitude: delivery.dropoff_lng ?? 0,
+                }}
+                title="Dropoff"
+                description={delivery.dropoff_address ?? undefined}
               pinColor="red"
             />
           </MapView>
@@ -241,14 +240,14 @@ export default function DriverActive() {
 
             <Text style={[styles.label, { marginTop: 10 }]}>Order Total</Text>
             <Text style={styles.value}>
-              ${(delivery.order.total_cents / 100).toFixed(2)}
+              ${((delivery.order.total_cents ?? 0) / 100).toFixed(2)}
             </Text>
           </>
         )}
 
         <Text style={[styles.label, { marginTop: 15 }]}>Delivery Fee</Text>
         <Text style={[styles.value, { color: '#FF7A00', fontWeight: 'bold' }]}>
-          ${(delivery.delivery_fee_cents / 100).toFixed(2)}
+          ${((delivery.delivery_fee_cents ?? 0) / 100).toFixed(2)}
         </Text>
       </View>
 
@@ -411,5 +410,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  uploadPlaceholder: {
+    padding: 16,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+  },
+  uploadPlaceholderTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+    marginBottom: 6,
+  },
+  uploadPlaceholderText: {
+    fontSize: 12,
+    color: '#6b7280',
+    textAlign: 'center',
   },
 });

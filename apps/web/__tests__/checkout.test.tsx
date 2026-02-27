@@ -77,7 +77,7 @@ global.fetch = vi.fn((url: string) => {
     ok: false,
     json: () => Promise.resolve({ error: 'Not found' }),
   } as Response);
-}) as any;
+}) as unknown as typeof fetch;
 
 describe('CheckoutPage', () => {
   beforeEach(() => {

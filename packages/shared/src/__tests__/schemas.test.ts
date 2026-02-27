@@ -8,7 +8,7 @@ import {
   UpdateOrderStatusSchema,
   CreateChefProfileSchema,
 } from '../schemas';
-import { UserRole, DeliveryMethod, OrderStatus, ChefStatus } from '../enums';
+import { UserRole, DeliveryMethod, OrderStatus } from '../enums';
 
 describe('Auth Schemas', () => {
   describe('SignUpSchema', () => {
